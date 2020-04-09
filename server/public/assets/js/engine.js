@@ -152,21 +152,30 @@ const engine = {
         //Clean the screen before drawing
         self.context.clearRect(0, 0, self.canvas.width, self.canvas.height)
 
-        if(self.controls.goUp)
+        if(self.controls.goUp){
             self.tileMap.startY ++
+            if(!character.moveInterval)
+                character.onMovingForward()
+        }
         
 
-        if(self.controls.goDown)
+        if(self.controls.goDown){
             self.tileMap.startY --
+            if(!character.moveInterval)
+                character.onMovingBackwards()
+        }
 
-        if(self.controls.goRight)
+        if(self.controls.goRight){
             self.tileMap.startX --
+            if(!character.moveInterval)
+                character.onMovingRight()
+        }
         
-        if(self.controls.goLeft)
+        if(self.controls.goLeft){
             self.tileMap.startX ++
-
-        if(!self.controls.goUp && !self.controls.goRight && !self.controls.goDown && !self.controls.goLeft)
-            character.onMovingStop()
+            if(!character.moveInterval)
+                character.onMovingLeft()
+        }
 
         /*  
             Draw the a rectangle surrounding the screen
@@ -223,25 +232,18 @@ const engine = {
             switch (event.key){
                 case 'w':
                     this.controls.goUp = true
-                    if(!character.moveInterval)
-                        character.onMovingForward()
                     break
 
                 case 's':
                     this.controls.goDown = true
-                    if(!character.moveInterval)
-                        character.onMovingBackwards()
                     break
 
                 case 'a':
                     this.controls.goLeft = true
-                    if(!character.moveInterval)
-                        character.onMovingLeft()
+                    
                     break
 
                 case 'd':
-                    if(!character.moveInterval)
-                        character.onMovingRight()
                     this.controls.goRight = true
                     break
             }
@@ -279,7 +281,7 @@ const engine = {
         let posX = Math.floor(((this.tileMap.width / 2) - this.tileMap.startX) / this.tile.width)
         let posY = Math.floor(((this.tileMap.height / 2) - this.tileMap.startY) / this.tile.height)
 
-        console.log(`${posX}, ${posY}`)
+        //console.log(`${posX}, ${posY}`)
     },
 
     drawCharacter: function(){
