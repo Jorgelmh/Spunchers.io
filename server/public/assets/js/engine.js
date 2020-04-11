@@ -41,6 +41,13 @@ const engine = {
 
     frameRatio: null,
 
+    offSet:{
+        x: null,
+        y: null,
+        xLimit: null,
+        yLimit: null
+    },
+
     /* FPS Counter */
 
     lastFrameTime: 0,
@@ -53,6 +60,10 @@ const engine = {
         goRight: false,
         goLeft: false 
     },
+
+    /* Collisionable */
+    colission : [],
+
 
     /**
      * ======================
@@ -70,6 +81,7 @@ const engine = {
 
         console.log(this.tileList)
         console.log(this.tileImages)
+        console.log(this.colission)
 
         this.resizeCanvas()
         this.addControls()
@@ -77,15 +89,24 @@ const engine = {
         requestAnimationFrame(this.render)
     },
 
-    load: function(map, tileSet){
+    load: function(mapObject){
 
-        this.tileMap.tileSet = tileSet
-        this.tileMap.tiles = map
+        this.tileMap.tileSet = mapObject.tileSet
+        this.tileMap.tiles = mapObject.tileMap
+        this.colission = mapObject.collisionable
 
         /* Retrieve single tile values */
-        for(let row of map){
+        for(let row of mapObject.tileMap){
             for(let element of row){
                 if(this.tileList.indexOf(element) < 0)
+                    this.tileList.push(element)
+            }
+        }
+
+        /* Retrieve single tile values for objects */
+        for(let row of mapObject.collisionable){
+            for(let element of row){
+                if(element != 0 && this.tileList.indexOf(element) < 0)
                     this.tileList.push(element)
             }
         }
@@ -153,26 +174,49 @@ const engine = {
         self.context.clearRect(0, 0, self.canvas.width, self.canvas.height)
 
         if(self.controls.goUp){
+            let oldPosition = self.tileMap.startY
             self.tileMap.startY ++
+
+            if(self.detectColissions())
+                self.tileMap.startY = oldPosition
+
             if(!character.moveInterval)
                 character.onMovingForward()
         }
         
 
         if(self.controls.goDown){
+
+            let oldPosition = self.tileMap.startY
             self.tileMap.startY --
+
+            if(self.detectColissions())
+                self.tileMap.startY = oldPosition
+            
             if(!character.moveInterval)
                 character.onMovingBackwards()
         }
 
         if(self.controls.goRight){
+
+            let oldPosition = self.tileMap.startX
             self.tileMap.startX --
+
+            if(self.detectColissions())
+                self.tileMap.startX = oldPosition
+            
             if(!character.moveInterval)
                 character.onMovingRight()
         }
         
         if(self.controls.goLeft){
+
+            let oldPosition = self.tileMap.startX
             self.tileMap.startX ++
+
+            if(self.detectColissions())
+                self.tileMap.startX = oldPosition
+
             if(!character.moveInterval)
                 character.onMovingLeft()
         }
@@ -185,9 +229,12 @@ const engine = {
             self.context.stroke()
         */
 
-        self.getPlayerPosition()
+        self.calculateOffset()
         self.drawMap()
+        self.drawObjects()
         self.drawCharacter()
+
+        self.context.fillText(`FPS: ${self.FPS}`, self.tileMap.width - 100, 50)
 
         requestAnimationFrame(() => {
 
@@ -202,27 +249,42 @@ const engine = {
         })
     },
 
+
+    /* Calculate which tiles are to be drawn within the screen */
+
+    calculateOffset: function(){
+        this.offSet.x = (this.tileMap.startX < 0) ? Math.floor((-this.tileMap.startX) / this.tile.width) : 0
+        this.offSet.y = (this.tileMap.startY < 0) ? Math.floor((-this.tileMap.startY) / this.tile.height) : 0
+
+        let offsetX =  this.screenTiles.x + Math.floor((-this.tileMap.startX) / this.tile.width)+1
+        let offsetY = this.screenTiles.y + Math.floor((-this.tileMap.startY) / this.tile.height)+1
+
+        this.offSet.xLimit = (offsetX > this.tileMap.tiles[0].length) ? this.tileMap.tiles[0].length: offsetX
+        this.offSet.yLimit = (offsetY > this.tileMap.tiles.length) ? this.tileMap.tiles.length:offsetY
+    },
+
     /* Draw Map function */
     drawMap: function(){
 
-        let offsetX = (this.tileMap.startX < 0) ? Math.floor((-this.tileMap.startX) / this.tile.width) : 0
-        let offsetXLimit = (offsetX + this.screenTiles.x > this.tileMap.tiles[0].length) ?  this.tileMap.tiles[0].length: this.screenTiles.x + offsetX
-
-        let offsetY = (this.tileMap.startY < 0) ? Math.floor((-this.tileMap.startY) / this.tile.height) : 0
-        let offsetYLimit = (offsetY+this.screenTiles.y > this.tileMap.tiles.length) ? this.tileMap.tiles.length: offsetY + this.screenTiles.y
-
-        for(let i =  offsetY; i < offsetYLimit; i++){
-            for(let j = offsetX; j < offsetXLimit; j++)
-                this.drawTile(j, i)
-
+        for(let i =  this.offSet.y; i < this.offSet.yLimit; i++){
+            for(let j = this.offSet.x; j < this.offSet.xLimit; j++)
+                this.drawTile(j, i, this.tileMap.tiles)
         }
     },
 
-    drawTile: function(xi, yi){
+    /* TEST to implement collisions */
+    drawObjects : function(){
+        for(let i =  this.offSet.y; i < this.offSet.yLimit; i++){
+            for(let j = this.offSet.x; j < this.offSet.xLimit; j++){
+                if(this.colission[i][j] != 0)
+                    this.drawTile(j, i, this.colission)
+            }   
+        }
+    },
 
-        let indexImage = this.tileImages.findIndex((elem) => elem.id === this.tileMap.tiles[yi][xi])
+    drawTile: function(xi, yi, matrix){
 
-        this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
+        let indexImage = this.tileImages.findIndex((elem) => elem.id === matrix[yi][xi])
         this.context.drawImage(this.tileImages[indexImage].img, xi * (this.tile.width) + this.tileMap.startX, yi * (this.tile.height) + this.tileMap.startY, this.tile.width, this.tile.height)
 
     },
@@ -280,13 +342,54 @@ const engine = {
     getPlayerPosition: function(){
         let posX = Math.floor(((this.tileMap.width / 2) - this.tileMap.startX) / this.tile.width)
         let posY = Math.floor(((this.tileMap.height / 2) - this.tileMap.startY) / this.tile.height)
-
         //console.log(`${posX}, ${posY}`)
+
+        return {posX, posY}
     },
 
     drawCharacter: function(){
+        let player = this.getPlayerRelativePosition()
+
         this.context.drawImage(character.spriteSheet.img, character.currentSprite.x * character.spriteSheet.width, character.currentSprite.y * character.spriteSheet.height
-                                , character.spriteSheet.width, character.spriteSheet.height, this.tileMap.width/2 - (this.tile.width/2), this.tileMap.height/2 - (this.tile.height/2), this.tile.width, this.tile.height)
+                                , character.spriteSheet.width, character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
+    },
+
+    /* Character relative position */
+    getPlayerRelativePosition: function(){
+        let posX = this.tileMap.width/2 - (this.tile.width/2)
+        let posY = this.tileMap.height/2 - (this.tile.height/2)
+
+        return {posX, posY}
+    },
+
+    /* returns position of a given position in the matrix realtive to the screen */
+    getTilesRelativePosition: function(x, y){
+        let posX = x*this.tile.width + this.tileMap.startX
+        let posY = y*this.tile.height + this.tileMap.startY
+
+        return {posX, posY}
+    },
+
+    /* DETECT COLLISIONS IN THE TILE MAP */
+    detectColissions: function(){
+
+        for(let i = 0; i < this.colission.length; i++){
+            for(let j = 0; j < this.colission[0].length; j++){
+                if(this.colission[i][j] !== 0){
+
+                    let relativePosition = this.getTilesRelativePosition(j, i)
+                    let playerRelativePosition = this.getPlayerRelativePosition()
+
+                    if((playerRelativePosition.posX + (this.tile.width/4) < relativePosition.posX + this.tile.width && playerRelativePosition.posX + (this.tile.width/4) + this.tile.width/2 > relativePosition.posX) 
+                        && (playerRelativePosition.posY + (this.tile.width/8) < relativePosition.posY + this.tile.height && playerRelativePosition.posY + this.tile.height > relativePosition.posY)){
+                        return true
+                    }
+                }
+            }
+        }
+
+        
+        return false
     }
 
 }
