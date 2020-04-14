@@ -1,6 +1,16 @@
-import engine from './engine.js'
+import LocalGame from './classes/LocalGame.js'
 
 //Load the engine
+
+const socket = io()
+
+socket.on('welcome', (data) => {
+    console.log(data)
+})
+
+socket.on('yes', (data) => {
+    console.log(data)
+})
 
 const generateRandomMap = (width, height) => {
     let matrix = []
@@ -43,14 +53,17 @@ const colissionsTest = (width, height, points) => {
     return matrix
 }
 
-
-
+/*
 const objectMap = {
     tileMap: generateRandomMap(16,9),
     tileSet: 'tileset',
-    collisionable: colissionsTest(16, 9, colissionable)
+    collisionable: colissionsTest(16, 9, colissionable),
+    local: true
 }
 
 
 engine.load(objectMap)
+*/
+
+const newengine = new LocalGame(generateRandomMap(16,9), colissionsTest(16, 9, colissionable), 'tileset', document.getElementById('game'))
 
