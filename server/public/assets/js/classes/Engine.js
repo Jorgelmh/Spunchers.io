@@ -8,7 +8,7 @@ import character from '../character.js'
 
 export default class Engine{
 
-    constructor(map, collisionMatrix, tileset, canvas, start){
+    constructor(map, collisionMatrix, tileset, canvas){
 
         /* General variables */
         this.canvas = canvas
@@ -19,11 +19,6 @@ export default class Engine{
         this.localGame = null
 
         this.character = character
-
-        /* Render Callback */
-
-        this.startCallback = start
-
         /* Tile properties */
 
         this.tile = {
@@ -37,8 +32,8 @@ export default class Engine{
 
             tileSet: tileset,
             tiles: map,
-            startX: -100,
-            startY: -10,
+            startX: 200,
+            startY: 200,
             width: 1280,
             height: 720
         }
@@ -128,7 +123,10 @@ export default class Engine{
     }
 
     loadCharacter(){
-        this.character.load('stormtrooper.png', this.startCallback.bind())
+        this.character.load('stormtrooper.png', () => {
+            requestAnimationFrame(this.render)
+            this.addControls()
+        })
     }
 
     /* Auto resize the canvas when the screen is resized */
@@ -250,8 +248,7 @@ export default class Engine{
 
     }
 
-    drawCharacter(){
-        let player = this.getPlayerRelativePosition()
+    drawCharacter(player){
 
         this.context.drawImage(character.spriteSheet.img, character.currentSprite.x * character.spriteSheet.width, character.currentSprite.y * character.spriteSheet.height
                                 , character.spriteSheet.width, character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)

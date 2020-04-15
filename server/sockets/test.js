@@ -1,6 +1,9 @@
-import LocalGame from './classes/LocalGame.js'
+/**
+ *  =======================
+ *      TESTING FUNCTIONS
+ *  =======================
+ */
 
-//Load the engine
 
 const generateRandomMap = (width, height) => {
     let matrix = []
@@ -43,17 +46,8 @@ const colissionsTest = (width, height, points) => {
     return matrix
 }
 
-/*
-const objectMap = {
-    tileMap: generateRandomMap(16,9),
-    tileSet: 'tileset',
-    collisionable: colissionsTest(16, 9, colissionable),
-    local: true
+module.exports = {
+    colissionsTest,
+    generateRandomMap,
+    colissionable
 }
-
-
-engine.load(objectMap)
-*/
-
-const newengine = new LocalGame(generateRandomMap(16,9), colissionsTest(16, 9, colissionable), 'tileset', document.getElementById('game'))
-

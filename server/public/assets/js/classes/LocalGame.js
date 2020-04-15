@@ -10,10 +10,7 @@ export default class LocalGame extends Engine{
         constructor(map, colissionMatrix, tileSet, canvas){
 
             /* Call the constructor of the parent class giving the data to create the MAP */
-            super(map, colissionMatrix, tileSet, canvas, () => {
-                requestAnimationFrame(this.render)
-                this.addControls()
-            })
+            super(map, colissionMatrix, tileSet, canvas)
         }
 
         render = (timeSinceLastFrame) =>{
@@ -27,12 +24,11 @@ export default class LocalGame extends Engine{
             */
 
             /* If local change the values if not wait for the server */
-            this.evaluateMovementLocal()
-
+            this.animateCharacter()
             this.calculateOffset()
             this.drawMap()
             this.drawObjects()
-            this.drawCharacter()
+            this.drawCharacter(this.getPlayerRelativePosition())
 
             this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
 
@@ -51,7 +47,7 @@ export default class LocalGame extends Engine{
 
         /* Change the position of the map when listeners are triggered */
 
-        evaluateMovementLocal(){
+        animateCharacter(){
         
             if(this.controls.goUp){
                 let oldPosition = this.tileMap.startY
