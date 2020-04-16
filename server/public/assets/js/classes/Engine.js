@@ -180,22 +180,22 @@ export default class Engine{
         window.addEventListener('keyup', () => {
             switch (event.key){
                 case 'w':
-                    character.onMovingStop()
+                    this.character.onMovingStop()
                     this.controls.goUp = false
                     break
 
                 case 's':
-                    character.onMovingStop()
+                    this.character.onMovingStop()
                     this.controls.goDown = false
                     break
 
                 case 'a':
-                    character.onMovingStop()
+                    this.character.onMovingStop()
                     this.controls.goLeft = false
                     break
 
                 case 'd':
-                    character.onMovingStop()
+                    this.character.onMovingStop()
                     this.controls.goRight = false
                     break
             }
@@ -250,8 +250,8 @@ export default class Engine{
 
     drawCharacter(player){
 
-        this.context.drawImage(character.spriteSheet.img, character.currentSprite.x * character.spriteSheet.width, character.currentSprite.y * character.spriteSheet.height
-                                , character.spriteSheet.width, character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
+        this.context.drawImage(this.character.spriteSheet.img, this.character.currentSprite.x * this.character.spriteSheet.width, this.character.currentSprite.y * this.character.spriteSheet.height
+                                , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
     }
 
 

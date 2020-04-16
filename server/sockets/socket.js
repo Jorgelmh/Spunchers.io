@@ -5,10 +5,9 @@
  */
 
 const socketIO = require('socket.io')
-const {generateRandomMap, colissionsTest, colissionable} = require('./test')
+const { generateRandomMap, colissionsTest, colissionable } = require('./test')
 //const lobby = new Lobby() //Class that will store all the values of players in it
 
-//It will be a class soon
 let players = []
 
 const socketListen = (app) => {
@@ -36,24 +35,28 @@ const socketListen = (app) => {
             players.push({
                 playerId: socket.id,
                 posX: 0,
-                posY: 0
+                posY: 0,
+                character: null
             })
         })
 
         /* Listener of socket movement */
         socket.on('movement', (data) => {
 
+            let currentPlayer = players.find((element) => element.playerId === data.id)
+            currentPlayer.character = data.character
+
             if(data.controls.goUp) 
-                players.find((element) => element.playerId === data.id).posY --
+                currentPlayer.posY --
 
             if(data.controls.goDown)
-                players.find((element) => element.playerId === data.id).posY ++
+                currentPlayer.posY ++
 
             if(data.controls.goLeft)
-                players.find((element) => element.playerId === data.id).posX --
+                currentPlayer.posX --
 
             if(data.controls.goRight)
-                players.find((element) => element.playerId === data.id).posX ++
+                currentPlayer.posX ++
         })
         
         socket.on('disconnect', () => {

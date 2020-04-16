@@ -48,6 +48,7 @@ const character = {
 
             if(this.currentSprite.x > 3) 
                 this.currentSprite.x = 0
+
         }, this.animationSpeed)
     },
 

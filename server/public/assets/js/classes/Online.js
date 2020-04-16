@@ -95,7 +95,8 @@ export default class Online extends Engine{
     emitPlayerPosition = () =>{
         this.socketIO.emit('movement', {
             id: this.playerID,
-            controls: this.controls
+            controls: this.controls,
+            character: this.character
         })
     }
 
@@ -122,9 +123,15 @@ export default class Online extends Engine{
                 let characterY = this.transformServerMagnitudes(player.posY)+this.tileMap.startY
 
                 if(characterX >= 0 && characterX < this.tileMap.width && characterY >= 0 && characterY < this.tileMap.height)
-                    this.drawCharacter({posX: characterX, posY: characterY} )
+                    this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character )
             }
         }
+    }
+
+    drawOnlineCharacter(player, onlineCharacter){
+
+        this.context.drawImage(this.character.spriteSheet.img, onlineCharacter.currentSprite.x * this.character.spriteSheet.width, onlineCharacter.currentSprite.y * this.character.spriteSheet.height
+                                , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
     }
 
     transformServerMagnitudes(serverValue){
