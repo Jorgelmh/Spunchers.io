@@ -110,7 +110,7 @@ export default class LocalGame extends Engine{
     
                         /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
                         if((playerRelativePosition.posX + (this.tile.width/4) < relativePosition.posX + this.tile.width && playerRelativePosition.posX + (this.tile.width/4) + this.tile.width/2 > relativePosition.posX) 
-                            && (playerRelativePosition.posY + (this.tile.width/8) < relativePosition.posY + this.tile.height && playerRelativePosition.posY + this.tile.height > relativePosition.posY)){
+                            && (playerRelativePosition.posY + 3*(this.tile.width/4) < relativePosition.posY + this.tile.height && playerRelativePosition.posY + this.tile.height > relativePosition.posY)){
                             return true
                         }
                     }

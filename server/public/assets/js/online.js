@@ -8,6 +8,6 @@ import Online from '../js/classes/Online.js'
 const socket = io()
 
 socket.on('loadMap', (data) => {
-    const game = new Online(data.map, data.colissionMatrix, data.tileSet , document.getElementById('game'), socket, data.playerID, data.server)
+    const game = new Online(data.lobby.map, data.lobby.colissionMatrix, data.lobby.tileSet , document.getElementById('game'), socket, data.playerID, data.lobby.server)
 })
  

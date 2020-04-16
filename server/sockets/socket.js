@@ -10,6 +10,43 @@ const { generateRandomMap, colissionsTest, colissionable } = require('./test')
 
 let players = []
 
+/* Server maginitudes and common map => currently created randomly*/
+const lobby = {
+    map: generateRandomMap(16, 9),
+    colissionMatrix: colissionsTest(16, 9, colissionable),
+    tileSet: 'tileSet',
+    server: {
+        width: 1280,
+        height: 720,
+        tilesX: 16,
+        tilesY: 9
+    },
+    getTileWidth: function(){
+        return this.server.width/this.server.tilesX
+    },
+    getTileHeight: function(){
+        return this.server.height/this.server.tilesY
+    }
+}
+
+const detectColissions = (player) =>{
+
+    for(let i = 0; i < lobby.colissionMatrix.length; i++){
+        for(let j = 0; j < lobby.colissionMatrix[0].length; j++){
+            if(lobby.colissionMatrix[i][j] !== 0){
+
+                /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
+                if((j*lobby.getTileWidth() < player.posX + (lobby.getTileWidth()/4) + (lobby.getTileWidth()/2) && j*lobby.getTileWidth() + lobby.getTileWidth() > player.posX + (lobby.getTileWidth()/4)) 
+                    && (i*lobby.getTileHeight()< player.posY + lobby.getTileHeight() && i*lobby.getTileHeight() + lobby.getTileHeight() > player.posY + 3*(lobby.getTileWidth()/4))){
+                    return true
+                }
+            }
+        }
+    }
+    return false
+}
+
+/* Scoket listener */
 const socketListen = (app) => {
     const io = socketIO(app)
     
@@ -21,14 +58,8 @@ const socketListen = (app) => {
 
         /* Add websockets in here */
         socket.emit('loadMap', {
-            map: generateRandomMap(16, 9),
-            colissionMatrix: colissionsTest(16, 9, colissionable),
-            tileSet: 'tileSet',
-            playerID: socket.id,
-            server: {
-                width: 1280,
-                height: 720
-            }
+            lobby,
+            playerID: socket.id
         })
 
         socket.on('New Player', (data) => {
@@ -46,17 +77,43 @@ const socketListen = (app) => {
             let currentPlayer = players.find((element) => element.playerId === data.id)
             currentPlayer.character = data.character
 
-            if(data.controls.goUp) 
+            if(data.controls.goUp){
+                let oldPosition = currentPlayer.posY
                 currentPlayer.posY --
 
-            if(data.controls.goDown)
+                if(detectColissions(currentPlayer)){
+                    currentPlayer.posY = oldPosition
+                }
+            }
+
+            if(data.controls.goDown){
+                let oldPosition = currentPlayer.posY
                 currentPlayer.posY ++
 
-            if(data.controls.goLeft)
+                if(detectColissions(currentPlayer)){
+                    currentPlayer.posY = oldPosition
+                }
+            }
+
+            if(data.controls.goLeft){
+                let oldPosition = currentPlayer.posX
                 currentPlayer.posX --
 
-            if(data.controls.goRight)
+                if(detectColissions(currentPlayer)){
+                    currentPlayer.posX = oldPosition
+                }
+            }
+                
+
+            if(data.controls.goRight){
+                let oldPosition = currentPlayer.posX
                 currentPlayer.posX ++
+
+                if(detectColissions(currentPlayer)){
+                    currentPlayer.posX = oldPosition
+                }
+
+            }
         })
         
         socket.on('disconnect', () => {

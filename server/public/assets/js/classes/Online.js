@@ -10,6 +10,7 @@ export default class Online extends Engine{
     constructor(map, colissionMatrix, tileSet, canvas, socket, playerID, server){
         super(map, colissionMatrix, tileSet, canvas)
 
+        /* Online attributes recevied from the sever */
         this.playerID = playerID
         this.socketIO = socket
         this.socketIO.emit('New Player')
@@ -17,11 +18,21 @@ export default class Online extends Engine{
         this.state = null
         this.server = server
 
+        /* CALCULATE network speed */
+
+        this.lastServerConnection = 0
+        this.ms = 0
+
         /* SOCKET LISTENERS */
 
         this.socketIO.on('state', (data) =>{
             this.state = data
             let currentPlayerPos = data.find((element) => element.playerId === this.playerID)
+
+            let now = new Date()
+            this.ms = now - this.lastServerConnection
+
+            this.lastServerConnection = now
 
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
@@ -53,6 +64,7 @@ export default class Online extends Engine{
         this.drawCharacter(this.getPlayerRelativePosition())
 
         this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
+        this.context.fillText(`Net: ${this.ms}ms`, this.tileMap.width - 100, 70)
         requestAnimationFrame(() => {
 
             /* FPS Counter */
@@ -66,7 +78,7 @@ export default class Online extends Engine{
         })
     }
 
-    /* Animating the character with the info from the server */
+    /* Animating the local character with the info from the server */
 
     animateCharacter(){
         
@@ -92,6 +104,7 @@ export default class Online extends Engine{
         }
     }
 
+    /* Send the info back to the server */
     emitPlayerPosition = () =>{
         this.socketIO.emit('movement', {
             id: this.playerID,
@@ -100,6 +113,7 @@ export default class Online extends Engine{
         })
     }
 
+    /* Calculates the position of the map in the browser => startX and startY */
     calculateLocalMap(x, y){
         let serverWidth = this.transformServerMagnitudes(x)
         let serverHeight = this.transformServerMagnitudes(y)
@@ -113,6 +127,7 @@ export default class Online extends Engine{
         }
     }
 
+    /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
     drawOtherPlayers(){
         if(this.state && this.state.length > 1){
             let otherPlayers = this.state.filter((player) => player.playerId !== this.playerID)
@@ -122,18 +137,21 @@ export default class Online extends Engine{
                 let characterX = this.transformServerMagnitudes(player.posX)+this.tileMap.startX
                 let characterY = this.transformServerMagnitudes(player.posY)+this.tileMap.startY
 
-                if(characterX >= 0 && characterX < this.tileMap.width && characterY >= 0 && characterY < this.tileMap.height && player.character)
+                /* If the character is outside the screen don't draw it */
+                if(characterX >= 0 && characterX < this.tileMap.width && characterY+ this.tile.height >= 0 && characterY < this.tileMap.height && player.character)
                     this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character )
             }
         }
     }
 
+    /* Draws the online players with the info from the server */
     drawOnlineCharacter(player, onlineCharacter){
 
         this.context.drawImage(this.character.spriteSheet.img, onlineCharacter.currentSprite.x * this.character.spriteSheet.width, onlineCharacter.currentSprite.y * this.character.spriteSheet.height
                                 , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
     }
 
+    /* Uses the rule of three mathematica formula to transform values from the server */
     transformServerMagnitudes(serverValue){
         return (this.tileMap.width * serverValue) / this.server.width
     }
