@@ -122,7 +122,7 @@ export default class Online extends Engine{
                 let characterX = this.transformServerMagnitudes(player.posX)+this.tileMap.startX
                 let characterY = this.transformServerMagnitudes(player.posY)+this.tileMap.startY
 
-                if(characterX >= 0 && characterX < this.tileMap.width && characterY >= 0 && characterY < this.tileMap.height)
+                if(characterX >= 0 && characterX < this.tileMap.width && characterY >= 0 && characterY < this.tileMap.height && player.character)
                     this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character )
             }
         }
