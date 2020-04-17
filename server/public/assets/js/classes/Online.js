@@ -44,7 +44,7 @@ export default class Online extends Engine{
             this.socketIO.emit('latency');
         }, 2000);
           
-        socket.on('latencyCheck', () => {
+        this.socketIO.on('latencyCheck', () => {
             this.latency = Date.now() - this.lastServerConnection;
         });
 
