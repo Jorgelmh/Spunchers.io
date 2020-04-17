@@ -50,8 +50,18 @@ const detectColissions = (player) =>{
 const socketListen = (app) => {
     const io = socketIO(app)
     
+
+    io.sockets.on('connection', function (socket) {
+        socket.on('ping', function() {
+          socket.emit('pong');
+        });
+      });
+
     io.on('connection', function(socket) {
 
+        socket.on('latency', () => {
+            socket.emit('latencyCheck')
+        })
         setInterval(() => {
             socket.emit('state', players)
         }, 1000 / 60)
@@ -115,12 +125,13 @@ const socketListen = (app) => {
 
             }
         })
-        
+
         socket.on('disconnect', () => {
             let index = players.findIndex((element) => element.playerId == socket.id)
             players.splice(index, 1)
         })
     });
+
 }
 
 module.exports.listen = socketListen

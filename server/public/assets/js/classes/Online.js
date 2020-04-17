@@ -14,6 +14,7 @@ export default class Online extends Engine{
         this.playerID = playerID
         this.socketIO = socket
         this.socketIO.emit('New Player')
+        this.socketIO.emit('chavez')
 
         this.state = null
         this.server = server
@@ -21,18 +22,13 @@ export default class Online extends Engine{
         /* CALCULATE network speed */
 
         this.lastServerConnection = 0
-        this.ms = 0
+        this.latency = 0
 
         /* SOCKET LISTENERS */
 
         this.socketIO.on('state', (data) =>{
             this.state = data
             let currentPlayerPos = data.find((element) => element.playerId === this.playerID)
-
-            let now = new Date()
-            this.ms = now - this.lastServerConnection
-
-            this.lastServerConnection = now
 
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
@@ -42,6 +38,15 @@ export default class Online extends Engine{
             }
             
         })
+
+        setInterval(() => {
+            this.lastServerConnection = Date.now();
+            this.socketIO.emit('latency');
+        }, 2000);
+          
+        socket.on('latencyCheck', () => {
+            this.latency = Date.now() - this.lastServerConnection;
+        });
 
         setInterval(this.emitPlayerPosition, 1000/60)
     }
@@ -64,7 +69,7 @@ export default class Online extends Engine{
         this.drawCharacter(this.getPlayerRelativePosition())
 
         this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
-        this.context.fillText(`Net: ${this.ms}ms`, this.tileMap.width - 100, 70)
+        this.context.fillText(`Net: ${this.latency}ms`, this.tileMap.width - 100, 70)
         requestAnimationFrame(() => {
 
             /* FPS Counter */
@@ -106,6 +111,7 @@ export default class Online extends Engine{
 
     /* Send the info back to the server */
     emitPlayerPosition = () =>{
+        this.lastServerConnection = Date.now()
         this.socketIO.emit('movement', {
             id: this.playerID,
             controls: this.controls,
