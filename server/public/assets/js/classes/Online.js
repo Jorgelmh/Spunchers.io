@@ -23,6 +23,7 @@ export default class Online extends Engine{
 
         this.lastServerConnection = 0
         this.latency = 0
+        this.ms= 0
 
         /* SOCKET LISTENERS */
 
@@ -48,6 +49,9 @@ export default class Online extends Engine{
             this.latency = Date.now() - this.lastServerConnection;
         });
 
+        this.socketIO.on('pong', (ms) => {
+            this.ms= ms
+        })
         setInterval(this.emitPlayerPosition, 1000/60)
     }
 
@@ -69,7 +73,7 @@ export default class Online extends Engine{
         this.drawCharacter(this.getPlayerRelativePosition())
 
         this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
-        this.context.fillText(`Net: ${this.latency}ms`, this.tileMap.width - 100, 70)
+        this.context.fillText(`Net: ${this.ms}ms`, this.tileMap.width - 100, 70)
         requestAnimationFrame(() => {
 
             /* FPS Counter */

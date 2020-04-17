@@ -48,7 +48,7 @@ const detectColissions = (player) =>{
 
 /* Scoket listener */
 const socketListen = (app) => {
-    const io = socketIO(app)
+    const io = socketIO(app, {pingInterval: 1000})
     
 
     io.sockets.on('connection', function (socket) {
