@@ -11,7 +11,8 @@ const server = require('http').createServer(app);
 socket.listen(server)
 
 /* Middlewares */
-app.use(express.static(__dirname+'/public/assets'))
+app.use(express.static(__dirname+'/public'))
+
 app.set('port', process.env.PORT)
 
 //Routes that will ne moved to a different folder soon

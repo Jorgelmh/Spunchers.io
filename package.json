@@ -5,13 +5,25 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@glidejs/glide": "^3.4.1",
+    "babel-preset-es2015": "^6.24.1",
     "express": "^4.17.1",
     "path": "^0.12.7",
     "socketio": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.5",
+    "babel-loader": "^8.1.0",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
   }
 }

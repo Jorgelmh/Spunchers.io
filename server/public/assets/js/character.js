@@ -36,7 +36,7 @@ const character = {
             this.currentSprite.y = 3
             callback()
         }
-        this.spriteSheet.img.src = `../characters/${name}`
+        this.spriteSheet.img.src = `../assets/characters/${name}`
     },
 
     /* Change the image when moving forward */

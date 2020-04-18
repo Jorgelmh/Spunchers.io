@@ -1,0 +1,47 @@
+/* 
+    ===============================
+        Styles for online game
+    ===============================
+*/
+
+#play{
+    display: block;
+    padding: 10px;
+    background-color: #00ff00;
+    margin: 10px auto;
+    border-radius: 20%;
+    font-size: 1.2rem;
+    border: none;
+    transition: all .5s ease-in-out;
+    cursor: pointer;
+}
+
+#play:hover{
+    background-color: #3ed311;
+}
+
+#playerName{
+    padding: 10px;
+}
+
+.background-frame{
+    position: fixed;
+    background-position: cover;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 1;
+    width: 100%;
+    min-height: 100%;
+}
+
+.frame{
+    position: absolute;
+    font-family: 'PT Sans', sans-serif;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    padding: 25px;
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}

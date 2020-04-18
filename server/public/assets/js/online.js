@@ -1,5 +1,5 @@
 import Online from '../js/classes/Online.js'
-
+import Glide from '@glidejs/glide'
 /**
  *  ============================
  *      Multiplayer TILE Game
@@ -8,6 +8,8 @@ import Online from '../js/classes/Online.js'
 const socket = io()
 const url = new URL(window.location)
 let skin = url.searchParams.get('skin')
+
+console.log('hello world from js')
 
 if(!skin)
     skin = 'stormtrooper'

@@ -4,10 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+    <link href="../assets/styles/styles.css" rel="stylesheet"/>
     <title>Document</title>
 </head>
 <body style="margin: 0; overflow:hidden;">
+    <div class="connect-frame">
+        <div class="background-frame"></div>
+        
+        <div class="frame">
+            <input placeholder="Name" id="playerName" type="text">
+            <br>
+            <button type="button" id="play">Play</button>
+        </div>
+    </div>
     <canvas id="game"></canvas>
-    <script src="../js/online.js" type="module"></script>
+    <script src="../dist/main.js" type="module"></script>
 </body>
 </html>
