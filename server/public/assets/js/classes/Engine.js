@@ -8,7 +8,7 @@ import character from '../character.js'
 
 export default class Engine{
 
-    constructor(map, collisionMatrix, tileset, canvas){
+    constructor(map, collisionMatrix, tileset, canvas, skin){
 
         /* General variables */
         this.canvas = canvas
@@ -17,6 +17,7 @@ export default class Engine{
         this.tileList = []
         this.tileImages = []
         this.localGame = null
+        this.skin = skin
 
         this.character = character
         /* Tile properties */
@@ -123,7 +124,7 @@ export default class Engine{
     }
 
     loadCharacter(){
-        this.character.load('stormtrooper.png', () => {
+        this.character.load(`${this.skin}.png`, () => {
             requestAnimationFrame(this.render)
             this.addControls()
         })

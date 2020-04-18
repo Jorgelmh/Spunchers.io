@@ -55,13 +55,10 @@ const socketListen = (app) => {
         socket.on('ping', function() {
           socket.emit('pong');
         });
-      });
+    });
 
     io.on('connection', function(socket) {
 
-        socket.on('latency', () => {
-            socket.emit('latencyCheck')
-        })
         setInterval(() => {
             socket.emit('state', players)
         }, 1000 / 60)
@@ -72,13 +69,31 @@ const socketListen = (app) => {
             playerID: socket.id
         })
 
+        /* When a new player enters the lobby => Note: Validations on repetitions are in the client version of the game*/
         socket.on('New Player', (data) => {
             players.push({
                 playerId: socket.id,
                 posX: 0,
                 posY: 0,
-                character: null
+                character: null,
+                skin: data.skin
             })
+
+            /* Get single values for the skins => non-repeated strings */
+            let srcArray = []
+
+            players.map((element) => {
+                if(srcArray.indexOf(element.skin))
+                    srcArray.push(element.skin)
+            })
+
+            /* load previous players' skins */
+            socket.emit('Load Skins', {
+                srcArray
+            })
+
+            /* Other players load tnew player's skin */
+            socket.broadcast.emit('Load New Skin', {src: data.skin})
         })
 
         /* Listener of socket movement */
