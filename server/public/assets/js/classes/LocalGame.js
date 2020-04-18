@@ -7,10 +7,10 @@ import Engine from './Engine.js'
      */
 export default class LocalGame extends Engine{
     
-        constructor(map, colissionMatrix, tileSet, canvas){
+        constructor(map, colissionMatrix, tileSet, canvas, skin){
 
             /* Call the constructor of the parent class giving the data to create the MAP */
-            super(map, colissionMatrix, tileSet, canvas)
+            super(map, colissionMatrix, tileSet, canvas, skin)
         }
 
         render = (timeSinceLastFrame) =>{
