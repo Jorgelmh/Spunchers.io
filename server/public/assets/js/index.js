@@ -55,5 +55,5 @@ const objectMap = {
 engine.load(objectMap)
 */
 
-const newengine = new LocalGame(generateRandomMap(16,9), colissionsTest(16, 9, colissionable), 'tileset', document.getElementById('game'))
+const newengine = new LocalGame(generateRandomMap(16,9), colissionsTest(16, 9, colissionable), 'tileset', document.getElementById('game'), 'stormtrooper')
 
