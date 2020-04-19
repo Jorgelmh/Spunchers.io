@@ -12,6 +12,7 @@ const characterSkins = ['c3po', 'deadpool', 'captainamerica', 'mandalorian', 'ni
 const track = document.getElementsByClassName('glide__slides')[0]
 
 let loadedImg = 0
+let glide
 
 characterSkins.map((skin) => {
     let divHTML = document.createElement('div')
@@ -25,7 +26,7 @@ characterSkins.map((skin) => {
     imgHTML.src = `../assets/selectCharacters/${skin}.png`
     imgHTML.onload = () => {
         if(++loadedImg >= characterSkins.length){
-            const glide = new Glide('.glide', {
+            glide = new Glide('.glide', {
                 startAt: 0,
                 perView: 1
               }).mount()
