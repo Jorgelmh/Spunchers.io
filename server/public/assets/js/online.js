@@ -40,8 +40,6 @@ characterSkins.map((skin) => {
 })
 
 /* Creating the Glide object to show the available skins */
-
-
 const play = document.getElementById('play')
 play.onclick = (event) => {
     let body =document.getElementsByTagName('body')[0]

@@ -187,7 +187,7 @@ export default class Online extends Engine{
 
     loadServerSkin(src){
         let characterSkin = new Image()
-        characterSkin.src = `../../characters/${src}.png`
+        characterSkin.src = `../assets/characters/${src}.png`
         this.onlineSkins.push(characterSkin)
     }
 
