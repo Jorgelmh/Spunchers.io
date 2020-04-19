@@ -11,6 +11,8 @@ let game
 const characterSkins = ['c3po', 'deadpool', 'captainamerica', 'mandalorian', 'nickfury', 'pirate', 'stormtrooper', 'tonystark']
 const track = document.getElementsByClassName('glide__slides')[0]
 
+let loadedImg = 0
+
 characterSkins.map((skin) => {
     let divHTML = document.createElement('div')
     divHTML.classList = "glide__slide single-character-skin"
@@ -21,6 +23,15 @@ characterSkins.map((skin) => {
 
     let imgHTML = document.createElement('img')
     imgHTML.src = `../assets/selectCharacters/${skin}.png`
+    imgHTML.onload = () => {
+        if(++loadedImg >= characterSkins.length){
+            const glide = new Glide('.glide', {
+                startAt: 0,
+                perView: 1
+              }).mount()
+        }
+
+    }
 
     divHTML.append(name)
     divHTML.append(imgHTML)
@@ -28,12 +39,6 @@ characterSkins.map((skin) => {
 })
 
 /* Creating the Glide object to show the available skins */
-
-const glide = new Glide('.glide', {
-    type: 'carousel',
-    startAt: 0,
-    perView: 1
-  }).mount()
 
 
 const play = document.getElementById('play')
