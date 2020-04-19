@@ -111,7 +111,7 @@ const socketListen = (app) => {
 
             let currentPlayer = players.find((element) => element.playerId === data.id)
 
-            if(data.character){
+            if(currentPlayer){
                 currentPlayer.character = data.character
 
                 if(data.controls.goUp){
@@ -157,7 +157,8 @@ const socketListen = (app) => {
 
         socket.on('disconnect', () => {
             let index = players.findIndex((element) => element.playerId == socket.id)
-            players.splice(index, 1)
+            if(index >= 0)
+                players.splice(index, 1)                     
         })
     });
 
