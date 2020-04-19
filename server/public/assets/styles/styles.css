@@ -3,6 +3,38 @@
         Styles for online game
     ===============================
 */
+@import "./glide.core.min.css";
+@import "./glide.theme.min.css";
+@import "https://use.fontawesome.com/releases/v5.8.1/css/all.css";
+
+body{
+    font-family: 'PT Sans', sans-serif;
+}
+
+.character-name{
+    text-align: center;
+    margin: 15px 30px;
+    border-bottom: 1px solid black;
+}
+
+.background-connect-frame{
+    background-image: url(../selectCharacters/background/background.png);
+}
+
+.glide__arrow{
+    color: black!important;
+}
+.connect-frame{
+    max-width: 600px;
+    background-color: white;
+    margin: auto;
+    margin-top: 10%;
+    padding-bottom: 20px;
+    border-radius: 10%;
+    box-shadow: 2px 4px 39px 3px rgba(0,0,0,0.75);
+    position: relative;
+    z-index: 2;
+}
 
 #play{
     display: block;
@@ -16,16 +48,29 @@
     cursor: pointer;
 }
 
+.single-character-skin img{
+    width: 100%;
+    max-width: 250px;
+    display: block;
+    margin: 0 auto;
+    border-radius: 15%;
+}
+
 #play:hover{
     background-color: #3ed311;
 }
 
 #playerName{
     padding: 10px;
+    display: block;
+    width: 200px;
+    margin: auto;
+    margin-bottom: 20px;
 }
 
 .background-frame{
-    position: fixed;
+    position: absolute;
+    top: 0;
     background-position: cover;
     background-color: rgba(0,0,0,0.75);
     z-index: 1;
@@ -33,6 +78,7 @@
     min-height: 100%;
 }
 
+/*
 .frame{
     position: absolute;
     font-family: 'PT Sans', sans-serif;
