@@ -8,12 +8,16 @@ import Glide from '@glidejs/glide'
 const socket = io()
 let game
 
+/* Skins on the server that are ready to use */
 const characterSkins = ['c3po', 'deadpool', 'captainamerica', 'mandalorian', 'nickfury', 'pirate', 'stormtrooper', 'tonystark']
+
+/* Glide track -> where the slides have to be added in */
 const track = document.getElementsByClassName('glide__slides')[0]
 
 let loadedImg = 0
 let glide
 
+/* Adding elements to the glide carousel */
 characterSkins.map((skin) => {
     let divHTML = document.createElement('div')
     divHTML.classList = "glide__slide single-character-skin"
@@ -25,6 +29,8 @@ characterSkins.map((skin) => {
     let imgHTML = document.createElement('img')
     imgHTML.src = `../assets/selectCharacters/${skin}.png`
     imgHTML.onload = () => {
+
+        /* When the last image is loaded, then the glide object can be created => Important */
         if(++loadedImg >= characterSkins.length){
             glide = new Glide('.glide', {
                 startAt: 0,
@@ -34,6 +40,7 @@ characterSkins.map((skin) => {
 
     }
 
+    /* Append the elements */
     divHTML.append(name)
     divHTML.append(imgHTML)
     track.append(divHTML)

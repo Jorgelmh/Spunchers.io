@@ -11,7 +11,7 @@ const generateRandomMap = (width, height) => {
     for(let i = 0; i < height; i++){
         matrix.push([])
         for(let j = 0; j < width; j++){
-            matrix[i].push(Math.floor(Math.random() * 10))
+            matrix[i].push(Math.floor(Math.random() * 2 + 1))
         }
     }
 
@@ -37,7 +37,7 @@ const colissionsTest = (width, height, points) => {
 
         for(let j = 0; j < width; j++){
             if(points.find((elem) => elem.x === j && elem.y === i))
-                matrix[i].push(37)
+                matrix[i].push(3)
             else
                 matrix[i].push(0)
         }

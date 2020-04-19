@@ -114,7 +114,7 @@ export default class Engine{
                 if(++loadedImages >= this.tileList.length)
                     this.loadCharacter()
             }
-            tileImage.src = `../assets/tiles/tile_00${(this.tileList[i]<10) ? '0'+this.tileList[i]: this.tileList[i]}.png`
+            tileImage.src = `../assets/tilesTest/tile_00${(this.tileList[i]<10) ? '0'+this.tileList[i]: this.tileList[i]}.png`
 
             this.tileImages.push({
                 id: this.tileList[i],
