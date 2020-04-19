@@ -110,46 +110,50 @@ const socketListen = (app) => {
         socket.on('movement', (data) => {
 
             let currentPlayer = players.find((element) => element.playerId === data.id)
-            currentPlayer.character = data.character
 
-            if(data.controls.goUp){
-                let oldPosition = currentPlayer.posY
-                currentPlayer.posY --
+            if(data.character){
+                currentPlayer.character = data.character
 
-                if(detectColissions(currentPlayer)){
-                    currentPlayer.posY = oldPosition
+                if(data.controls.goUp){
+                    let oldPosition = currentPlayer.posY
+                    currentPlayer.posY --
+    
+                    if(detectColissions(currentPlayer)){
+                        currentPlayer.posY = oldPosition
+                    }
+                }
+    
+                if(data.controls.goDown){
+                    let oldPosition = currentPlayer.posY
+                    currentPlayer.posY ++
+    
+                    if(detectColissions(currentPlayer)){
+                        currentPlayer.posY = oldPosition
+                    }
+                }
+    
+                if(data.controls.goLeft){
+                    let oldPosition = currentPlayer.posX
+                    currentPlayer.posX --
+    
+                    if(detectColissions(currentPlayer)){
+                        currentPlayer.posX = oldPosition
+                    }
+                }
+                    
+    
+                if(data.controls.goRight){
+                    let oldPosition = currentPlayer.posX
+                    currentPlayer.posX ++
+    
+                    if(detectColissions(currentPlayer)){
+                        currentPlayer.posX = oldPosition
+                    }
+    
                 }
             }
-
-            if(data.controls.goDown){
-                let oldPosition = currentPlayer.posY
-                currentPlayer.posY ++
-
-                if(detectColissions(currentPlayer)){
-                    currentPlayer.posY = oldPosition
-                }
-            }
-
-            if(data.controls.goLeft){
-                let oldPosition = currentPlayer.posX
-                currentPlayer.posX --
-
-                if(detectColissions(currentPlayer)){
-                    currentPlayer.posX = oldPosition
-                }
-            }
-                
-
-            if(data.controls.goRight){
-                let oldPosition = currentPlayer.posX
-                currentPlayer.posX ++
-
-                if(detectColissions(currentPlayer)){
-                    currentPlayer.posX = oldPosition
-                }
-
-            }
-        })
+            
+        }) 
 
         socket.on('disconnect', () => {
             let index = players.findIndex((element) => element.playerId == socket.id)
