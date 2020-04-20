@@ -93,8 +93,8 @@ export default class Engine{
         console.log(this.tileList)
         console.log(this.tileImages)
         console.log(this.colissionMatrix)
-        /* Retrieve single tile values */
 
+        /* Retrieve single tile values */
         for(let i = 0; i < this.tileMap.tiles.length; i++){
             for(let j = 0; j < this.tileMap.tiles[0].length; j++){
                 if(this.tileList.indexOf(this.tileMap.tiles[i][j]) < 0)

@@ -7,15 +7,20 @@ import Engine from './Engine.js'
  */
 export default class Online extends Engine{
 
-    constructor(map, colissionMatrix, tileSet, canvas, socket, playerID, server, skin){
+    constructor(map, colissionMatrix, tileSet, canvas, socket, playerID, server, skin, name){
         super(map, colissionMatrix, tileSet, canvas, skin)
+
+        this.name = name
 
         /* Online attributes recevied from the sever */
         this.playerID = playerID
         this.socketIO = socket
 
         /* Add to emit => the skin */
-        this.socketIO.emit('New Player', {skin: this.skin})
+        this.socketIO.emit('New Player', {
+            name: this.name,
+            skin: this.skin
+        })
 
         this.state = null
         this.server = server
@@ -79,7 +84,13 @@ export default class Online extends Engine{
         this.drawMap()
         this.drawObjects()
         this.drawOtherPlayers()
-        this.drawCharacter(this.getPlayerRelativePosition())
+
+        let playerPosition = this.getPlayerRelativePosition()
+
+        this.context.font = '16px cursive'
+        this.context.textAlign = 'center'
+        this.context.fillText(this.name, playerPosition.posX + this.tile.width/2, playerPosition.posY - 10)
+        this.drawCharacter(playerPosition)
 
         this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
         this.context.fillText(`Net: ${this.latency}ms`, this.tileMap.width - 100, 70)
@@ -161,10 +172,11 @@ export default class Online extends Engine{
                 let characterY = this.transformServerMagnitudes(player.posY)+this.tileMap.startY
 
                 /* If the character is outside the screen don't draw it */
-                if(characterX >= 0 && characterX < this.tileMap.width && characterY+ this.tile.height >= 0 && characterY < this.tileMap.height && player.character){
+                if(characterX + this.tile.width >= 0 && characterX < this.tileMap.width && characterY+ this.tile.height >= 0 && characterY < this.tileMap.height && player.character){
+
                     let skin = (player.skin == this.skin)? this.character.spriteSheet.img : this.onlineSkins.find((elem) => elem.src.includes(player.skin))
                     if(skin){
-                        this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character, skin )
+                        this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character, skin, player.playerName )
                     }
                 }
             }
@@ -172,8 +184,10 @@ export default class Online extends Engine{
     }
 
     /* Draws the online players with the info from the server */
-    drawOnlineCharacter(player, onlineCharacter, skin){
+    drawOnlineCharacter(player, onlineCharacter, skin, name){
 
+        this.context.textAlign = 'center'
+        this.context.fillText(name, player.posX + this.tile.width/2, player.posY - 10)
         this.context.drawImage(skin, onlineCharacter.currentSprite.x * this.character.spriteSheet.width, onlineCharacter.currentSprite.y * this.character.spriteSheet.height
                                 , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
     }
