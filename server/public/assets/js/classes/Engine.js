@@ -157,7 +157,7 @@ export default class Engine{
     /* Listeners for Controls */
     addControls(){
         window.addEventListener('keydown', () => {
-            switch (event.key){
+            switch (event.key.toLowerCase()){
                 case 'w':
                     this.controls.goUp = true
                     break
@@ -179,7 +179,7 @@ export default class Engine{
         })
 
         window.addEventListener('keyup', () => {
-            switch (event.key){
+            switch (event.key.toLowerCase()){
                 case 'w':
                     this.character.onMovingStop()
                     this.controls.goUp = false
