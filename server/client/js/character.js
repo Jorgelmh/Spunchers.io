@@ -56,7 +56,7 @@ const character = {
 
         spriteShooting.onload = () => {
             this.spriteImages.shooting = spriteShooting
-            
+
             if(++loadedImages == 2)
                 callback()
         }

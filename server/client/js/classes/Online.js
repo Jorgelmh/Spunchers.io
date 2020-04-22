@@ -203,7 +203,15 @@ export default class Online extends Engine{
                 /* If the character is outside the screen don't draw it */
                 if(characterX + this.tile.width >= 0 && characterX < this.tileMap.width && characterY+ this.tile.height >= 0 && characterY < this.tileMap.height && player.character){
 
-                    let skin = (player.skin == this.skin)? this.character.spriteSheet.img : this.onlineSkins.find((elem) => elem.src.includes(player.skin))
+                    let skin
+
+                    if(player.skin == this.skin){
+                        if(player.shooting)
+                            skin = this.character.spriteImages.shooting
+                        else
+                            skin = this.character.spriteImages.normal
+                    }
+
                     if(skin){
                         this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character, skin, player.playerName )
                     }

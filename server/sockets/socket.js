@@ -96,6 +96,7 @@ const socketListen = (app) => {
                 posX: 600,
                 posY: 400,
                 character: null,
+                shooting: null,
                 skin: data.skin,
                 playerName: data.name
             })
@@ -162,6 +163,8 @@ const socketListen = (app) => {
                     }
     
                 }
+
+                currentPlayer.shooting = data.controls.shoot
             }
             
         }) 

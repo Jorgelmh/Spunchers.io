@@ -177,8 +177,10 @@ export default class Engine{
                     break
 
                 case 'a':
-                    if(this.character.spriteSheet.img != this.character.spriteImages.shooting)
+                    if(!this.controls.shoot){
                         this.character.spriteSheet.img = this.character.spriteImages.shooting
+                        this.controls.shoot = true
+                    }
                     break
             }
 
