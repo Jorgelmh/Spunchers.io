@@ -9,7 +9,7 @@ const socket = io()
 let game
 
 /* Skins on the server that are ready to use */
-const characterSkins = ['c3po', 'deadpool', 'captainamerica', 'mandalorian', 'nickfury', 'pirate', 'stormtrooper', 'tonystark']
+const characterSkins = ['blade']
 
 /* Glide track -> where the slides have to be added in */
 const track = document.getElementsByClassName('glide__slides')[0]

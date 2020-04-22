@@ -71,7 +71,8 @@ export default class Engine{
             goUp: false,
             goDown: false,
             goRight: false,
-            goLeft: false 
+            goLeft: false,
+            shoot: false
         }
 
         /* Collisionable */
@@ -158,21 +159,26 @@ export default class Engine{
     addControls(){
         window.addEventListener('keydown', () => {
             switch (event.key.toLowerCase()){
-                case 'w':
+                case 'arrowup':
                     this.controls.goUp = true
                     break
 
-                case 's':
+                case 'arrowdown':
                     this.controls.goDown = true
                     break
 
-                case 'a':
+                case 'arrowleft':
                     this.controls.goLeft = true
                     
                     break
 
-                case 'd':
+                case 'arrowright':
                     this.controls.goRight = true
+                    break
+
+                case 'a':
+                    if(this.character.spriteSheet.img != this.character.spriteImages.shooting)
+                        this.character.spriteSheet.img = this.character.spriteImages.shooting
                     break
             }
 
@@ -180,24 +186,28 @@ export default class Engine{
 
         window.addEventListener('keyup', () => {
             switch (event.key.toLowerCase()){
-                case 'w':
+                case 'arrowup':
                     this.character.onMovingStop()
                     this.controls.goUp = false
                     break
 
-                case 's':
+                case 'arrowdown':
                     this.character.onMovingStop()
                     this.controls.goDown = false
                     break
 
-                case 'a':
+                case 'arrowleft':
                     this.character.onMovingStop()
                     this.controls.goLeft = false
                     break
 
-                case 'd':
+                case 'arrowright':
                     this.character.onMovingStop()
                     this.controls.goRight = false
+                    break
+                case 'a':
+                    this.controls.shoot = false
+                    this.character.spriteSheet.img = this.character.spriteImages.normal
                     break
             }
 

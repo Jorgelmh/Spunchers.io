@@ -13,8 +13,13 @@ const character = {
     },
     spriteSheet: {
         img: null,
-        width: 32,
-        height: 48
+        width: 64,
+        height: 64
+    },
+
+    spriteImages: {
+        normal: null,
+        shooting: null
     },
 
     /* Animations */
@@ -29,61 +34,93 @@ const character = {
 
     /* Load the sprites for the given character */
     load: function(name, callback) {
+        let loadedImages = 0
 
-        this.spriteSheet.img = new Image()
-        this.spriteSheet.img.onload = () =>{
+        /* Loading normal spritesheet */
+        let sprite = new Image()
+        sprite.onload = () =>{
+            this.spriteSheet.img = sprite
+            this.spriteImages.normal = sprite
+
             this.currentSprite.x = 0
             this.currentSprite.y = 3
-            callback()
+
+            if(++loadedImages == 2)
+                callback()
         }
-        this.spriteSheet.img.src = `../assets/characters/${name}`
+        sprite.src = `../assets/characters/${name}`
+
+
+        /* Loading shooting spritesheet */
+        let spriteShooting = new Image()
+
+        spriteShooting.onload = () => {
+            this.spriteImages.shooting = spriteShooting
+            
+            if(++loadedImages == 2)
+                callback()
+        }
+
+        spriteShooting.src = `../assets/characters/shooting/${name}`
+
+
     },
 
     /* Change the image when moving forward */
     onMovingForward: function() {
         this.currentSprite.y = 3
 
-        this.moveInterval = setInterval(() =>{
-            this.currentSprite.x ++
-
-            if(this.currentSprite.x > 3) 
-                this.currentSprite.x = 0
-
-        }, this.animationSpeed)
+        this.createInterval()
     },
 
     onMovingBackwards: function(){
         this.currentSprite.y = 0
 
-        this.moveInterval = setInterval(() =>{
-            this.currentSprite.x ++
-
-            if(this.currentSprite.x > 3) 
-                this.currentSprite.x = 0
-        }, this.animationSpeed)
+        this.createInterval()
     },
 
     onMovingLeft: function(){
         this.currentSprite.y = 1
 
-        this.moveInterval = setInterval(() =>{
-            this.currentSprite.x ++
-
-            if(this.currentSprite.x > 3) 
-                this.currentSprite.x = 0
-        }, this.animationSpeed)
+        this.createInterval()
     },
 
     onMovingRight: function(){
         this.currentSprite.y = 2
 
+        this.createInterval()
+    },
+
+    onMovingForwardLeft: function(){
+        this.currentSprite.y = 5
+
+        this.createInterval()
+    },
+
+    onMovingForwardRight: function(){
+        this.currentSprite.y = 4
+        this.createInterval()
+    },
+
+    onMovingBackwardsRight: function(){
+        this.currentSprite.y = 6
+        this.createInterval()
+    },
+
+    onMovingBackwardsLeft: function(){
+        this.currentSprite.y = 7
+        this.createInterval()
+    },
+
+    createInterval : function(){
+        this.currentSprite.x = 1
         this.moveInterval = setInterval(() =>{
             this.currentSprite.x ++
 
             if(this.currentSprite.x > 3) 
-                this.currentSprite.x = 0
+                this.currentSprite.x = 1
 
-        }, this.animationSpeed)
+        }, this.animationSpeed)  
     },
 
     /* Delete  */

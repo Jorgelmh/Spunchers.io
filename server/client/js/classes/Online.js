@@ -111,6 +111,34 @@ export default class Online extends Engine{
 
     animateCharacter(){
         
+        if(this.controls.goUp && this.controls.goLeft){
+            if(this.character.currentSprite.y != 5){
+                this.character.onMovingStop()
+                this.character.onMovingForwardLeft()
+            } 
+        }
+
+        if(this.controls.goUp && this.controls.goRight){
+            if(this.character.currentSprite.y != 4){
+                this.character.onMovingStop()
+                this.character.onMovingForwardRight()
+            } 
+        }
+
+        if(this.controls.goDown && this.controls.goRight){
+            if(this.character.currentSprite.y != 6){
+                this.character.onMovingStop()
+                this.character.onMovingBackwardsRight()
+            } 
+        }
+
+        if(this.controls.goDown && this.controls.goLeft){
+            if(this.character.currentSprite.y != 7){
+                this.character.onMovingStop()
+                this.character.onMovingBackwardsLeft()
+            } 
+        }
+
         if(this.controls.goUp){
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
@@ -131,6 +159,7 @@ export default class Online extends Engine{
             if(!this.character.moveInterval)
                 this.character.onMovingLeft()
         }
+
     }
 
     /* Send the info back to the server */
