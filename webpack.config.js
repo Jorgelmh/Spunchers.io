@@ -12,7 +12,7 @@ const path = require('path');
 
 */
 module.exports = {
-    entry: './server/public/assets/js/online.js',
+    entry: './server/client/js/online.js',
     mode: 'development',
     output: {
         filename: 'main.js',
