@@ -196,7 +196,7 @@ export default class Online extends Engine{
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
     drawOtherPlayers(){
         if(this.state.players && this.state.players.length > 1){
-            let otherPlayers = this.state.players.filter((player) => player.playerId !== this.playerID)
+            let otherPlayers = this.state.players.filter((player) => player.playerID !== this.playerID)
 
             for(let player of otherPlayers){
                 
