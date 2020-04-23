@@ -41,6 +41,8 @@ export default class Engine{
 
         /* Tiles per screen */
 
+        this.ableToshoot = true,
+
         this.screenTiles= {
             x: 16,
             y: 9
@@ -77,6 +79,8 @@ export default class Engine{
 
         /* Collisionable */
         this.colissionMatrix = collisionMatrix
+
+        this.shooting = false
 
         window.addEventListener('resize', this.resizeCanvas)
         this.resizeCanvas()
@@ -141,13 +145,13 @@ export default class Engine{
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
 
-        /* Dimensions of the tile map */
-        this.tileMap.width = this.canvas.width
-        this.tileMap.height = this.canvas.width * this.frameRatio
-
         /* Tile width and height responsive */
-        this.tile.width = this.tileMap.width / this.screenTiles.x
-        this.tile.height = this.tileMap.height / this.screenTiles.y
+        this.tile.width = this.canvas.width/ this.screenTiles.x
+        this.tile.height = this.canvas.width * this.frameRatio / this.screenTiles.y
+
+        /* Dimensions of the tile map */
+        this.tileMap.width = this.tileMap.tiles[0].length * this.tile.width
+        this.tileMap.height = this.tileMap.tiles.length * this.tile.height
 
         /* Start points responsive -> rule of 3*/
         this.tileMap.startX = (this.tileMap.startX * this.tileMap.width) / tempWidth
@@ -169,7 +173,6 @@ export default class Engine{
 
                 case 'arrowleft':
                     this.controls.goLeft = true
-                    
                     break
 
                 case 'arrowright':
@@ -177,10 +180,9 @@ export default class Engine{
                     break
 
                 case 'a':
-                    if(!this.controls.shoot){
-                        this.character.spriteSheet.img = this.character.spriteImages.shooting
-                        this.controls.shoot = true
-                    }
+                    if(!this.controls.shoot && this.ableToshoot)
+                        this.triggerShooting()
+                    
                     break
             }
 
@@ -284,8 +286,8 @@ export default class Engine{
 
     /* Get player realtive position to the screen size */
     getPlayerRelativePosition(){
-        let posX = this.tileMap.width/2 - (this.tile.width/2)
-        let posY = this.tileMap.height/2 - (this.tile.height/2)
+        let posX = this.screenTiles.x * this.tile.width/2 - (this.tile.width/2)
+        let posY = this.screenTiles.y * this.tile.height/2 - (this.tile.height/2)
 
         return {posX, posY}
     }
@@ -296,5 +298,30 @@ export default class Engine{
         let posY = y*this.tile.height + this.tileMap.startY
 
         return {posX, posY}
+    }
+
+    /** 
+     *  =========================
+     *      SHOOTING MECHANICS
+     *  =========================
+    */
+
+    /* Shooting timing */
+    triggerShooting(){
+        this.character.spriteSheet.img = this.character.spriteImages.shooting
+        this.controls.shoot = true
+        this.ableToshoot = false
+
+        /* Fire animation */
+        setTimeout(() => {
+            this.character.spriteSheet.img =  this.character.spriteImages.normal
+            this.emitBullet()
+        }, 70)
+
+        /* Fire again after */
+        setTimeout(() => {
+            this.ableToshoot = true
+            this.controls.shoot = false
+        }, 400)
     }
 }

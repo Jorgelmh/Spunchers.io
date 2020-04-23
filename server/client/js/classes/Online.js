@@ -24,6 +24,7 @@ export default class Online extends Engine{
 
         this.state = null
         this.server = server
+        this.serverPlayer = null
 
         /* CALCULATE network speed */
         this.latency = 0
@@ -34,7 +35,8 @@ export default class Online extends Engine{
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
             this.state = data
-            let currentPlayerPos = data.find((element) => element.playerId === this.playerID)
+            let currentPlayerPos = this.state.players.find((element) => element.playerID === this.playerID)
+            this.serverPlayer = currentPlayerPos
 
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
@@ -47,7 +49,7 @@ export default class Online extends Engine{
 
         /* When new players enter the lobby, they must load other users skins */
         this.socketIO.on('Load Skins', (data) => {
-            data.srcArray.forEach((value) => {
+            data.forEach((value) => {
                 if(value != this.skin){
                     this.loadServerSkin(value)
                 }
@@ -84,6 +86,7 @@ export default class Online extends Engine{
         this.drawMap()
         this.drawObjects()
         this.drawOtherPlayers()
+        this.drawBullets()
 
         let playerPosition = this.getPlayerRelativePosition()
 
@@ -92,8 +95,8 @@ export default class Online extends Engine{
         this.context.fillText(this.name, playerPosition.posX + this.tile.width/2, playerPosition.posY - 10)
         this.drawCharacter(playerPosition)
 
-        this.context.fillText(`FPS: ${this.FPS}`, this.tileMap.width - 100, 50)
-        this.context.fillText(`Net: ${this.latency}ms`, this.tileMap.width - 100, 70)
+        this.context.fillText(`FPS: ${this.FPS}`, (this.screenTiles.x * this.tile.height) - 100, 50)
+        this.context.fillText(`Net: ${this.latency}ms`, (this.screenTiles.x * this.tile.height) - 100, 70)
         requestAnimationFrame(() => {
 
             /* FPS Counter */
@@ -178,11 +181,11 @@ export default class Online extends Engine{
 
     /* Calculates the position of the map in the browser => startX and startY */
     calculateLocalMap(x, y){
-        let serverWidth = this.transformServerMagnitudes(x)
-        let serverHeight = this.transformServerMagnitudes(y)
+        let serverWidth = this.transformServerMagnitudesX(x)
+        let serverHeight = this.transformServerMagnitudesY(y)
 
-        let posX = (this.tileMap.width/2 - this.tile.width/2) - serverWidth
-        let posY = (this.tileMap.height/2 - this.tile.height/2) - serverHeight
+        let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth
+        let posY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight
 
         return {
             posX, 
@@ -192,13 +195,13 @@ export default class Online extends Engine{
 
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
     drawOtherPlayers(){
-        if(this.state && this.state.length > 1){
-            let otherPlayers = this.state.filter((player) => player.playerId !== this.playerID)
+        if(this.state.players && this.state.players.length > 1){
+            let otherPlayers = this.state.players.filter((player) => player.playerId !== this.playerID)
 
             for(let player of otherPlayers){
                 
-                let characterX = this.transformServerMagnitudes(player.posX)+this.tileMap.startX
-                let characterY = this.transformServerMagnitudes(player.posY)+this.tileMap.startY
+                let characterX = this.transformServerMagnitudesX(player.posX)+this.tileMap.startX
+                let characterY = this.transformServerMagnitudesY(player.posY)+this.tileMap.startY
 
                 /* If the character is outside the screen don't draw it */
                 if(characterX + this.tile.width >= 0 && characterX < this.tileMap.width && characterY+ this.tile.height >= 0 && characterY < this.tileMap.height && player.character){
@@ -230,8 +233,12 @@ export default class Online extends Engine{
     }
 
     /* Uses the rule of three mathematica formula to transform values from the server */
-    transformServerMagnitudes(serverValue){
+    transformServerMagnitudesX(serverValue){
         return (this.tileMap.width * serverValue) / this.server.width
+    }
+
+    transformServerMagnitudesY(serverValue){
+        return (this.tileMap.height * serverValue) / this.server.height
     }
 
     /* Load new skin from the server */
@@ -240,6 +247,100 @@ export default class Online extends Engine{
         let characterSkin = new Image()
         characterSkin.src = `../assets/characters/${src}.png`
         this.onlineSkins.push(characterSkin)
+    }
+
+    /** 
+     * =========================
+     *      Bullet Mechanics
+     * =========================
+    */
+
+    /* Draw bullets contain on the server */
+
+    drawBullets(){
+
+        if(this.state.bullets.length > 0){
+            console.log('Into the draw method');
+            this.state.bullets.map((element) => {
+                this.context.beginPath()
+                this.context.arc(this.transformServerMagnitudesX(element.posX)+this.tileMap.startX, this.transformServerMagnitudesY(element.posY) +this.tileMap.startY, 5, 0, 2 * Math.PI)
+                this.context.fill()
+            })
+        }
+    }
+
+    /* Emit bullet to the server */
+
+    emitBullet(){
+        let halfServerTileWidth = this.server.width/(this.tileMap.tiles[0].length*2)
+        let dirX, dirY
+        
+
+        switch (this.character.currentSprite.y){
+            case 0:
+                dirX = 0
+                dirY = 1 
+                break
+            case 1:
+                dirX = -1
+                dirY = 0
+                break
+            case 2:
+                dirX = 1
+                dirY = 0
+                break
+            case 3:
+                dirY = -1
+                dirX = 0
+                break
+            case 4:
+                if(this.character.currentSprite.x == 0){
+                    dirX = 1
+                    dirY = 0
+                }else{
+                    dirX = Math.sin(Math.PI / 4)
+                    dirY = - Math.sin(Math.PI / 4)
+                }
+                break
+
+            case 5: 
+                if(this.character.currentSprite.x == 0){
+                    dirX = -1
+                    dirY = 0
+                }else{
+                    dirX = -Math.sin(Math.PI / 4)
+                    dirY = - Math.sin(Math.PI / 4)
+                }
+                break
+            case 6:
+                if(this.character.currentSprite.x == 0){
+                    dirX = 1
+                    dirY = 0
+                }else{
+                    dirX = Math.sin(Math.PI / 4)
+                    dirY = Math.sin(Math.PI / 4)
+                }
+                break
+            case 7:
+                if(this.character.currentSprite.x == 0){
+                    dirX = -1
+                    dirY = 0
+                }else{
+                    dirX = -Math.sin(Math.PI / 4)
+                    dirY = Math.sin(Math.PI / 4)
+                }
+                break
+
+        }
+
+        let bullet = {
+            posX: this.serverPlayer.posX + halfServerTileWidth,
+            posY: this.serverPlayer.posY,
+            dirX: dirX,
+            dirY: dirY
+        }
+
+        this.socketIO.emit('shoot', bullet)
     }
 
 }

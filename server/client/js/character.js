@@ -117,7 +117,7 @@ const character = {
         this.moveInterval = setInterval(() =>{
             this.currentSprite.x ++
 
-            if(this.currentSprite.x > 3) 
+            if(this.currentSprite.x > 4) 
                 this.currentSprite.x = 1
 
         }, this.animationSpeed)  

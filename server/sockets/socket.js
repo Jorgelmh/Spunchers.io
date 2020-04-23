@@ -6,6 +6,8 @@
 
 const socketIO = require('socket.io')
 const { generateRandomMap, colissionsTest, colissionable } = require('./test')
+const Game = require('./classes/Game')
+const map = require('./maps/test.json')
 //const lobby = new Lobby() //Class that will store all the values of players in it
 
 let players = []
@@ -66,11 +68,12 @@ const detectColissions = (player) =>{
     return false
 }
 
+const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet)
+
 /* Scoket listener */
 const socketListen = (app) => {
     const io = socketIO(app, {pingInterval: 1000})
     
-
     io.sockets.on('connection', function (socket) {
         socket.on('ping', function() {
           socket.emit('pong');
@@ -80,100 +83,36 @@ const socketListen = (app) => {
     io.on('connection', function(socket) {
 
         setInterval(() => {
-            socket.emit('state', players)
+            serverGame.update()
+            socket.emit('state', serverGame.getState())
         }, 1000 / 60)
 
         /* Add websockets in here */
-        socket.emit('loadMap', {
-            lobby,
-            playerID: socket.id
-        })
+        socket.emit('loadMap', serverGame.onLoadMap(socket.id))
 
         /* When a new player enters the lobby => Note: Validations on repetitions are in the client version of the game*/
         socket.on('New Player', (data) => {
-            players.push({
-                playerId: socket.id,
-                posX: 600,
-                posY: 400,
-                character: null,
-                shooting: null,
-                skin: data.skin,
-                playerName: data.name
-            })
-
-            /* Get single values for the skins => non-repeated strings */
-            let srcArray = []
-
-            players.map((element) => {
-                if(srcArray.indexOf(element.skin))
-                    srcArray.push(element.skin)
-            })
+            serverGame.addPlayers(data, socket.id)
 
             /* load previous players' skins */
-            socket.emit('Load Skins', {
-                srcArray
-            })
+            socket.emit('Load Skins', serverGame.getSkins())
 
             /* Other players load tnew player's skin */
             socket.broadcast.emit('Load New Skin', {src: data.skin})
         })
 
         /* Listener of socket movement */
-        socket.on('movement', (data) => {
+        socket.on('movement', serverGame.onMovement)
 
-            let currentPlayer = players.find((element) => element.playerId === data.id)
-
-            if(currentPlayer){
-                currentPlayer.character = data.character
-
-                if(data.controls.goUp){
-                    let oldPosition = currentPlayer.posY
-                    currentPlayer.posY --
-    
-                    if(detectColissions(currentPlayer)){
-                        currentPlayer.posY = oldPosition
-                    }
-                }
-    
-                if(data.controls.goDown){
-                    let oldPosition = currentPlayer.posY
-                    currentPlayer.posY ++
-    
-                    if(detectColissions(currentPlayer)){
-                        currentPlayer.posY = oldPosition
-                    }
-                }
-    
-                if(data.controls.goLeft){
-                    let oldPosition = currentPlayer.posX
-                    currentPlayer.posX --
-    
-                    if(detectColissions(currentPlayer)){
-                        currentPlayer.posX = oldPosition
-                    }
-                }
-                    
-    
-                if(data.controls.goRight){
-                    let oldPosition = currentPlayer.posX
-                    currentPlayer.posX ++
-    
-                    if(detectColissions(currentPlayer)){
-                        currentPlayer.posX = oldPosition
-                    }
-    
-                }
-
-                currentPlayer.shooting = data.controls.shoot
-            }
-            
-        }) 
-
-        socket.on('disconnect', () => {
-            let index = players.findIndex((element) => element.playerId == socket.id)
-            if(index >= 0)
-                players.splice(index, 1)                     
+        socket.on('disconnect', (data) => {
+            serverGame.removePlayer(socket.io)                 
         })
+
+        /* Listener of players shooting */
+        socket.on('shoot',(data) => {
+            serverGame.addBullet(data, socket.id)
+        })
+
     });
 
 }
