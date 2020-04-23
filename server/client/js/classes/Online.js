@@ -163,6 +163,9 @@ export default class Online extends Engine{
                 this.character.onMovingLeft()
         }
 
+        if(this.ableToshoot && this.controls.shoot)
+            this.triggerShooting()
+
     }
 
     /* Send the info back to the server */

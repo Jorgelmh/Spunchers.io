@@ -180,9 +180,7 @@ export default class Engine{
                     break
 
                 case 'a':
-                    if(!this.controls.shoot && this.ableToshoot)
-                        this.triggerShooting()
-                    
+                    this.controls.shoot = true                    
                     break
             }
 
@@ -308,8 +306,6 @@ export default class Engine{
 
     /* Shooting timing */
     triggerShooting(){
-        console.log('shooting');
-        this.controls.shoot = true
         this.ableToshoot = false
 
         /* Fire animation */
@@ -326,7 +322,6 @@ export default class Engine{
         /* Fire again after */
         setTimeout(() => {
             this.ableToshoot = true
-            this.controls.shoot = false
         }, 400)
     }
 }
