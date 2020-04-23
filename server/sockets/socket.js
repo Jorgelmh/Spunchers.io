@@ -47,7 +47,7 @@ const socketListen = (app) => {
         socket.on('movement', serverGame.onMovement)
 
         socket.on('disconnect', (data) => {
-            serverGame.removePlayer(socket.io)                 
+            serverGame.removePlayer(socket.id)                 
         })
 
         /* Listener of players shooting */
