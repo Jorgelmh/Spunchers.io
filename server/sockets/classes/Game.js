@@ -53,7 +53,7 @@ class Game {
     /* Remove Player ->  recieves the socket id as the parameter */
 
     removePlayer = (id) => {
-        let index = this.players.findIndex((element) => element.playerId == id)
+        let index = this.players.findIndex((element) => element.playerID == id)
         if(index >= 0)
             this.players.splice(index, 1)    
     }

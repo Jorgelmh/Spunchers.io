@@ -260,7 +260,6 @@ export default class Online extends Engine{
     drawBullets(){
 
         if(this.state.bullets.length > 0){
-            console.log('Into the draw method');
             this.state.bullets.map((element) => {
                 this.context.beginPath()
                 this.context.arc(this.transformServerMagnitudesX(element.posX)+this.tileMap.startX, this.transformServerMagnitudesY(element.posY) +this.tileMap.startY, 5, 0, 2 * Math.PI)

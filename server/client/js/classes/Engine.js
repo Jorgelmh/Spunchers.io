@@ -308,14 +308,19 @@ export default class Engine{
 
     /* Shooting timing */
     triggerShooting(){
-        this.character.spriteSheet.img = this.character.spriteImages.shooting
+        console.log('shooting');
         this.controls.shoot = true
         this.ableToshoot = false
 
         /* Fire animation */
         setTimeout(() => {
-            this.character.spriteSheet.img =  this.character.spriteImages.normal
             this.emitBullet()
+            this.character.spriteSheet.img =  this.character.spriteImages.shooting
+
+            setTimeout(() => {
+                this.character.spriteSheet.img = this.character.spriteImages.normal
+            }, 40)
+
         }, 70)
 
         /* Fire again after */
