@@ -26,7 +26,8 @@ const socketListen = (app) => {
 
         setInterval(() => {
             serverGame.update()
-            socket.emit('state', serverGame.getState())
+            //socket.emit('state', serverGame.getState())
+            io.sockets.emit('state', serverGame.getState())
         }, 1000 / 60)
 
         /* Add websockets in here */
