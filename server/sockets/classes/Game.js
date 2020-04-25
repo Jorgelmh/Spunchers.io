@@ -6,6 +6,8 @@ class Game {
         this.bullets = []
         this.bulletSpeed = 400
 
+        this.bulletWidth = 10
+
         /* 
              ====================
                 Map features 
@@ -43,6 +45,7 @@ class Game {
             playerID: socketID,
             posX: 600,
             posY: 400,
+            life: 100,
             character: null,
             shooting: null,
             skin: data.skin,
@@ -103,8 +106,6 @@ class Game {
                     }
     
                 }
-
-                currentPlayer.shooting = data.controls.shoot
             }
 
     }
@@ -135,6 +136,14 @@ class Game {
      */
 
     addBullet(data, playerID){
+
+        let currentPlayer = this.players.find((element) => element.playerID === playerID)
+
+        currentPlayer.shooting = true
+
+        setTimeout(() => {
+            currentPlayer.shooting = false
+        }, 90)
         this.bullets.push({
             ownerID: playerID,
             posX: data.posX,
@@ -158,9 +167,40 @@ class Game {
             element.posX += dt * this.bulletSpeed * element.dirX
             element.posY += dt * this.bulletSpeed * element.dirY
 
-            if(element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height)
+            console.log(this.checkColissionsWithBullets(element))
+            if(this.checkColissionsWithBullets(element) || (element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height))
                 this.bullets.splice(index, 1)
         })
+    }
+
+    /**
+     *  =========================================
+     *      Detect if a bullet impacts a player
+     *  =========================================
+     * 
+     */
+
+    checkColissionsWithBullets(bullet){
+
+        if(this.players.length > 1){
+
+            /* Use for loop instead of array methods so the loop is broken whenever the colission happens -> don't keep looping if there's a colission */
+            for(let i = 0; i < this.players.length; i++){
+
+                /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
+                if(this.players[i].playerID != bullet.ownerID && (this.players[i].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[i].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
+                    && (this.players[i].posY + (this.tile.width/4) < bullet.posY + this.bulletWidth && this.players[i].posY + this.tile.height > bullet.posY)){
+                        this.players[i].life -=20
+                        if(this.players[i].life <= 0){
+                            this.players[i].posX = 0
+                            this.players[i].posY = 0
+                            this.players[i].life = 100
+                        }
+                        return true
+                }
+            }
+        }
+        return false
     }
 
     /**

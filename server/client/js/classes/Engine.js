@@ -298,6 +298,25 @@ export default class Engine{
         return {posX, posY}
     }
 
+    /* Draw life of an entity */
+    drawLife(posX, posY, life){
+
+        this.context.beginPath()
+
+        this.context.rect(posX, posY, this.tile.width, this.tile.height/10)
+        this.context.stroke()
+
+        this.context.beginPath()
+
+        this.context.rect(posX, posY, this.tile.width*life/100, this.tile.height/10)
+        this.context.fillStyle = 'red'
+        this.context.fill()
+
+        this.context.closePath()
+
+        this.context.restore()
+    }
+
     /** 
      *  =========================
      *      SHOOTING MECHANICS
@@ -315,13 +334,13 @@ export default class Engine{
 
             setTimeout(() => {
                 this.character.spriteSheet.img = this.character.spriteImages.normal
-            }, 40)
+            }, 90)
 
         }, 70)
 
         /* Fire again after */
         setTimeout(() => {
             this.ableToshoot = true
-        }, 400)
+        }, 250)
     }
 }

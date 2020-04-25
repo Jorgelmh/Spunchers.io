@@ -80,21 +80,24 @@ export default class Online extends Engine{
      */ 
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        let playerPosition = this.getPlayerRelativePosition()
 
         this.animateCharacter()
         this.calculateOffset()
         this.drawMap()
         this.drawObjects()
         this.drawOtherPlayers()
-        this.drawBullets()
+        this.drawLife(playerPosition.posX, playerPosition.posY - 6, this.serverPlayer.life)
 
-        let playerPosition = this.getPlayerRelativePosition()
+        this.context.fillStyle = 'black'
+        this.drawBullets()
 
         this.context.font = '16px cursive'
         this.context.textAlign = 'center'
         this.context.fillText(this.name, playerPosition.posX + this.tile.width/2, playerPosition.posY - 10)
         this.drawCharacter(playerPosition)
 
+        this.context.fillStyle = "black"
         this.context.fillText(`FPS: ${this.FPS}`, (this.screenTiles.x * this.tile.height) - 100, 50)
         this.context.fillText(`Net: ${this.latency}ms`, (this.screenTiles.x * this.tile.height) - 100, 70)
         requestAnimationFrame(() => {
@@ -219,6 +222,7 @@ export default class Online extends Engine{
                     }
 
                     if(skin){
+                        this.drawLife(characterX, characterY -6, player.life)
                         this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character, skin, player.playerName )
                     }
                 }
@@ -230,6 +234,7 @@ export default class Online extends Engine{
     drawOnlineCharacter(player, onlineCharacter, skin, name){
 
         this.context.textAlign = 'center'
+        this.context.fillStyle = 'black'
         this.context.fillText(name, player.posX + this.tile.width/2, player.posY - 10)
         this.context.drawImage(skin, onlineCharacter.currentSprite.x * this.character.spriteSheet.width, onlineCharacter.currentSprite.y * this.character.spriteSheet.height
                                 , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
@@ -275,13 +280,13 @@ export default class Online extends Engine{
 
     emitBullet(){
         let halfServerTileWidth = this.server.width/(this.tileMap.tiles[0].length*2)
-        let dirX, dirY
-        
+        let dirX, dirY, posX = this.serverPlayer.posX + halfServerTileWidth, posY = this.serverPlayer.posY
 
         switch (this.character.currentSprite.y){
             case 0:
                 dirX = 0
                 dirY = 1 
+                posY+= halfServerTileWidth*2
                 break
             case 1:
                 dirX = -1
@@ -294,6 +299,7 @@ export default class Online extends Engine{
             case 3:
                 dirY = -1
                 dirX = 0
+                posX+=(halfServerTileWidth/4)
                 break
             case 4:
                 if(this.character.currentSprite.x == 0){
@@ -335,9 +341,23 @@ export default class Online extends Engine{
 
         }
 
+        if(this.character.currentSprite.y === 1 || this.character.currentSprite.y === 2 
+            || (this.character.currentSprite.y >= 4 && this.character.currentSprite.x === 0))
+            posY+=halfServerTileWidth + (halfServerTileWidth/6)
+
+        if((this.character.currentSprite.y === 4 || this.character.currentSprite.y === 5) && this.character.currentSprite.x != 0){
+            posX+=(halfServerTileWidth * dirX)
+            posY+=(halfServerTileWidth * -dirY)
+        }
+
+        if((this.character.currentSprite.y === 6 || this.character.currentSprite.y === 7) && this.character.currentSprite.x != 0){
+            posX+=(halfServerTileWidth * dirX)
+            posY+=(halfServerTileWidth + halfServerTileWidth * dirY)
+        }
+
         let bullet = {
-            posX: this.serverPlayer.posX + halfServerTileWidth,
-            posY: this.serverPlayer.posY,
+            posX,
+            posY,
             dirX: dirX,
             dirY: dirY
         }
