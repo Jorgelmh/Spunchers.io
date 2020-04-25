@@ -146,6 +146,7 @@ export default class Online extends Engine{
         }
 
         if(this.controls.goUp){
+            this.tileMap.startY ++
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
         }
@@ -364,5 +365,7 @@ export default class Online extends Engine{
 
         this.socketIO.emit('shoot', bullet)
     }
+
+    
 
 }
