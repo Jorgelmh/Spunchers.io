@@ -10,11 +10,10 @@ const Game = require('./classes/Game')
 const map = require('./maps/test.json')
 //const lobby = new Lobby() //Class that will store all the values of players in it
 
-const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet)
-
 /* Scoket listener */
 const socketListen = (app) => {
     const io = socketIO(app, {pingInterval: 1000})
+    const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet)
     
     io.sockets.on('connection', function (socket) {
         socket.on('ping', function() {

@@ -66,8 +66,10 @@ class Game {
 
         let currentPlayer = this.players.find((element) => element.playerID === data.id)
 
-            if(currentPlayer){
-                currentPlayer.character = data.character
+        if(currentPlayer){
+            currentPlayer.character = data.character
+
+            if(currentPlayer.life > 0){
 
                 if(data.controls.goUp){
                     let oldPosition = currentPlayer.posY
@@ -107,7 +109,7 @@ class Game {
     
                 }
             }
-
+        }
     }
 
     /* Detect colission between players and objects on the server */
@@ -167,7 +169,6 @@ class Game {
             element.posX += dt * this.bulletSpeed * element.dirX
             element.posY += dt * this.bulletSpeed * element.dirY
 
-            console.log(this.checkColissionsWithBullets(element))
             if(this.checkColissionsWithBullets(element) || (element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height))
                 this.bullets.splice(index, 1)
         })
@@ -188,13 +189,13 @@ class Game {
             for(let i = 0; i < this.players.length; i++){
 
                 /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
-                if(this.players[i].playerID != bullet.ownerID && (this.players[i].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[i].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
+                if(this.players[i].playerID != bullet.ownerID && this.players[i].life > 0 && (this.players[i].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[i].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
                     && (this.players[i].posY + (this.tile.width/4) < bullet.posY + this.bulletWidth && this.players[i].posY + this.tile.height > bullet.posY)){
-                        this.players[i].life -=20
+
+                        this.players[i].life = (this.players[i].life - 33.4 < 0) ? 0 : this.players[i].life - 33.4
+
                         if(this.players[i].life <= 0){
-                            this.players[i].posX = 0
-                            this.players[i].posY = 0
-                            this.players[i].life = 100
+                            this.playerHasDied(this.players[i].playerID)
                         }
                         return true
                 }
@@ -203,6 +204,33 @@ class Game {
         return false
     }
 
+    /** 
+     *  ==================================================
+     *      Functions to be called when a Player dies
+     *  ==================================================
+    */
+
+    playerHasDied(playerID){
+        let index = this.players.findIndex((player) => player.playerID === playerID)
+        let newPosition = this.respawnPlayerPosition()
+
+        if(index !== undefined){
+
+            setTimeout(() => {
+                this.players[index].life = 100
+                this.players[index].posX = newPosition.x
+                this.players[index].posY = newPosition.y
+            }, 1000) 
+        }
+        
+    }
+
+    respawnPlayerPosition(){
+        return {
+            x: 0,
+            y: 0
+        }
+    }
     /**
      *  ==================
      *       Getters

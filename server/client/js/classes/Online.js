@@ -43,6 +43,18 @@ export default class Online extends Engine{
 
                 this.tileMap.startX = startPoints.posX
                 this.tileMap.startY = startPoints.posY
+
+                if(this.serverPlayer.life === 0 && !this.character.deathCharacter){
+                    this.character.deathCharacter = true
+                    this.character.onMovingStop()
+                    this.character.onCharacterDies()
+                }
+
+                if(this.serverPlayer.life > 0 && this.character.deathCharacter){
+                    this.character.deathCharacter = false
+                    this.character.currentSprite.x = 0
+                    this.character.currentSprite.y = 2
+                }
             }
             
         })
@@ -67,6 +79,10 @@ export default class Online extends Engine{
 
         this.socketIO.on('pong', (ms) => {
             this.latency= ms
+        })
+
+        this.socketIO.on('Player Died', (data) => {
+            console.log(data);
         })
         setInterval(this.emitPlayerPosition, 1000/60)
     }
@@ -146,23 +162,31 @@ export default class Online extends Engine{
         }
 
         if(this.controls.goUp){
-            this.tileMap.startY ++
+
+            if(this.serverPlayer.life > 0)
+                this.tileMap.startY ++
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
         }
         
 
-        if(this.controls.goDown){   
+        if(this.controls.goDown){
+            if(this.serverPlayer.life > 0)   
+                this.tileMap.startY --
             if(!this.character.moveInterval)
                 this.character.onMovingBackwards()
         }
 
         if(this.controls.goRight){
+            if(this.serverPlayer.life > 0)
+                this.tileMap.startX ++
             if(!this.character.moveInterval)
                 this.character.onMovingRight()
         }
         
         if(this.controls.goLeft){
+            if(this.serverPlayer.life > 0)
+                this.tileMap.startX --
             if(!this.character.moveInterval)
                 this.character.onMovingLeft()
         }
@@ -211,7 +235,7 @@ export default class Online extends Engine{
                 let characterY = this.transformServerMagnitudesY(player.posY)+this.tileMap.startY
 
                 /* If the character is outside the screen don't draw it */
-                if(characterX + this.tile.width >= 0 && characterX < this.tileMap.width && characterY+ this.tile.height >= 0 && characterY < this.tileMap.height && player.character){
+                if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && player.character){
 
                     let skin
 

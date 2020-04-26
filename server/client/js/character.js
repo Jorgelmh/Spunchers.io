@@ -6,6 +6,9 @@
 
 const character = {
 
+
+    deathCharacter : false,
+
     /* Sprites */
     currentSprite: {
         x: null,
@@ -110,6 +113,14 @@ const character = {
     onMovingBackwardsLeft: function(){
         this.currentSprite.y = 7
         this.createInterval()
+    },
+
+    onCharacterDies: function(){
+        this.spriteSheet.img = this.spriteImages.normal
+        this.currentSprite.y = 8
+        setTimeout(() => {
+            this.currentSprite.x ++
+        }, 300)
     },
 
     createInterval : function(){
