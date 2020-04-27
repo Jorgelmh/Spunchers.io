@@ -59,14 +59,12 @@ class Game {
 
     removePlayer = (id) => {
         delete this.players[id]  
-        console.log(this.players);
     }
 
     /* change position of players when the movement events on the client are triggered */
     onMovement = (data) => {
 
         let currentPlayer = this.players[data.id]
-        console.log(currentPlayer);
 
         if(currentPlayer){
             currentPlayer.character = data.character

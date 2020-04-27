@@ -149,30 +149,25 @@ export default class Online extends Engine{
 
         if(this.controls.goUp){
 
-            if(this.playerStats.life > 0)
-                this.tileMap.startY ++
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
         }
         
 
         if(this.controls.goDown){
-            if(this.playerStats.life > 0)   
-                this.tileMap.startY --
+
             if(!this.character.moveInterval)
                 this.character.onMovingBackwards()
         }
 
         if(this.controls.goRight){
-            if(this.playerStats.life > 0)
-                this.tileMap.startX ++
+
             if(!this.character.moveInterval)
                 this.character.onMovingRight()
         }
         
         if(this.controls.goLeft){
-            if(this.playerStats.life > 0)
-                this.tileMap.startX --
+
             if(!this.character.moveInterval)
                 this.character.onMovingLeft()
         }
