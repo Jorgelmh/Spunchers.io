@@ -20,8 +20,8 @@ export default class Engine{
         this.skin = skin
 
         this.character = character
-        /* Tile properties */
 
+        /* Tile properties */
         this.tile = {
             width: null,
             height: null
@@ -53,6 +53,10 @@ export default class Engine{
             height: 720
         }
 
+        /* Player stats */
+
+        this.playerStats = null
+
         /* Calculate the average ratio of the screen */
         this.frameRatio= this.frameDefaultDimensions.height / this.frameDefaultDimensions.width
 
@@ -62,6 +66,10 @@ export default class Engine{
             xLimit: null,
             yLimit: null
         }
+
+        /* Relative position of player */
+
+        this.playerRelativePosition = null
 
         /* FPS Counter */
 
@@ -156,6 +164,9 @@ export default class Engine{
         /* Start points responsive -> rule of 3*/
         this.tileMap.startX = (this.tileMap.startX * this.tileMap.width) / tempWidth
         this.tileMap.startY = (this.tileMap.startY * this.tileMap.height) / tempHeight
+
+        /* Set player's position */
+        this.playerRelativePosition = this.getPlayerRelativePosition()
 
     }
 
@@ -261,10 +272,12 @@ export default class Engine{
 
     }
 
-    drawCharacter(player){
+    drawCharacter(){
 
-        this.context.drawImage(this.character.spriteSheet.img, this.character.currentSprite.x * this.character.spriteSheet.width, this.character.currentSprite.y * this.character.spriteSheet.height
-                                , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
+        let spriteSheetPos = (this.playerStats.life === 0 ) ? {x: 1, y: 8} : this.character.currentSprite
+
+        this.context.drawImage(this.character.spriteSheet.img, spriteSheetPos.x * this.character.spriteSheet.width, spriteSheetPos.y * this.character.spriteSheet.height
+                                , this.character.spriteSheet.width, this.character.spriteSheet.height, this.playerRelativePosition.posX, this.playerRelativePosition.posY, this.tile.width, this.tile.height)
     }
 
 

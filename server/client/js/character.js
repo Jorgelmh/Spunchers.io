@@ -114,15 +114,7 @@ const character = {
         this.currentSprite.y = 7
         this.createInterval()
     },
-
-    onCharacterDies: function(){
-        this.spriteSheet.img = this.spriteImages.normal
-        this.currentSprite.y = 8
-        setTimeout(() => {
-            this.currentSprite.x ++
-        }, 300)
-    },
-
+    
     createInterval : function(){
         this.currentSprite.x = 1
         this.moveInterval = setInterval(() =>{

@@ -24,7 +24,6 @@ export default class Online extends Engine{
 
         this.state = null
         this.server = server
-        this.serverPlayer = null
 
         /* CALCULATE network speed */
         this.latency = 0
@@ -35,26 +34,14 @@ export default class Online extends Engine{
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
             this.state = data
-            let currentPlayerPos = this.state.players.find((element) => element.playerID === this.playerID)
-            this.serverPlayer = currentPlayerPos
+            let currentPlayerPos = this.state.players[this.playerID]
+            this.playerStats = currentPlayerPos
 
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
 
                 this.tileMap.startX = startPoints.posX
                 this.tileMap.startY = startPoints.posY
-
-                if(this.serverPlayer.life === 0 && !this.character.deathCharacter){
-                    this.character.deathCharacter = true
-                    this.character.onMovingStop()
-                    this.character.onCharacterDies()
-                }
-
-                if(this.serverPlayer.life > 0 && this.character.deathCharacter){
-                    this.character.deathCharacter = false
-                    this.character.currentSprite.x = 0
-                    this.character.currentSprite.y = 2
-                }
             }
             
         })
@@ -103,7 +90,7 @@ export default class Online extends Engine{
         this.drawMap()
         this.drawObjects()
         this.drawOtherPlayers()
-        this.drawLife(playerPosition.posX, playerPosition.posY - 6, this.serverPlayer.life)
+        this.drawLife(this.playerRelativePosition.posX, this.playerRelativePosition.posY - 6, this.playerStats.life)
 
         this.context.fillStyle = 'black'
         this.drawBullets()
@@ -111,7 +98,7 @@ export default class Online extends Engine{
         this.context.font = '16px cursive'
         this.context.textAlign = 'center'
         this.context.fillText(this.name, playerPosition.posX + this.tile.width/2, playerPosition.posY - 10)
-        this.drawCharacter(playerPosition)
+        this.drawCharacter()
 
         this.context.fillStyle = "black"
         this.context.fillText(`FPS: ${this.FPS}`, (this.screenTiles.x * this.tile.height) - 100, 50)
@@ -163,7 +150,7 @@ export default class Online extends Engine{
 
         if(this.controls.goUp){
 
-            if(this.serverPlayer.life > 0)
+            if(this.playerStats.life > 0)
                 this.tileMap.startY ++
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
@@ -171,21 +158,21 @@ export default class Online extends Engine{
         
 
         if(this.controls.goDown){
-            if(this.serverPlayer.life > 0)   
+            if(this.playerStats.life > 0)   
                 this.tileMap.startY --
             if(!this.character.moveInterval)
                 this.character.onMovingBackwards()
         }
 
         if(this.controls.goRight){
-            if(this.serverPlayer.life > 0)
+            if(this.playerStats.life > 0)
                 this.tileMap.startX ++
             if(!this.character.moveInterval)
                 this.character.onMovingRight()
         }
         
         if(this.controls.goLeft){
-            if(this.serverPlayer.life > 0)
+            if(this.playerStats.life > 0)
                 this.tileMap.startX --
             if(!this.character.moveInterval)
                 this.character.onMovingLeft()
@@ -226,29 +213,33 @@ export default class Online extends Engine{
 
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
     drawOtherPlayers(){
-        if(this.state.players && this.state.players.length > 1){
-            let otherPlayers = this.state.players.filter((player) => player.playerID !== this.playerID)
+        if(this.state.players && Object.keys(this.state.players).length > 1){
 
-            for(let player of otherPlayers){
-                
-                let characterX = this.transformServerMagnitudesX(player.posX)+this.tileMap.startX
-                let characterY = this.transformServerMagnitudesY(player.posY)+this.tileMap.startY
+            for(let playerID in  this.state.players){
 
-                /* If the character is outside the screen don't draw it */
-                if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && player.character){
+                if(playerID !== this.playerID){
+                    let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
+                    let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
 
-                    let skin
+                    /* If the character is outside the screen don't draw it */
+                    if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
 
-                    if(player.skin == this.skin){
-                        if(player.shooting)
-                            skin = this.character.spriteImages.shooting
-                        else
-                            skin = this.character.spriteImages.normal
-                    }
+                        let skin
 
-                    if(skin){
-                        this.drawLife(characterX, characterY -6, player.life)
-                        this.drawOnlineCharacter({posX: characterX, posY: characterY}, player.character, skin, player.playerName )
+                        if(this.state.players[playerID].skin == this.skin){
+                            if(this.state.players[playerID].shooting)
+                                skin = this.character.spriteImages.shooting
+                            else
+                                skin = this.character.spriteImages.normal
+                        }
+
+                        if(this.state.players[playerID].life === 0)
+                            this.state.players[playerID].character.currentSprite = {x: 1, y: 8}
+
+                        if(skin){
+                            this.drawLife(characterX, characterY -6, this.state.players[playerID].life)
+                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, this.state.players[playerID].character, skin, this.state.players[playerID].playerName )
+                        }
                     }
                 }
             }
@@ -305,7 +296,7 @@ export default class Online extends Engine{
 
     emitBullet(){
         let halfServerTileWidth = this.server.width/(this.tileMap.tiles[0].length*2)
-        let dirX, dirY, posX = this.serverPlayer.posX + halfServerTileWidth, posY = this.serverPlayer.posY
+        let dirX, dirY, posX = this.playerStats.posX + halfServerTileWidth, posY = this.playerStats.posY
 
         switch (this.character.currentSprite.y){
             case 0:

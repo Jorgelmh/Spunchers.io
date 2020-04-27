@@ -2,9 +2,11 @@ class Game {
     constructor(map, collisionMap, width, height, tileSet){
 
         /* Arrays for players and active bullets */
-        this.players = []
+        this.players = {}
         this.bullets = []
         this.bulletSpeed = 400
+
+        this.characterSpeed = 1
 
         this.bulletWidth = 10
 
@@ -41,8 +43,8 @@ class Game {
     /* Add Players */
 
     addPlayers(data, socketID){
-        this.players.push({
-            playerID: socketID,
+
+        this.players[socketID] = {
             posX: 600,
             posY: 400,
             life: 100,
@@ -50,21 +52,19 @@ class Game {
             shooting: null,
             skin: data.skin,
             playerName: data.name
-        })
+        }
     }
 
     /* Remove Player ->  recieves the socket id as the parameter */
 
     removePlayer = (id) => {
-        let index = this.players.findIndex((element) => element.playerID == id)
-        if(index >= 0)
-            this.players.splice(index, 1)    
+        delete this.players[id]  
     }
 
     /* change position of players when the movement events on the client are triggered */
     onMovement = (data) => {
 
-        let currentPlayer = this.players.find((element) => element.playerID === data.id)
+        let currentPlayer = this.players[data.id]
 
         if(currentPlayer){
             currentPlayer.character = data.character
@@ -73,7 +73,7 @@ class Game {
 
                 if(data.controls.goUp){
                     let oldPosition = currentPlayer.posY
-                    currentPlayer.posY --
+                    currentPlayer.posY -=this.characterSpeed
     
                     if(this.detectColissions(currentPlayer)){
                         currentPlayer.posY = oldPosition
@@ -82,7 +82,7 @@ class Game {
     
                 if(data.controls.goDown){
                     let oldPosition = currentPlayer.posY
-                    currentPlayer.posY ++
+                    currentPlayer.posY += this.characterSpeed
     
                     if(this.detectColissions(currentPlayer)){
                         currentPlayer.posY = oldPosition
@@ -91,7 +91,7 @@ class Game {
     
                 if(data.controls.goLeft){
                     let oldPosition = currentPlayer.posX
-                    currentPlayer.posX --
+                    currentPlayer.posX -= this.characterSpeed
     
                     if(this.detectColissions(currentPlayer)){
                         currentPlayer.posX = oldPosition
@@ -101,7 +101,7 @@ class Game {
     
                 if(data.controls.goRight){
                     let oldPosition = currentPlayer.posX
-                    currentPlayer.posX ++
+                    currentPlayer.posX += this.characterSpeed
     
                     if(this.detectColissions(currentPlayer)){
                         currentPlayer.posX = oldPosition
@@ -139,7 +139,7 @@ class Game {
 
     addBullet(data, playerID){
 
-        let currentPlayer = this.players.find((element) => element.playerID === playerID)
+        let currentPlayer = this.players[playerID]
 
         currentPlayer.shooting = true
 
@@ -183,19 +183,19 @@ class Game {
 
     checkColissionsWithBullets(bullet){
 
-        if(this.players.length > 1){
+        if(Object.keys(this.players).length > 1){
 
             /* Use for loop instead of array methods so the loop is broken whenever the colission happens -> don't keep looping if there's a colission */
-            for(let i = 0; i < this.players.length; i++){
+            for(let playerID in this.players){
 
                 /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
-                if(this.players[i].playerID != bullet.ownerID && this.players[i].life > 0 && (this.players[i].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[i].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
-                    && (this.players[i].posY + (this.tile.width/4) < bullet.posY + this.bulletWidth && this.players[i].posY + this.tile.height > bullet.posY)){
+                if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
+                    && (this.players[playerID].posY + (this.tile.width/4) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
 
-                        this.players[i].life = (this.players[i].life - 33.4 < 0) ? 0 : this.players[i].life - 33.4
+                        this.players[playerID].life = (this.players[playerID].life - 33.4 < 0) ? 0 : this.players[playerID].life - 33.4
 
-                        if(this.players[i].life <= 0){
-                            this.playerHasDied(this.players[i].playerID)
+                        if(this.players[playerID].life <= 0){
+                            this.playerHasDied(playerID)
                         }
                         return true
                 }
@@ -211,15 +211,15 @@ class Game {
     */
 
     playerHasDied(playerID){
-        let index = this.players.findIndex((player) => player.playerID === playerID)
+        let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()
 
-        if(index !== undefined){
+        if(currentPlayer){
 
             setTimeout(() => {
-                this.players[index].life = 100
-                this.players[index].posX = newPosition.x
-                this.players[index].posY = newPosition.y
+                currentPlayer.life = 100
+                currentPlayer.posX = newPosition.x
+                currentPlayer.posY = newPosition.y
             }, 1000) 
         }
         
@@ -241,10 +241,10 @@ class Game {
     getSkins(){
         let srcArray = []
 
-        this.players.map((element) => {
-            if(srcArray.indexOf(element.skin))
-                srcArray.push(element.skin)
-        })
+        for(let playerID in this.players){
+            if(srcArray.indexOf(this.players[playerID].skin))
+                srcArray.push(this.players[playerID].skin)
+        }   
 
         return srcArray
     }
