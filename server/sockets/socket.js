@@ -23,12 +23,6 @@ const socketListen = (app) => {
 
     io.on('connection', function(socket) {
 
-        setInterval(() => {
-            serverGame.update()
-            //socket.emit('state', serverGame.getState())
-            io.sockets.emit('state', serverGame.getState())
-        }, 1000 / 60)
-
         /* Add websockets in here */
         socket.emit('loadMap', serverGame.onLoadMap(socket.id))
 
@@ -41,10 +35,15 @@ const socketListen = (app) => {
 
             /* Other players load tnew player's skin */
             socket.broadcast.emit('Load New Skin', {src: data.skin})
+            io.sockets.emit('state', serverGame.update())
+
         })
 
         /* Listener of socket movement */
-        socket.on('movement', serverGame.onMovement)
+        socket.on('movement', (data) => {
+            serverGame.onMovement(data)
+            io.sockets.emit('state', serverGame.update())
+        } )
 
         socket.on('disconnect', (data) => {
             serverGame.removePlayer(socket.id)                 

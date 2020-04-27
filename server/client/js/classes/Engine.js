@@ -194,7 +194,6 @@ export default class Engine{
                     this.controls.shoot = true                    
                     break
             }
-
         })
 
         window.addEventListener('keyup', () => {
@@ -223,7 +222,6 @@ export default class Engine{
                     this.character.spriteSheet.img = this.character.spriteImages.normal
                     break
             }
-
         })
     }
 

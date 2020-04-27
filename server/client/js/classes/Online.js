@@ -71,7 +71,6 @@ export default class Online extends Engine{
         this.socketIO.on('Player Died', (data) => {
             console.log(data);
         })
-        setInterval(this.emitPlayerPosition, 1000/60)
     }
 
     /**
@@ -180,6 +179,8 @@ export default class Online extends Engine{
 
         if(this.ableToshoot && this.controls.shoot)
             this.triggerShooting()
+
+        this.emitPlayerPosition()
 
     }
 
