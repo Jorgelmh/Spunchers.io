@@ -19,7 +19,8 @@ export default class Online extends Engine{
         /* Add to emit => the skin */
         this.socketIO.emit('New Player', {
             name: this.name,
-            skin: this.skin
+            skin: this.skin,
+            character: this.character.currentSprite
         })
 
         this.state = null
@@ -68,9 +69,6 @@ export default class Online extends Engine{
             this.latency= ms
         })
 
-        this.socketIO.on('Player Died', (data) => {
-            console.log(data);
-        })
     }
 
     /**
@@ -119,6 +117,8 @@ export default class Online extends Engine{
 
     animateCharacter(){
         
+        let emitPos = false
+
         if(this.controls.goUp && this.controls.goLeft){
             if(this.character.currentSprite.y != 5){
                 this.character.onMovingStop()
@@ -149,6 +149,8 @@ export default class Online extends Engine{
 
         if(this.controls.goUp){
 
+            emitPos = true
+
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
         }
@@ -156,17 +158,23 @@ export default class Online extends Engine{
 
         if(this.controls.goDown){
 
+            emitPos = true
+
             if(!this.character.moveInterval)
                 this.character.onMovingBackwards()
         }
 
         if(this.controls.goRight){
 
+            emitPos = true
+
             if(!this.character.moveInterval)
                 this.character.onMovingRight()
         }
         
         if(this.controls.goLeft){
+
+            emitPos = true
 
             if(!this.character.moveInterval)
                 this.character.onMovingLeft()
@@ -175,7 +183,8 @@ export default class Online extends Engine{
         if(this.ableToshoot && this.controls.shoot)
             this.triggerShooting()
 
-        this.emitPlayerPosition()
+        if(emitPos)
+            this.emitPlayerPosition()
 
     }
 
@@ -211,11 +220,14 @@ export default class Online extends Engine{
     drawOtherPlayers(){
         if(this.state.players && Object.keys(this.state.players).length > 1){
 
-            for(let playerID in  this.state.players){
+            for(let playerID in this.state.players){
 
                 if(playerID !== this.playerID){
+
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
+
+                    console.log(this.state.players[playerID].character);
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){

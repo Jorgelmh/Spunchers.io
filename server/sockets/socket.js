@@ -15,6 +15,8 @@ const socketListen = (app) => {
     const io = socketIO(app, {pingInterval: 1000})
     const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet)
     
+    let shootingInterval = null
+    
     io.sockets.on('connection', function (socket) {
         socket.on('ping', function() {
           socket.emit('pong');
@@ -46,12 +48,27 @@ const socketListen = (app) => {
         } )
 
         socket.on('disconnect', (data) => {
-            serverGame.removePlayer(socket.id)                 
+            serverGame.removePlayer(socket.id) 
+            io.sockets.emit('state', serverGame.update())                
         })
 
         /* Listener of players shooting */
         socket.on('shoot',(data) => {
             serverGame.addBullet(data, socket.id)
+
+            if(shootingInterval === null){
+                io.sockets.emit('state', serverGame.update(Date.now()))
+                shootingInterval = setInterval(() => {
+
+                    io.sockets.emit('state', serverGame.update())
+
+                    if(serverGame.bullets.length === 0){
+                        clearInterval(shootingInterval)
+                        shootingInterval = null
+                    }
+                }, 1000 / 60)
+            }
+            
         })
 
     });

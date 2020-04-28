@@ -222,6 +222,8 @@ export default class Engine{
                     this.character.spriteSheet.img = this.character.spriteImages.normal
                     break
             }
+
+            this.emitPlayerPosition()
         })
     }
 

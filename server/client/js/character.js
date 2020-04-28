@@ -11,8 +11,8 @@ const character = {
 
     /* Sprites */
     currentSprite: {
-        x: null,
-        y: null
+        x: 0,
+        y: 2
     },
     spriteSheet: {
         img: null,
@@ -44,9 +44,6 @@ const character = {
         sprite.onload = () =>{
             this.spriteSheet.img = sprite
             this.spriteImages.normal = sprite
-
-            this.currentSprite.x = 0
-            this.currentSprite.y = 3
 
             if(++loadedImages == 2)
                 callback()

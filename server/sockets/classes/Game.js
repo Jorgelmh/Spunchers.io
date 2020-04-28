@@ -10,6 +10,8 @@ class Game {
 
         this.bulletWidth = 10
 
+        this.shootingInterval = null
+
         /* 
              ====================
                 Map features 
@@ -48,7 +50,9 @@ class Game {
             posX: 600,
             posY: 400,
             life: 100,
-            character: null,
+            character: {
+                currentSprite: data.character
+            },
             shooting: null,
             skin: data.skin,
             playerName: data.name
@@ -155,15 +159,20 @@ class Game {
         })
     }
 
-    update(){
+    update(date){
+
         let now = new Date()
+        this.lastRefresh = date || this.lastRefresh
         let dt = (now - this.lastRefresh)/1000
         this.lastRefresh = now
 
         if(this.bullets.length > 0)
             this.updateBulletsPosition(dt)
 
-        return this.getState()
+        return {
+            players: this.players,
+            bullets: this.bullets
+        }
     }
 
     updateBulletsPosition(dt){
@@ -249,14 +258,6 @@ class Game {
         }   
 
         return srcArray
-    }
-
-    /* Returns the state of the game running on the server */
-    getState(){
-        return {
-            players: this.players,
-            bullets: this.bullets
-        }
     }
 
     /* Data that is needed to be loaded before the game can run */
