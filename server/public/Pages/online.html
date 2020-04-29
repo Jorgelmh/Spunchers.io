@@ -31,7 +31,19 @@
         </div>
     </div>
 
-    <canvas id="game"></canvas>
+    <div id="site-game">
+        <canvas id="game"></canvas>
+        <div class="site-chat">
+            <div class="chat-messages" id="chatMessages">
+                <p>Chat with other players</p>
+            </div>
+            <div class="write-chat">
+                <input type="text" id="chat-message" placeholder="Leave a message">
+                <button id="submit-message" type="button"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+    
     <script src="../dist/main.js" type="module"></script>
 </body>
 </html>

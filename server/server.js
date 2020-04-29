@@ -7,7 +7,7 @@ const app = express()
 const path = require('path')
 const server = require('http').createServer(app);
 
-//Add the webcoket logic to the server
+//Add the websocket logic to the server
 socket.listen(server)
 
 /* Middlewares */

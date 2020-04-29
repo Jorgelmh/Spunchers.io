@@ -1,6 +1,11 @@
-class Game {
-    constructor(map, collisionMap, width, height, tileSet){
+const OnlineChatServer = require('./OnlineChatServer')
 
+class Game {
+    constructor(map, collisionMap, width, height, tileSet, io){
+
+        /* Socket to use in case of specific state events */
+        this.socketIO = io
+        
         /* Arrays for players and active bullets */
         this.players = {}
         this.bullets = []
@@ -41,6 +46,9 @@ class Game {
 
         /* Bullets movement */
         this.lastRefresh = Date.now()
+
+        /* Create chat object */
+        this.onlineChat = new OnlineChatServer()
     }
     /* Add Players */
 
@@ -225,12 +233,17 @@ class Game {
         let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()
 
+        this.bullets = this.bullets.filter((elem) => {
+            elem.ownerID !== playerID
+        })
+
         if(currentPlayer){
 
             setTimeout(() => {
                 currentPlayer.life = 100
                 currentPlayer.posX = newPosition.x
                 currentPlayer.posY = newPosition.y
+                this.socketIO.sockets.emit('state', this.update())
             }, 1000) 
         }
         
@@ -242,6 +255,43 @@ class Game {
             y: 0
         }
     }
+
+    /**
+     * =======================
+     *      Online Chat
+     * =======================
+     */
+
+     addChatMessage(message, socket, adminID){
+
+        /* Add the message if it's not a command and return true */
+        let isAdmin = (adminID === process.env.AdminKey)
+        let command = this.onlineChat.checkCommand(message, isAdmin)
+
+        if(!command){
+            this.onlineChat.addMessage(this.players[socket.id].playerName, message)
+
+            if(isAdmin)
+                return `${this.players[socket.id].playerName} [Admin]`
+            else
+                return this.players[socket.id].playerName
+
+        }else{
+
+            if(command.keyword === 'ban'){
+                let playerID = Object.keys(this.players).find((elem) => this.players[elem].playerName === command.name)
+                
+                if(playerID){
+                    delete this.players[playerID]
+                    this.socketIO.to(playerID).emit('banned')
+                    this.socketIO.sockets.emit('state', this.update())
+                }
+            }
+        }
+     }
+
+     /* Commands */
+
     /**
      *  ==================
      *       Getters

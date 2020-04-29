@@ -11,6 +11,10 @@ body{
     font-family: 'PT Sans', sans-serif;
 }
 
+#site-game{
+    display: none;
+}
+
 .character-name{
     text-align: center;
     margin: 15px 30px;
@@ -76,4 +80,61 @@ body{
     z-index: 1;
     width: 100%;
     min-height: 100%;
+}
+
+/* SITE-CHAT */
+
+.chat-messages{
+    max-height: 100px;
+    overflow-y: scroll;
+    padding: 5px;
+}
+
+.chat-messages p{
+    margin-bottom: 0;
+}
+
+.chat-messages:first-child{
+    margin-top: 0;
+}
+
+.site-chat{
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 15%;
+    min-width: 200px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 5px;
+}
+
+.write-chat{
+    margin: 5px;
+    align-items: center;
+    display: flex;
+}
+.write-chat input{
+    width: 80%;
+    float: left;
+    box-sizing: border-box;
+}
+
+.write-chat button{
+    width: 20%;
+    box-sizing: border-box;
+    color: aqua;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.write-chat input, .write-chat button{
+    padding: 5px;
+    border: none;
+}
+
+@media(max-width: 700px){
+    .site-chat{
+        display: none;
+    }
 }

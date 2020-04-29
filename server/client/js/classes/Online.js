@@ -1,4 +1,5 @@
 import Engine from './Engine.js'
+import OnlineChat from './OnlineChat.js'
 
 /**
  * ================================
@@ -15,6 +16,9 @@ export default class Online extends Engine{
         /* Online attributes recevied from the sever */
         this.playerID = playerID
         this.socketIO = socket
+
+        /* Create a chat room */
+        this.chat = new OnlineChat(this.socketIO)
 
         /* Add to emit => the skin */
         this.socketIO.emit('New Player', {
@@ -180,7 +184,7 @@ export default class Online extends Engine{
                 this.character.onMovingLeft()
         }
 
-        if(this.ableToshoot && this.controls.shoot)
+        if(this.ableToshoot && this.controls.shoot && !this.chat.active)
             this.triggerShooting()
 
         if(emitPos)
@@ -226,8 +230,6 @@ export default class Online extends Engine{
 
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
-
-                    console.log(this.state.players[playerID].character);
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
@@ -388,7 +390,4 @@ export default class Online extends Engine{
 
         this.socketIO.emit('shoot', bullet)
     }
-
-    
-
 }

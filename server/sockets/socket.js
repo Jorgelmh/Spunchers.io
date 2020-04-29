@@ -5,18 +5,26 @@
  */
 
 const socketIO = require('socket.io')
-const { generateRandomMap, colissionsTest, colissionable } = require('./test')
 const Game = require('./classes/Game')
 const map = require('./maps/test.json')
-//const lobby = new Lobby() //Class that will store all the values of players in it
 
 /* Scoket listener */
 const socketListen = (app) => {
+
     const io = socketIO(app, {pingInterval: 1000})
-    const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet)
+
+    //Lobby of the currrent game
+    const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet, io)
     
     let shootingInterval = null
+
+    /**
+     * ====================================
+     *      Socket Listeners (Logic)
+     * ====================================
+     */
     
+    // Emit the latency
     io.sockets.on('connection', function (socket) {
         socket.on('ping', function() {
           socket.emit('pong');
@@ -71,7 +79,20 @@ const socketListen = (app) => {
             
         })
 
-    });
+        /** 
+         * ========================
+         *      Chat Listeners
+         * ========================
+        */
+
+        socket.on('Chat Message', (data) => {
+            let name = serverGame.addChatMessage(data.text, socket, data.adminID)
+
+            if(name)
+                io.sockets.emit('new Chat Message', {name, text: data.text})
+        })
+
+    })
 
 }
 
