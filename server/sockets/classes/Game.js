@@ -63,7 +63,8 @@ class Game {
             },
             shooting: null,
             skin: data.skin,
-            playerName: data.name
+            playerName: data.name,
+            score: 0
         }
     }
 
@@ -214,6 +215,7 @@ class Game {
                         this.players[playerID].life = (this.players[playerID].life - 33.4 < 0) ? 0 : this.players[playerID].life - 33.4
 
                         if(this.players[playerID].life <= 0){
+                            this.players[bullet.ownerID].score ++
                             this.playerHasDied(playerID)
                         }
                         return true
@@ -246,7 +248,10 @@ class Game {
                 this.socketIO.sockets.emit('state', this.update())
             }, 1000) 
         }
-        
+
+        /* Emit new leaderboard */
+        this.socketIO.sockets.emit('New leaderboard', this.sortScores(this.players))
+                
     }
 
     respawnPlayerPosition(){
@@ -254,6 +259,42 @@ class Game {
             x: 0,
             y: 0
         }
+    }
+
+    /**
+     * =========================
+     *  Sending Updated Scores
+     * =========================
+     *
+    */
+
+    /* Insertion sort application to find the 3 highest scores -> returns 3 names and scores */
+    sortScores(hashMap){
+
+        let arr = Object.keys(hashMap)
+        let newArr = []
+
+        let length = (arr.length < 3) ? arr.length : 3
+        for(let i = 0; i < length ; i++){
+            let greaterScore = i
+
+            for(let j = i+1; j < arr.length; j++){
+                if(hashMap[arr[j]].score > hashMap[arr[greaterScore]].score)
+                    greaterScore = j
+                
+            }
+            let temp = arr[i]
+            arr[i] = arr[greaterScore]
+            arr[greaterScore] = temp
+
+            newArr.push({
+                id: arr[i],
+                name: hashMap[arr[i]].playerName,
+                score: hashMap[arr[i]].score
+            })
+        }
+
+        return newArr
     }
 
     /**

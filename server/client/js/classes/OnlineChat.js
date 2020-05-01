@@ -76,12 +76,15 @@ export default class OnlineChat{
         const url = new URLSearchParams(window.location.search)
         const adminID = url.get('adminID')
 
-        this.socketIO.emit('Chat Message', {
-            text: this.inputChat.value,
-            adminID: adminID
-        })
-
-        /* Reset the content */
-        this.inputChat.value = ""
+        if(this.inputChat.value != ''){
+            this.socketIO.emit('Chat Message', {
+                text: this.inputChat.value,
+                adminID: adminID
+            })
+    
+            /* Reset the content */
+            this.inputChat.value = ""
+        }
+        
     }
 }

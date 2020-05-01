@@ -69,6 +69,29 @@ export default class Online extends Engine{
         })
 
 
+        /* When the score changes */
+
+        this.socketIO.on('New leaderboard', (data) => {
+
+            let positions = ['trophy', 'medal', 'award']
+            let score = document.getElementById('scores')
+
+            score.innerHTML = ''
+
+            data.map((elem, index) => {
+
+                let text = document.createElement('p')
+                if(elem.id === this.playerID)
+                    text.style.color = '#f0565e'
+
+                let scoreText = `<i class="fas fa-${positions[index]}"></i>.${elem.name}: ${elem.score}`
+                text.innerHTML = scoreText
+
+                score.appendChild(text)
+            })
+
+        })
+
         this.socketIO.on('pong', (ms) => {
             this.latency= ms
         })
