@@ -331,9 +331,8 @@ export default class Online extends Engine{
 
     emitBullet(){
 
-        console.log(Date.now());
         this.socketIO.emit('shoot', {
-            shootTime: Date.now()
+            shootTime: Date.now() + 6300
         })
     }
 }
