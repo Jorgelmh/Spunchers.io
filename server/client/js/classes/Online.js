@@ -12,6 +12,7 @@ export default class Online extends Engine{
         super(map, colissionMatrix, tileSet, canvas, skin)
 
         this.name = name
+        this.serverDelay = null
 
         /* Online attributes recevied from the sever */
         this.playerID = playerID
@@ -26,8 +27,6 @@ export default class Online extends Engine{
             skin: this.skin,
             character: this.character.currentSprite
         })
-
-        this.socketIO.on('new time', (data) => console.log(data))
 
         this.state = null
         this.server = server
@@ -44,7 +43,7 @@ export default class Online extends Engine{
             let currentPlayerPos = this.state.players[this.playerID]
             this.playerStats = currentPlayerPos
 
-            console.log(Date.now() - data.serverTime);
+            this.serverDelay = Date.now() - data.serverTime
 
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
@@ -334,7 +333,7 @@ export default class Online extends Engine{
     emitBullet(){
 
         this.socketIO.emit('shoot', {
-            shootTime: Date.now() + 6300
+            shootTime: Date.now() - this.serverDelay
         })
     }
 }
