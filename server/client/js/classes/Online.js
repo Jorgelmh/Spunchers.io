@@ -44,6 +44,8 @@ export default class Online extends Engine{
             let currentPlayerPos = this.state.players[this.playerID]
             this.playerStats = currentPlayerPos
 
+            console.log(Date.now() - data.serverTime);
+
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
 

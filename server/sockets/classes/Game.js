@@ -182,7 +182,8 @@ class Game {
 
         return {
             players: this.players,
-            bullets: this.bullets
+            bullets: this.bullets,
+            serverTime: Date.now()
         }
     }
 
