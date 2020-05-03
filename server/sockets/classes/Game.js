@@ -237,6 +237,7 @@ class Game {
 
         /* Synn check time */
         this.players[playerID].lastDeath = Date.now()
+        this.socketIO.emit('new time', this.players[playerID].lastDeath)
         
         let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()

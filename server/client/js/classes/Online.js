@@ -27,6 +27,8 @@ export default class Online extends Engine{
             character: this.character.currentSprite
         })
 
+        this.socketIO.on('new time', (data) => console.log(data))
+
         this.state = null
         this.server = server
 
@@ -328,6 +330,8 @@ export default class Online extends Engine{
     /* Emit bullet to the server */
 
     emitBullet(){
+
+        console.log(Date.now());
         this.socketIO.emit('shoot', {
             shootTime: Date.now()
         })
