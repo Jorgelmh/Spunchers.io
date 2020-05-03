@@ -64,7 +64,8 @@ class Game {
             shooting: null,
             skin: data.skin,
             playerName: data.name,
-            score: 0
+            score: 0,
+            lastDeath: Date.now()
         }
     }
 
@@ -150,9 +151,10 @@ class Game {
      * ========================
      */
 
-    addBullet(data, playerID){
+    addBullet(playerID){
 
         let currentPlayer = this.players[playerID]
+        let bullet = this.emitBullet(playerID)
 
         currentPlayer.shooting = true
 
@@ -161,10 +163,10 @@ class Game {
         }, 90)
         this.bullets.push({
             ownerID: playerID,
-            posX: data.posX,
-            posY: data.posY,
-            dirX: data.dirX,
-            dirY: data.dirY
+            posX: bullet.posX,
+            posY: bullet.posY,
+            dirX: bullet.dirX,
+            dirY: bullet.dirY
         })
     }
 
@@ -232,6 +234,10 @@ class Game {
     */
 
     playerHasDied(playerID){
+
+        /* Synn check time */
+        this.players[playerID].lastDeath = Date.now()
+        
         let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()
 
@@ -313,7 +319,7 @@ class Game {
             this.onlineChat.addMessage(this.players[socket.id].playerName, message)
 
             if(isAdmin)
-                return `${this.players[socket.id].playerName} [Admin]`
+                return `${this.players[socket.id].playerName} [<i class="fas fa-user-check"></i>]`
             else
                 return this.players[socket.id].playerName
 
@@ -365,6 +371,94 @@ class Game {
             },
             playerID: id
         }
+    }
+
+    /* Emit Bullet */
+    emitBullet(playerID){
+        let halfServerTileWidth = this.tile.width/2
+        let dirX, dirY, posX = this.players[playerID].posX + halfServerTileWidth, posY = this.players[playerID].posY
+
+        switch (this.players[playerID].character.currentSprite.y){
+            case 0:
+                dirX = 0
+                dirY = 1 
+                posY+= halfServerTileWidth*2
+                break
+            case 1:
+                dirX = -1
+                dirY = 0
+                break
+            case 2:
+                dirX = 1
+                dirY = 0
+                break
+            case 3:
+                dirY = -1
+                dirX = 0
+                posX+=(halfServerTileWidth/4)
+                break
+            case 4:
+                if(this.players[playerID].character.currentSprite.x == 0){
+                    dirX = 1
+                    dirY = 0
+                }else{
+                    dirX = Math.sin(Math.PI / 4)
+                    dirY = - Math.sin(Math.PI / 4)
+                }
+                break
+
+            case 5: 
+                if(this.players[playerID].character.currentSprite.x == 0){
+                    dirX = -1
+                    dirY = 0
+                }else{
+                    dirX = -Math.sin(Math.PI / 4)
+                    dirY = - Math.sin(Math.PI / 4)
+                }
+                break
+            case 6:
+                if(this.players[playerID].character.currentSprite.x == 0){
+                    dirX = 1
+                    dirY = 0
+                }else{
+                    dirX = Math.sin(Math.PI / 4)
+                    dirY = Math.sin(Math.PI / 4)
+                }
+                break
+            case 7:
+                if(this.players[playerID].character.currentSprite.x == 0){
+                    dirX = -1
+                    dirY = 0
+                }else{
+                    dirX = -Math.sin(Math.PI / 4)
+                    dirY = Math.sin(Math.PI / 4)
+                }
+                break
+
+        }
+
+        if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 2 
+            || (this.players[playerID].character.currentSprite.y >= 4 && this.players[playerID].character.currentSprite.x === 0))
+            posY+=halfServerTileWidth + (halfServerTileWidth/6)
+
+        if((this.players[playerID].character.currentSprite.y === 4 || this.players[playerID].character.currentSprite.y === 5) && this.players[playerID].character.currentSprite.x != 0){
+            posX+=(halfServerTileWidth * dirX)
+            posY+=(halfServerTileWidth * -dirY)
+        }
+
+        if((this.players[playerID].character.currentSprite.y === 6 || this.players[playerID].character.currentSprite.y === 7) && this.players[playerID].character.currentSprite.x != 0){
+            posX+=(halfServerTileWidth * dirX)
+            posY+=(halfServerTileWidth + halfServerTileWidth * dirY)
+        }
+
+        let bullet = {
+            posX,
+            posY,
+            dirX: dirX,
+            dirY: dirY
+        }
+
+        return bullet
     }
 
 }
