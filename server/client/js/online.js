@@ -9,7 +9,7 @@ const socket = io()
 let game
 
 /* Skins on the server that are ready to use */
-const characterSkins = ['blade']
+const characterSkins = ['blade', 'mikaela']
 
 /* Glide track -> where the slides have to be added in */
 const track = document.getElementsByClassName('glide__slides')[0]

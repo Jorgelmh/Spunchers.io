@@ -35,7 +35,7 @@ export default class Online extends Engine{
         this.latency = 0
 
         /* Skins array of images */
-        this.onlineSkins = []
+        this.onlineSkins = {}
 
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
@@ -65,10 +65,10 @@ export default class Online extends Engine{
 
         /* when a new player enters, other people must load his skin */
         this.socketIO.on('Load New Skin', (data) =>{
-            let element = this.onlineSkins.find((elem) => elem.src === data.src)
-            if(!element && data.src != this.skin){
+            let element = this.onlineSkins[data.src]
+            if(!element && data.src != this.skin)
                 this.loadServerSkin(data.src)
-            }
+            
         })
 
 
@@ -267,6 +267,11 @@ export default class Online extends Engine{
                                 skin = this.character.spriteImages.shooting
                             else
                                 skin = this.character.spriteImages.normal
+                        }else{
+                            if(this.state.players[playerID].shooting)
+                                skin = this.onlineSkins[this.state.players[playerID].skin].shooting
+                            else
+                                skin = this.onlineSkins[this.state.players[playerID].skin].normal
                         }
 
                         if(this.state.players[playerID].life === 0)
@@ -306,7 +311,14 @@ export default class Online extends Engine{
     loadServerSkin(src){
         let characterSkin = new Image()
         characterSkin.src = `../assets/characters/${src}.png`
-        this.onlineSkins.push(characterSkin)
+
+        let shootingSkin = new Image()
+        shootingSkin.src = `../assets/characters/shooting/${src}.png`
+
+        this.onlineSkins[src] = {
+            normal: characterSkin,
+            shooting: shootingSkin
+        }
     }
 
     /** 
