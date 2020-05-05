@@ -461,16 +461,16 @@ class Game {
 
         if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 2 
             || (this.players[playerID].character.currentSprite.y >= 4 && this.players[playerID].character.currentSprite.x === 0))
-            posY+=halfServerTileWidth + (halfServerTileWidth/6)
+            posY+=this.players[playerID].offsetYHorizontal(halfServerTileWidth)
 
         if((this.players[playerID].character.currentSprite.y === 4 || this.players[playerID].character.currentSprite.y === 5) && this.players[playerID].character.currentSprite.x != 0){
-            posX+=(halfServerTileWidth * dirX)
-            posY+=(halfServerTileWidth * -dirY)
+            posX+=this.players[playerID].diagonalUpOffsetX(halfServerTileWidth, dirX)
+            posY+=this.players[playerID].diagonalUpOffsetY(halfServerTileWidth, dirY)
         }
 
         if((this.players[playerID].character.currentSprite.y === 6 || this.players[playerID].character.currentSprite.y === 7) && this.players[playerID].character.currentSprite.x != 0){
-            posX+=(halfServerTileWidth * dirX)
-            posY+=(halfServerTileWidth + halfServerTileWidth * dirY)
+            posX+=this.players[playerID].diagonalDownOffsetX(halfServerTileWidth, dirX)
+            posY+=this.players[playerID].diagonalDownOffsetY(halfServerTileWidth, dirY)
         }
 
         let bullet = {
