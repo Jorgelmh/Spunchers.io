@@ -1,4 +1,9 @@
+/* Import Chat Class */
 const OnlineChatServer = require('./OnlineChatServer')
+
+/* Import character classes */
+const Mikaela = require('./characters/Mikaela.js');
+const Blade = require('./characters/Blade.js');
 
 class Game {
     constructor(map, collisionMap, width, height, tileSet, io){
@@ -54,6 +59,17 @@ class Game {
 
     addPlayers(data, socketID){
 
+        switch (data.skin) {
+            case 'blade':
+                this.players[socketID] = new Blade(600, 400, data.character, data.name)
+                break
+
+            case 'mikaela':
+                this.players[socketID] = new Mikaela(600, 400, data.character, data.name)
+                break
+        }
+
+        /*
         this.players[socketID] = {
             posX: 600,
             posY: 400,
@@ -68,6 +84,7 @@ class Game {
             ableToShoot:  true,
             lastDeath: Date.now()
         }
+        */
     }
 
     /* Remove Player ->  recieves the socket id as the parameter */
@@ -173,7 +190,7 @@ class Game {
 
         currentPlayer.ableToShoot = false
 
-        setTimeout(() => currentPlayer.ableToShoot = true, 250)
+        setTimeout(() => currentPlayer.ableToShoot = true, this.players[playerID].shootingDelay)
     }
 
     update(date){
@@ -221,7 +238,7 @@ class Game {
                 if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
                     && (this.players[playerID].posY + (this.tile.width/4) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
 
-                        this.players[playerID].life = (this.players[playerID].life - 33.4 < 0) ? 0 : this.players[playerID].life - 33.4
+                        this.players[playerID].life = (this.players[playerID].life - this.players[bullet.ownerID].impactDamage < 0) ? 0 : this.players[playerID].life - this.players[bullet.ownerID].impactDamage
 
                         if(this.players[playerID].life <= 0){
                             this.players[bullet.ownerID].score ++
