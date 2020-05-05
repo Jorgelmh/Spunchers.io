@@ -69,10 +69,10 @@ const socketListen = (app) => {
         /* Listener of players shooting */
         socket.on('shoot',(data) => {
 
-            if(data.shootTime > serverGame.players[socket.id].lastDeath && serverGame.players[socket.id].life > 0)
+            if(data.shootTime > serverGame.players[socket.id].lastDeath && serverGame.players[socket.id].life > 0 && serverGame.players[socket.id].ableToShoot)
                 serverGame.addBullet(socket.id)
 
-            if(shootingInterval === null){
+            if(shootingInterval === null && serverGame.bullets.length > 0 ){
                 io.sockets.emit('state', serverGame.update(Date.now()))
                 shootingInterval = setInterval(() => {
 

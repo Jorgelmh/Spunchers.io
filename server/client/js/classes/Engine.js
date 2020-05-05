@@ -41,8 +41,6 @@ export default class Engine{
 
         /* Tiles per screen */
 
-        this.ableToshoot = true,
-
         this.screenTiles= {
             x: 16,
             y: 9
@@ -338,22 +336,18 @@ export default class Engine{
 
     /* Shooting timing */
     triggerShooting(){
-        this.ableToshoot = false
 
         /* Fire animation */
         setTimeout(() => {
             this.emitBullet()
-            this.character.spriteSheet.img =  this.character.spriteImages.shooting
+
+            if(this.playerStats.life > 0)
+                this.character.spriteSheet.img =  this.character.spriteImages.shooting
 
             setTimeout(() => {
                 this.character.spriteSheet.img = this.character.spriteImages.normal
             }, 90)
 
         }, 70)
-
-        /* Fire again after */
-        setTimeout(() => {
-            this.ableToshoot = true
-        }, 250)
     }
 }

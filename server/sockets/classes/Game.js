@@ -65,6 +65,7 @@ class Game {
             skin: data.skin,
             playerName: data.name,
             score: 0,
+            ableToShoot:  true,
             lastDeath: Date.now()
         }
     }
@@ -161,13 +162,18 @@ class Game {
         setTimeout(() => {
             currentPlayer.shooting = false
         }, 90)
+
         this.bullets.push({
-            ownerID: playerID,
-            posX: bullet.posX,
-            posY: bullet.posY,
-            dirX: bullet.dirX,
-            dirY: bullet.dirY
-        })
+                ownerID: playerID,
+                posX: bullet.posX,
+                posY: bullet.posY,
+                dirX: bullet.dirX,
+                dirY: bullet.dirY
+        }) 
+
+        currentPlayer.ableToShoot = false
+
+        setTimeout(() => currentPlayer.ableToShoot = true, 250)
     }
 
     update(date){
@@ -242,9 +248,7 @@ class Game {
         let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()
 
-        this.bullets = this.bullets.filter((elem) => {
-            elem.ownerID !== playerID
-        })
+        this.bullets = this.bullets.filter((elem) => elem.ownerID !== playerID )
 
         if(currentPlayer){
 

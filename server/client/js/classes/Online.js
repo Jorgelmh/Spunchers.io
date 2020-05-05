@@ -210,7 +210,7 @@ export default class Online extends Engine{
                 this.character.onMovingLeft()
         }
 
-        if(this.ableToshoot && this.controls.shoot && !this.chat.active)
+        if(this.playerStats.ableToShoot && this.controls.shoot && !this.chat.active)
             this.triggerShooting()
 
         if(emitPos)
