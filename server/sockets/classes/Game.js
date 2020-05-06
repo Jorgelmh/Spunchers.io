@@ -174,7 +174,10 @@ class Game {
         let currentPlayer = this.players[playerID]
         let bullet = this.emitBullet(playerID)
 
+        this.socketIO.to(playerID).emit('reduce ammo')
+
         currentPlayer.shooting = true
+        currentPlayer.reduceAmmunition(this.emitReload, playerID)
 
         setTimeout(() => {
             currentPlayer.shooting = false
@@ -190,7 +193,11 @@ class Game {
 
         currentPlayer.ableToShoot = false
 
-        setTimeout(() => currentPlayer.ableToShoot = true, this.players[playerID].shootingDelay)
+        setTimeout(() => {
+            currentPlayer.ableToShoot = true
+
+            this.socketIO.to(playerID).emit('able to shoot')
+        }, this.players[playerID].shootingDelay)
     }
 
     update(date){
@@ -203,11 +210,14 @@ class Game {
         if(this.bullets.length > 0)
             this.updateBulletsPosition(dt)
 
+        /* return only the info the user needs to know about the players */
+        let clientPlayers = Object.fromEntries(Object.entries(this.players).map(([id, player]) => [id, player.playerState()]))
         return {
-            players: this.players,
+            players: clientPlayers,
             bullets: this.bullets,
             serverTime: Date.now()
         }
+
     }
 
     updateBulletsPosition(dt){
@@ -218,6 +228,20 @@ class Game {
             if(this.checkColissionsWithBullets(element) || (element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height))
                 this.bullets.splice(index, 1)
         })
+    }
+
+    /**
+     * ========================
+     *      RELOAD WEAPON
+     * ========================
+     */
+
+    reloadPlayerWeapon(playerID){
+        this.players[playerID].reloadWeapon(this.emitReload, playerID)
+    }
+
+    emitReload = (playerID) => {
+        this.socketIO.to(playerID).emit('Reload Weapon')
     }
 
     /**
@@ -368,7 +392,7 @@ class Game {
      */
 
     /* Return non-repeated values of skins */
-    getSkins(){
+    getSkins(playerID){
         let srcArray = []
 
         for(let playerID in this.players){
@@ -376,7 +400,12 @@ class Game {
                 srcArray.push(this.players[playerID].skin)
         }   
 
-        return srcArray
+        return {
+            srcArray,
+            characterInfo: {
+                bullets: this.players[playerID].ammunition
+            }
+        }
     }
 
     /* Data that is needed to be loaded before the game can run */

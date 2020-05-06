@@ -9,6 +9,14 @@ class Blade extends Character{
         this.skin = 'blade'
         this.shootingDelay = 200
         this.impactDamage = 25
+
+        /* Full charger bullets */
+        this.ammunition = 30
+
+        /* Current state of the charger */
+        this.bulletsCharger = 30
+
+        this.reloadTime = 1200
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */

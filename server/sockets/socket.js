@@ -40,8 +40,8 @@ const socketListen = (app) => {
         socket.on('New Player', (data) => {
             serverGame.addPlayers(data, socket.id)
 
-            /* load previous players' skins */
-            socket.emit('Load Skins', serverGame.getSkins())
+            /* load previous players' skins and send ammunition for the character selected */
+            socket.emit('Load Skins and ammunition', serverGame.getSkins(socket.id))
 
             /* Other players load tnew player's skin */
             socket.broadcast.emit('Load New Skin', {src: data.skin})
@@ -66,10 +66,15 @@ const socketListen = (app) => {
               
         })
 
+        socket.on('reload weapon', (data) => {
+            serverGame.reloadPlayerWeapon(socket.id)
+        })
+
         /* Listener of players shooting */
         socket.on('shoot',(data) => {
 
-            if(data.shootTime > serverGame.players[socket.id].lastDeath && serverGame.players[socket.id].life > 0 && serverGame.players[socket.id].ableToShoot)
+            if(data.shootTime > serverGame.players[socket.id].lastDeath && serverGame.players[socket.id].life > 0 
+                && serverGame.players[socket.id].ableToShoot && serverGame.players[socket.id].bulletsCharger > 0)
                 serverGame.addBullet(socket.id)
 
             if(shootingInterval === null && serverGame.bullets.length > 0 ){

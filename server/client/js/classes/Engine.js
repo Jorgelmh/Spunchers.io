@@ -19,6 +19,14 @@ export default class Engine{
         this.localGame = null
         this.skin = skin
 
+        /* Total amount of ammo for the character selected */
+        this.playerAmmunition = null
+        this.currentAmmo = null
+        this.reloading = false
+
+        /* Html <p> that shows the amount of bullets in the charger */
+        this.bulletsHTMLElement = document.getElementById('charger')
+
         this.character = character
 
         /* Tile properties */
@@ -149,7 +157,6 @@ export default class Engine{
 
         /* Dimension of the general canvas */
         this.canvas.width = window.innerWidth
-        this.canvas.height = window.innerHeight
 
         /* Tile width and height responsive */
         this.tile.width = this.canvas.width/ this.screenTiles.x
@@ -158,6 +165,8 @@ export default class Engine{
         /* Dimensions of the tile map */
         this.tileMap.width = this.tileMap.tiles[0].length * this.tile.width
         this.tileMap.height = this.tileMap.tiles.length * this.tile.height
+
+        this.canvas.height = (this.tileMap.height > window.innerHeight) ? window.innerHeight : this.tileMap.height
 
         /* Start points responsive -> rule of 3*/
         this.tileMap.startX = (this.tileMap.startX * this.tileMap.width) / tempWidth
@@ -190,6 +199,12 @@ export default class Engine{
 
                 case 'a':
                     this.controls.shoot = true                    
+                    break
+                case 'r':
+                    if(this.currentAmmo !== this.playerAmmunition){
+                        this.reloading = true
+                        this.emitReload()
+                    }
                     break
             }
         })
@@ -343,7 +358,7 @@ export default class Engine{
 
             if(this.playerStats.life > 0)
                 this.character.spriteSheet.img =  this.character.spriteImages.shooting
-
+            
             setTimeout(() => {
                 this.character.spriteSheet.img = this.character.spriteImages.normal
             }, 90)

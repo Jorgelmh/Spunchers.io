@@ -54,13 +54,23 @@ export default class Online extends Engine{
             
         })
 
-        /* When new players enter the lobby, they must load other users skins */
-        this.socketIO.on('Load Skins', (data) => {
-            data.forEach((value) => {
+        /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
+        this.socketIO.on('Load Skins and ammunition', (data) => {
+            data.srcArray.forEach((value) => {
                 if(value != this.skin){
                     this.loadServerSkin(value)
                 }
             })
+
+            this.playerAmmunition = data.characterInfo.bullets
+            this.currentAmmo = this.playerAmmunition
+
+            this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+        })
+
+        /* When the gun is able to shoot */
+        this.socketIO.on('able to shoot', (data) => {
+            this.playerStats.ableToShoot = true
         })
 
         /* when a new player enters, other people must load his skin */
@@ -71,6 +81,16 @@ export default class Online extends Engine{
             
         })
 
+        /* When weapon is reloaded */
+        this.socketIO.on('Reload Weapon', (data) => {
+            this.currentAmmo = this.playerAmmunition
+            this.reloading = false
+            this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+        })
+
+        this.socketIO.on('reduce ammo', (data) => {
+            this.currentAmmo --
+        })
 
         /* When the score changes */
 
@@ -130,6 +150,12 @@ export default class Online extends Engine{
         this.context.fillStyle = "black"
         this.context.fillText(`FPS: ${this.FPS}`, (this.screenTiles.x * this.tile.height) - 100, 50)
         this.context.fillText(`Net: ${this.latency}ms`, (this.screenTiles.x * this.tile.height) - 100, 70)
+
+        if(this.reloading || this.currentAmmo === 0){
+            this.context.textAlign = 'center'
+            this.context.fillText('Reloading...',(this.screenTiles.x * this.tile.width)/2, (this.screenTiles.y * this.tile.height) - 10)
+        }
+            
         requestAnimationFrame(() => {
 
             /* FPS Counter */
@@ -210,7 +236,7 @@ export default class Online extends Engine{
                 this.character.onMovingLeft()
         }
 
-        if(this.playerStats.ableToShoot && this.controls.shoot && !this.chat.active)
+        if(this.playerStats.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading)
             this.triggerShooting()
 
         if(emitPos)
@@ -344,8 +370,14 @@ export default class Online extends Engine{
 
     emitBullet(){
 
+        this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+
         this.socketIO.emit('shoot', {
             shootTime: Date.now() - this.serverDelay
         })
+    }
+
+    emitReload(){
+        this.socketIO.emit('reload weapon')
     }
 }

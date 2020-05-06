@@ -13,6 +13,7 @@ body{
 
 #site-game{
     display: none;
+    position: relative;
 }
 
 .character-name{
@@ -173,4 +174,15 @@ body{
     margin: 0;
     margin-bottom: 5px;
     text-align: center;
+}
+
+/* Bullet counter */
+#bullets{
+    position: absolute;
+    z-index: 2;
+    text-align: center;
+    bottom: 10px;
+    left: 50%;
+    transform: translate(-50%, 10%);
+    font-size: 3vw;
 }
