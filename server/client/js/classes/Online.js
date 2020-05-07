@@ -153,7 +153,7 @@ export default class Online extends Engine{
 
         if(this.reloading || this.currentAmmo === 0){
             this.context.textAlign = 'center'
-            this.context.fillText('Reloading...',(this.screenTiles.x * this.tile.width)/2, (this.screenTiles.y * this.tile.height) - 10)
+            this.context.fillText('Reloading...',(this.screenTiles.x * this.tile.width)/2, this.canvas.height - 10)
         }
             
         requestAnimationFrame(() => {
