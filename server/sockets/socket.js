@@ -6,7 +6,7 @@
 
 const socketIO = require('socket.io')
 const Game = require('./classes/Game')
-const map = require('./maps/test.json')
+const map = require('./maps/castle.json')
 
 /* Scoket listener */
 const socketListen = (app) => {
@@ -14,7 +14,7 @@ const socketListen = (app) => {
     const io = socketIO(app, {pingInterval: 1000})
 
     //Lobby of the currrent game
-    const serverGame = new Game(map.tileMap, map.colissionMap, map.dimensions.width, map.dimensions.height, map.tileSet, io)
+    const serverGame = new Game(map, io)
     
     let shootingInterval = null
 

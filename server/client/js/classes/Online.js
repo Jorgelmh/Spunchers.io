@@ -8,8 +8,8 @@ import OnlineChat from './OnlineChat.js'
  */
 export default class Online extends Engine{
 
-    constructor(map, colissionMatrix, tileSet, canvas, socket, playerID, server, skin, name){
-        super(map, colissionMatrix, tileSet, canvas, skin)
+    constructor(map, colissionMatrix, collisionMatrixObjects, tileSet, canvas, socket, playerID, server, skin, name){
+        super(map, colissionMatrix, collisionMatrixObjects, tileSet, canvas, skin)
 
         this.name = name
         this.serverDelay = null
@@ -42,6 +42,11 @@ export default class Online extends Engine{
             this.state = data
             let currentPlayerPos = this.state.players[this.playerID]
             this.playerStats = currentPlayerPos
+
+            if(this.currentAmmo !== this.playerStats.bulletsCharger){
+                this.currentAmmo = this.playerStats.currentAmmo
+                this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+            }
 
             this.serverDelay = Date.now() - data.serverTime
 
@@ -81,15 +86,8 @@ export default class Online extends Engine{
             
         })
 
-        /* When weapon is reloaded */
         this.socketIO.on('Reload Weapon', (data) => {
-            this.currentAmmo = this.playerAmmunition
             this.reloading = false
-            this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
-        })
-
-        this.socketIO.on('reduce ammo', (data) => {
-            this.currentAmmo --
         })
 
         /* When the score changes */
@@ -369,8 +367,6 @@ export default class Online extends Engine{
     /* Emit bullet to the server */
 
     emitBullet(){
-
-        this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
 
         this.socketIO.emit('shoot', {
             shootTime: Date.now() - this.serverDelay

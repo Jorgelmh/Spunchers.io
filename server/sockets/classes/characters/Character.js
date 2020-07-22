@@ -51,7 +51,8 @@ class Character {
             shooting: this.shooting,
             skin: this.skin,
             playerName: this.playerName,
-            ableToShoot: this.ableToShoot
+            ableToShoot: this.ableToShoot,
+            currentAmmo: this.bulletsCharger
         }
     }
 }

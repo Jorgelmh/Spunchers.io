@@ -6,7 +6,7 @@ const Mikaela = require('./characters/Mikaela.js');
 const Blade = require('./characters/Blade.js');
 
 class Game {
-    constructor(map, collisionMap, width, height, tileSet, io){
+    constructor(map, io){
 
         /* Socket to use in case of specific state events */
         this.socketIO = io
@@ -30,13 +30,16 @@ class Game {
 
         /* Matrix for map and collisionMap */
 
-        this.tileSet = tileSet
-        this.map = map
-        this.colissionMatrix = collisionMap
+        this.tileSet = map.tileSet
+        this.map = map.tileMap
+        this.collisionMatrix = map.collisionMap
+
+        /* Objects attached to a collisionable object -> for example: things attached to a wall */
+        this.collisionMatrixObjects = map.collisionMapObjects
 
         /* Dimensions of the server */
-        this.width = width
-        this.height = height
+        this.width = map.dimensions.width
+        this.height = map.dimensions.height
 
         this.tilesDimension = {
             x: this.map[0].length,
@@ -51,6 +54,8 @@ class Game {
 
         /* Bullets movement */
         this.lastRefresh = Date.now()
+
+        this.ratioMovement = this.tilesDimension.x/ this.tilesDimension.y
 
         /* Create chat object */
         this.onlineChat = new OnlineChatServer()
@@ -105,9 +110,9 @@ class Game {
 
                 if(data.controls.goUp){
                     let oldPosition = currentPlayer.posY
-                    currentPlayer.posY -=this.characterSpeed
+                    currentPlayer.posY -= this.characterSpeed
     
-                    if(this.detectColissions(currentPlayer)){
+                    if(this.detectCollisions(currentPlayer)){
                         currentPlayer.posY = oldPosition
                     }
                 }
@@ -116,7 +121,7 @@ class Game {
                     let oldPosition = currentPlayer.posY
                     currentPlayer.posY += this.characterSpeed
     
-                    if(this.detectColissions(currentPlayer)){
+                    if(this.detectCollisions(currentPlayer)){
                         currentPlayer.posY = oldPosition
                     }
                 }
@@ -125,7 +130,7 @@ class Game {
                     let oldPosition = currentPlayer.posX
                     currentPlayer.posX -= this.characterSpeed
     
-                    if(this.detectColissions(currentPlayer)){
+                    if(this.detectCollisions(currentPlayer)){
                         currentPlayer.posX = oldPosition
                     }
                 }
@@ -135,7 +140,7 @@ class Game {
                     let oldPosition = currentPlayer.posX
                     currentPlayer.posX += this.characterSpeed
     
-                    if(this.detectColissions(currentPlayer)){
+                    if(this.detectCollisions(currentPlayer)){
                         currentPlayer.posX = oldPosition
                     }
     
@@ -146,13 +151,13 @@ class Game {
 
     /* Detect colission between players and objects on the server */
 
-    detectColissions(player){
+    detectCollisions(player){
 
-        for(let i = 0; i < this.colissionMatrix.length; i++){
-            for(let j = 0; j < this.colissionMatrix[0].length; j++){
-                if(this.colissionMatrix[i][j] !== 0){
+        for(let i = 0; i < this.collisionMatrix.length; i++){
+            for(let j = 0; j < this.collisionMatrix[0].length; j++){
+                if(this.collisionMatrix[i][j] !== 0){
     
-                    /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
+                    /* Check if exists a collision => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
                     if((j*this.tile.width < player.posX + (this.tile.width/4) + (this.tile.width/2) && j*this.tile.width + this.tile.width > player.posX + (this.tile.width/4)) 
                         && (i*this.tile.height< player.posY + this.tile.height && i*this.tile.height + this.tile.height > player.posY + 3*(this.tile.width/4))){
                         return true
@@ -225,7 +230,7 @@ class Game {
             element.posX += dt * this.bulletSpeed * element.dirX
             element.posY += dt * this.bulletSpeed * element.dirY
 
-            if(this.checkColissionsWithBullets(element) || (element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height))
+            if(this.checkCollisionsWithBullets(element) || (element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height))
                 this.bullets.splice(index, 1)
         })
     }
@@ -251,7 +256,7 @@ class Game {
      * 
      */
 
-    checkColissionsWithBullets(bullet){
+    checkCollisionsWithBullets(bullet){
 
         if(Object.keys(this.players).length > 1){
 
@@ -272,6 +277,15 @@ class Game {
                 }
             }
         }
+
+
+        /* Check collisions between bullets and objects in the tile map -> using the coordinates of the bullet at the moment of collision */
+        let bulletPosXMatrix = Math.floor(bullet.posX / this.tile.width) 
+        let bulletPosYMatrix = Math.floor(bullet.posY / this.tile.height)
+
+        if((bulletPosYMatrix >= 0 && bulletPosYMatrix < this.tilesDimension.y) && (bulletPosXMatrix >= 0 && bulletPosXMatrix < this.tilesDimension.x ) && this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix] !== 0)
+            return true
+
         return false
     }
 
@@ -285,6 +299,10 @@ class Game {
 
         /* Synn check time */
         this.players[playerID].lastDeath = Date.now()
+
+        /* Reload user's weapon when died */
+        this.players[playerID].bulletsCharger = this.players[playerID].ammunition
+        this.emitReload(playerID)
         
         let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()
@@ -413,7 +431,8 @@ class Game {
         return {
             lobby: {
                 map: this.map,
-                colissionMatrix: this.colissionMatrix,
+                collisionMatrix: this.collisionMatrix,
+                collisionMatrixObjects: this.collisionMatrixObjects,
                 tileSet: this.tileSet,
                 server : {
                     width: this.width,

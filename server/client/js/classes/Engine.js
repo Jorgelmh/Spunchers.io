@@ -8,13 +8,16 @@ import character from '../character.js'
 
 export default class Engine{
 
-    constructor(map, collisionMatrix, tileset, canvas, skin){
+    constructor(map, collisionMatrix, collisionMatrixObjects, tileset, canvas, skin){
 
         /* General variables */
         this.canvas = canvas
         this.context  = this.canvas.getContext("2d")
         
+        /* List with single tiles -> no-repeated img -> Use to load only one image for each value */
         this.tileList = []
+
+        /* Array that stores -> id = in the map matrix AND img = Image object */
         this.tileImages = []
         this.localGame = null
         this.skin = skin
@@ -92,9 +95,16 @@ export default class Engine{
         }
 
         /* Collisionable */
-        this.colissionMatrix = collisionMatrix
+        this.collisionMatrix = collisionMatrix
+        this.collisionMatrixObjects = collisionMatrixObjects
 
         this.shooting = false
+
+        /* Animation? */
+        this.animatedSprites = false
+
+        /* Get the timings of the animation 0-4 */
+        this.animationTiming = 1
 
         window.addEventListener('resize', this.resizeCanvas)
         this.resizeCanvas()
@@ -111,16 +121,26 @@ export default class Engine{
 
         console.log(this.tileList)
         console.log(this.tileImages)
-        console.log(this.colissionMatrix)
+        console.log(this.collisionMatrix)
+
+        const pushImg = (val) => {
+
+            if(Array.isArray(val)){
+                val.forEach((value) => pushImg(value))
+                this.animatedSprites = true
+
+            }else{
+                if(val !== 0 && this.tileList.indexOf(val) < 0)
+                    this.tileList.push(val)
+            }
+        }
 
         /* Retrieve single tile values */
         for(let i = 0; i < this.tileMap.tiles.length; i++){
             for(let j = 0; j < this.tileMap.tiles[0].length; j++){
-                if(this.tileList.indexOf(this.tileMap.tiles[i][j]) < 0)
-                    this.tileList.push(this.tileMap.tiles[i][j])
-
-                if(this.colissionMatrix[i][j] !== 0 && this.tileList.indexOf(this.colissionMatrix[i][j]) < 0)
-                    this.tileList.push(this.colissionMatrix[i][j])
+                pushImg(this.tileMap.tiles[i][j])
+                pushImg(this.collisionMatrix[i][j])
+                pushImg(this.collisionMatrixObjects[i][j])
             }
         }
 
@@ -133,7 +153,8 @@ export default class Engine{
                 if(++loadedImages >= this.tileList.length)
                     this.loadCharacter()
             }
-            tileImage.src = `../assets/tilesTest/tile_00${(this.tileList[i]<10) ? '0'+this.tileList[i]: this.tileList[i]}.png`
+
+            tileImage.src = `../assets/tiles/${this.tileMap.tileSet}/tile_00${(this.tileList[i]<10) ? '0'+this.tileList[i]: this.tileList[i]}.png`
 
             this.tileImages.push({
                 id: this.tileList[i],
@@ -144,6 +165,10 @@ export default class Engine{
 
     loadCharacter(){
         this.character.load(`${this.skin}.png`, () => {
+            console.log(this.animatedSprites);
+            if(this.animatedSprites)
+                this.setAnimationTiming()
+
             requestAnimationFrame(this.render)
             this.addControls()
         })
@@ -271,8 +296,12 @@ export default class Engine{
     drawObjects(){
         for(let i =  this.offSet.y; i < this.offSet.yLimit; i++){
             for(let j = this.offSet.x; j < this.offSet.xLimit; j++){
-                if(this.colissionMatrix[i][j] != 0)
-                    this.drawTile(j, i, this.colissionMatrix)
+                if(this.collisionMatrix[i][j] != 0){
+                    this.drawTile(j, i, this.collisionMatrix)
+
+                    if(this.collisionMatrixObjects[i][j] !== 0)
+                        this.drawTile(j, i, this.collisionMatrixObjects)
+                }
             }   
         }
     }
@@ -280,9 +309,10 @@ export default class Engine{
     /* Draw single tile on the canvas */
     drawTile(xi, yi, matrix){
 
-        let indexImage = this.tileImages.findIndex((elem) => elem.id === matrix[yi][xi])
-        this.context.drawImage(this.tileImages[indexImage].img, xi * (this.tile.width) + this.tileMap.startX, yi * (this.tile.height) + this.tileMap.startY, this.tile.width, this.tile.height)
-
+        let indexImage = (Array.isArray(matrix[yi][xi])) ? this.tileImages.findIndex((elem) => elem.id === matrix[yi][xi][this.animationTiming]) : this.tileImages.findIndex((elem) => elem.id === matrix[yi][xi])
+          
+        if(matrix[yi][xi] !== 0)
+            this.context.drawImage(this.tileImages[indexImage].img, xi * (this.tile.width) + this.tileMap.startX, yi * (this.tile.height) + this.tileMap.startY, this.tile.width, this.tile.height)
     }
 
     drawCharacter(){
@@ -291,6 +321,16 @@ export default class Engine{
 
         this.context.drawImage(this.character.spriteSheet.img, spriteSheetPos.x * this.character.spriteSheet.width, spriteSheetPos.y * this.character.spriteSheet.height
                                 , this.character.spriteSheet.width, this.character.spriteSheet.height, this.playerRelativePosition.posX, this.playerRelativePosition.posY, this.tile.width, this.tile.height)
+    }
+
+    /* In case of animated tile -> set the timing for every tile */
+    setAnimationTiming(){
+        setInterval(() => {
+            if(this.animationTiming === 4)
+                this.animationTiming = 0
+            else
+                this.animationTiming ++
+        }, 350)
     }
 
 
