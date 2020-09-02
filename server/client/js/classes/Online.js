@@ -279,7 +279,7 @@ export default class Online extends Engine{
                     let characterY = (playerID === this.playerID) ? this.transformServerMagnitudesY(this.playerStats.posY)+this.tileMap.startY : this.transformServerMagnitudesX(this.state.players[playerID].posY)+this.tileMap.startY
 
                     if(playerID === this.playerID)
-                        console.log(`${characterX}, ${characterY}`);
+                        console.log(`${this.playerStats.posX}, ${this.playerStats.posY}`);
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
