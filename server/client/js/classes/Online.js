@@ -53,9 +53,10 @@ export default class Online extends Engine{
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
 
+                setTimeout(() => {
                     this.tileMap.startX = startPoints.posX
                     this.tileMap.startY = startPoints.posY
-                
+                }, 100)
                 
             }
             
