@@ -53,8 +53,11 @@ export default class Online extends Engine{
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
 
-                this.tileMap.startX = startPoints.posX
-                this.tileMap.startY = startPoints.posY
+                setTimeout(() => {
+                    this.tileMap.startX = startPoints.posX
+                    this.tileMap.startY = startPoints.posY
+                }, 150)
+                
             }
             
         })
@@ -135,15 +138,11 @@ export default class Online extends Engine{
         this.drawMap()
         this.drawObjects()
         this.drawOtherPlayers()
-        this.drawLife(this.playerRelativePosition.posX, this.playerRelativePosition.posY - 6, this.playerStats.life)
 
         this.context.fillStyle = 'black'
         this.drawBullets()
 
-        this.context.font = '16px cursive'
-        this.context.textAlign = 'center'
-        this.context.fillText(this.name, playerPosition.posX + this.tile.width/2, playerPosition.posY - 10)
-        this.drawCharacter()
+        //this.drawCharacter()
 
         this.context.fillStyle = "black"
         this.context.fillText(`FPS: ${this.FPS}`, (this.screenTiles.x * this.tile.height) - 100, 50)
@@ -272,11 +271,9 @@ export default class Online extends Engine{
 
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
     drawOtherPlayers(){
-        if(this.state.players && Object.keys(this.state.players).length > 1){
+        if(this.state.players){
 
             for(let playerID in this.state.players){
-
-                if(playerID !== this.playerID){
 
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
@@ -305,7 +302,6 @@ export default class Online extends Engine{
                             this.drawLife(characterX, characterY -6, this.state.players[playerID].life)
                             this.drawOnlineCharacter({posX: characterX, posY: characterY}, this.state.players[playerID].character, skin, this.state.players[playerID].playerName )
                         }
-                    }
                 }
             }
         }
