@@ -49,16 +49,6 @@ export default class Online extends Engine{
             }
 
             this.serverDelay = Date.now() - data.serverTime
-
-            if(currentPlayerPos){
-                let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
-                
-                setTimeout(() => {
-                    this.tileMap.startX = startPoints.posX
-                    this.tileMap.startY = startPoints.posY   
-                }, 100)
-                             
-            }
             
         })
 
@@ -132,6 +122,16 @@ export default class Online extends Engine{
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
         let playerPosition = this.getPlayerRelativePosition()
+
+        if(this.playerStats){
+            let startPoints = this.calculateLocalMap(this.playerStats.posX, this.playerStats.posY)
+            
+            setTimeout(() => {
+                this.tileMap.startX = startPoints.posX
+                this.tileMap.startY = startPoints.posY   
+            }, 100)
+                         
+        }
 
         this.animateCharacter()
         this.calculateOffset()
