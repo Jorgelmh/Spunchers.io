@@ -56,7 +56,7 @@ export default class Online extends Engine{
                 setTimeout(() => {
                     this.tileMap.startX = startPoints.posX
                     this.tileMap.startY = startPoints.posY
-                }, 100)
+                }, 150)
                 
             }
             
@@ -278,8 +278,12 @@ export default class Online extends Engine{
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
 
+                    if(playerID === this.playerID){
+                        this.drawOnlineCharacter({posX: characterX, posY: characterY}, this.character, this.character.spriteSheet.img, this.name)
+                    }
+
                     /* If the character is outside the screen don't draw it */
-                    if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
+                    else if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
 
                         let skin
 
