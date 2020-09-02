@@ -27,7 +27,7 @@ const socketListen = (app) => {
     // Emit the latency
     io.sockets.on('connection', function (socket) {
         socket.on('ping', function() {
-          socket.emit('pong');
+            socket.emit('pong');
         });
     });
 
