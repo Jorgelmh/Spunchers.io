@@ -52,8 +52,12 @@ export default class Online extends Engine{
 
             if(currentPlayerPos){
                 let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
-                this.tileMap.startX = startPoints.posX
-                this.tileMap.startY = startPoints.posY                
+                
+                setTimeout(() => {
+                    this.tileMap.startX = startPoints.posX
+                    this.tileMap.startY = startPoints.posY   
+                }, 1)
+                             
             }
             
         })
@@ -274,6 +278,8 @@ export default class Online extends Engine{
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
 
+                    if(playerID === this.playerID)
+                        console.log(`${characterX}, ${characterY}`);
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
@@ -314,7 +320,7 @@ export default class Online extends Engine{
                                 , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
     }
 
-    /* Uses the rule of three mathematica formula to transform values from the server */
+    /* Uses the rule of three mathematic formula to transform values from the server */
     transformServerMagnitudesX(serverValue){
         return (this.tileMap.width * serverValue) / this.server.width
     }
