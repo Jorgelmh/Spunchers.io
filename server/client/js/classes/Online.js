@@ -56,7 +56,7 @@ export default class Online extends Engine{
                 setTimeout(() => {
                     this.tileMap.startX = startPoints.posX
                     this.tileMap.startY = startPoints.posY
-                }, 150 + this.serverDelay)
+                }, 150 - this.serverDelay)
                 
             }
             
