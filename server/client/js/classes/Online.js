@@ -56,7 +56,7 @@ export default class Online extends Engine{
                 setTimeout(() => {
                     this.tileMap.startX = startPoints.posX
                     this.tileMap.startY = startPoints.posY   
-                }, 1)
+                }, 100)
                              
             }
             
@@ -275,8 +275,8 @@ export default class Online extends Engine{
 
             for(let playerID in this.state.players){
 
-                    let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
-                    let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
+                    let characterX = (playerID === this.playerID) ? this.transformServerMagnitudesX(this.playerStats.posX)+this.tileMap.startX : this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
+                    let characterY = (playerID === this.playerID) ? this.transformServerMagnitudesY(this.playerStats.posY)+this.tileMap.startY : this.transformServerMagnitudesX(this.state.players[playerID].posY)+this.tileMap.startY
 
                     if(playerID === this.playerID)
                         console.log(`${characterX}, ${characterY}`);
