@@ -49,6 +49,13 @@ export default class Online extends Engine{
             }
 
             this.serverDelay = Date.now() - data.serverTime
+
+            if(currentPlayerPos){
+                let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
+                
+                this.tileMap.startX = startPoints.posX
+                this.tileMap.startY = startPoints.posY   
+            }
             
         })
 
@@ -126,11 +133,8 @@ export default class Online extends Engine{
         if(this.playerStats){
             let startPoints = this.calculateLocalMap(this.playerStats.posX, this.playerStats.posY)
             
-            setTimeout(() => {
-                this.tileMap.startX = startPoints.posX
-                this.tileMap.startY = startPoints.posY   
-            }, 100)
-                         
+            this.tileMap.startX = startPoints.posX
+            this.tileMap.startY = startPoints.posY   
         }
 
         this.animateCharacter()
@@ -260,8 +264,38 @@ export default class Online extends Engine{
         let serverWidth = this.transformServerMagnitudesX(x)
         let serverHeight = this.transformServerMagnitudesY(y)
 
-        let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth
-        let posY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight
+        console.log(`${this.cartesianValueOfMovement.x} , ${this.cartesianValueOfMovement.y}`);
+
+        if(this.cameraAcceleration.accX < 100 && this.cameraAcceleration.accX > -100 && this.cartesianValueOfMovement.x)
+            this.cameraAcceleration.accX += this.cameraAcceleration.velocityOfCameraX *(this.cartesianValueOfMovement.x)
+
+        else if(this.cartesianValueOfMovement.x === 0 && this.cameraAcceleration.accX !== 0){
+
+            if(this.cameraAcceleration.accX < 0)
+                this.cameraAcceleration.accX += this.cameraAcceleration.velocityOfCameraX
+            else
+                this.cameraAcceleration.accX -= this.cameraAcceleration.velocityOfCameraX
+        }
+
+        if(this.cameraAcceleration.accY < 100 && this.cameraAcceleration.accY > -100 && this.cartesianValueOfMovement.y)
+            this.cameraAcceleration.accY += this.cameraAcceleration.velocityOfCameraY *(this.cartesianValueOfMovement.y * -1)
+
+        else if(this.cartesianValueOfMovement.y === 0 && this.cameraAcceleration.accY !== 0){
+
+            if(this.cameraAcceleration.accY < 0)
+                this.cameraAcceleration.accY += this.cameraAcceleration.velocityOfCameraY
+            else
+                this.cameraAcceleration.accY -= this.cameraAcceleration.velocityOfCameraY
+        }
+            
+            
+
+        /* Offset smooth camera */
+
+        let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraAcceleration.accX
+        let posY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraAcceleration.accY
+
+        console.log(`${this.cameraAcceleration.accX }`);
 
         return {
             posX, 
@@ -275,11 +309,8 @@ export default class Online extends Engine{
 
             for(let playerID in this.state.players){
 
-                    let characterX = (playerID === this.playerID) ? this.transformServerMagnitudesX(this.playerStats.posX)+this.tileMap.startX : this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
-                    let characterY = (playerID === this.playerID) ? this.transformServerMagnitudesY(this.playerStats.posY)+this.tileMap.startY : this.transformServerMagnitudesX(this.state.players[playerID].posY)+this.tileMap.startY
-
-                    if(playerID === this.playerID)
-                        console.log(`${this.playerStats.posX}, ${this.playerStats.posY}`);
+                    let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
+                    let characterY = this.transformServerMagnitudesX(this.state.players[playerID].posY)+this.tileMap.startY
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){

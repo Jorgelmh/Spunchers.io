@@ -103,6 +103,22 @@ export default class Engine{
         /* Animation? */
         this.animatedSprites = false
 
+        /* Camera smoothness */
+        this.cartesianValueOfMovement = {
+            x: 0,
+            y: 0,
+        }
+
+        this.cameraAcceleration = {
+            accX: 0,
+            accY: 0,
+            velocityOfCameraX: 2,
+            velocityOfCameraY: 2
+        }
+        /*TODO: Add values to the cartesian movement -> moving left => x= -1 -> moving right => x = 1, same for Y axis
+        then increase progressively the camera acceleration to hundred and then stop. If the movement 
+        */
+
         /* Get the timings of the animation 0-4 */
         this.animationTiming = 1
 
@@ -208,18 +224,22 @@ export default class Engine{
             switch (event.key.toLowerCase()){
                 case 'arrowup':
                     this.controls.goUp = true
+                    this.cartesianValueOfMovement.y = 1
                     break
 
                 case 'arrowdown':
                     this.controls.goDown = true
+                    this.cartesianValueOfMovement.y = -1
                     break
 
                 case 'arrowleft':
                     this.controls.goLeft = true
+                    this.cartesianValueOfMovement.x = -1
                     break
 
                 case 'arrowright':
                     this.controls.goRight = true
+                    this.cartesianValueOfMovement.x = 1
                     break
 
                 case 'a':
@@ -239,21 +259,29 @@ export default class Engine{
                 case 'arrowup':
                     this.character.onMovingStop()
                     this.controls.goUp = false
+                    this.cartesianValueOfMovement.y = 0
+                    this.cartesianValueOfMovement.onChangeY = true
                     break
 
                 case 'arrowdown':
                     this.character.onMovingStop()
                     this.controls.goDown = false
+                    this.cartesianValueOfMovement.y = 0
+                    this.cartesianValueOfMovement.onChangeY = true
                     break
 
                 case 'arrowleft':
                     this.character.onMovingStop()
                     this.controls.goLeft = false
+                    this.cartesianValueOfMovement.x = 0
+                    this.cartesianValueOfMovement.onChangeX = true
                     break
 
                 case 'arrowright':
                     this.character.onMovingStop()
                     this.controls.goRight = false
+                    this.cartesianValueOfMovement.x = 0
+                    this.cartesianValueOfMovement.onChangeX = true
                     break
                 case 'a':
                     this.controls.shoot = false
