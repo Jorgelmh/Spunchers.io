@@ -266,36 +266,43 @@ export default class Online extends Engine{
 
         console.log(`${this.cartesianValueOfMovement.x} , ${this.cartesianValueOfMovement.y}`);
 
-        if(this.cameraAcceleration.accX < 100 && this.cameraAcceleration.accX > -100 && this.cartesianValueOfMovement.x)
-            this.cameraAcceleration.accX += this.cameraAcceleration.velocityOfCameraX *(this.cartesianValueOfMovement.x)
+        /* X axis smoothness */
 
-        else if(this.cartesianValueOfMovement.x === 0 && this.cameraAcceleration.accX !== 0){
-
-            if(this.cameraAcceleration.accX < 0)
-                this.cameraAcceleration.accX += this.cameraAcceleration.velocityOfCameraX
-            else
-                this.cameraAcceleration.accX -= this.cameraAcceleration.velocityOfCameraX
+        if(this.cameraSmoothness.offsetX < 100 && this.cameraSmoothness.offsetX > -100 && this.cartesianValueOfMovement.x){
+            this.cameraSmoothness.velX = (this.cameraSmoothness.velX > 1.8) ? 2 : this.cameraSmoothness.velX / this.cameraSmoothness.friction
+            this.cameraSmoothness.offsetX += this.cameraSmoothness.velX *(this.cartesianValueOfMovement.x)
         }
 
-        if(this.cameraAcceleration.accY < 100 && this.cameraAcceleration.accY > -100 && this.cartesianValueOfMovement.y)
-            this.cameraAcceleration.accY += this.cameraAcceleration.velocityOfCameraY *(this.cartesianValueOfMovement.y * -1)
-
-        else if(this.cartesianValueOfMovement.y === 0 && this.cameraAcceleration.accY !== 0){
-
-            if(this.cameraAcceleration.accY < 0)
-                this.cameraAcceleration.accY += this.cameraAcceleration.velocityOfCameraY
+        else if(this.cartesianValueOfMovement.x === 0 && this.cameraSmoothness.offsetX !== 0){
+            this.cameraSmoothness.velX = (this.cameraSmoothness.velX <= .4) ? .4 : this.cameraSmoothness.velX * this.cameraSmoothness.friction
+            if(this.cameraSmoothness.offsetX < 0)
+                this.cameraSmoothness.offsetX += this.cameraSmoothness.velX
             else
-                this.cameraAcceleration.accY -= this.cameraAcceleration.velocityOfCameraY
+                this.cameraSmoothness.offsetX -= this.cameraSmoothness.velX
+        }
+
+        /* Y axis smootheness */
+
+        if(this.cameraSmoothness.offsetY < 100 && this.cameraSmoothness.offsetY > -100 && this.cartesianValueOfMovement.y){
+            this.cameraSmoothness.velY = (this.cameraSmoothness.velY > 1.7) ? 2 : this.cameraSmoothness.velY / this.cameraSmoothness.friction
+            this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.cartesianValueOfMovement.y * -1)
+        }
+        else if(this.cartesianValueOfMovement.y === 0 && this.cameraSmoothness.offsetY !== 0){
+            this.cameraSmoothness.velY = (this.cameraSmoothness.velY <= .4) ? .4 : this.cameraSmoothness.velX * this.cameraSmoothness.friction
+
+            if(this.cameraSmoothness.offsetY < 0)
+                this.cameraSmoothness.offsetY += this.cameraSmoothness.velY
+            else
+                this.cameraSmoothness.offsetY -= this.cameraSmoothness.velY
         }
             
-            
+        console.log(`${this.cameraSmoothness.velX}, ${this.cameraSmoothness.velY}`);
 
         /* Offset smooth camera */
 
-        let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraAcceleration.accX
-        let posY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraAcceleration.accY
+        let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
+        let posY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraSmoothness.offsetY
 
-        console.log(`${this.cameraAcceleration.accX }`);
 
         return {
             posX, 

@@ -109,11 +109,12 @@ export default class Engine{
             y: 0,
         }
 
-        this.cameraAcceleration = {
-            accX: 0,
-            accY: 0,
-            velocityOfCameraX: 2,
-            velocityOfCameraY: 2
+        this.cameraSmoothness = {
+            velX: .5,
+            velY: 2,
+            friction: .98,
+            offsetX: 0,
+            offsetY: 0
         }
         /*TODO: Add values to the cartesian movement -> moving left => x= -1 -> moving right => x = 1, same for Y axis
         then increase progressively the camera acceleration to hundred and then stop. If the movement 
