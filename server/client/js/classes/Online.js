@@ -288,7 +288,7 @@ export default class Online extends Engine{
             this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.cartesianValueOfMovement.y * -1)
         }
         else if(this.cartesianValueOfMovement.y === 0 && this.cameraSmoothness.offsetY !== 0){
-            this.cameraSmoothness.velY = (this.cameraSmoothness.velY <= .4) ? .4 : this.cameraSmoothness.velX * this.cameraSmoothness.friction
+            this.cameraSmoothness.velY = (this.cameraSmoothness.velY <= .4) ? .4 : this.cameraSmoothness.velY * this.cameraSmoothness.friction
 
             if(this.cameraSmoothness.offsetY < 0)
                 this.cameraSmoothness.offsetY += this.cameraSmoothness.velY
@@ -296,8 +296,6 @@ export default class Online extends Engine{
                 this.cameraSmoothness.offsetY -= this.cameraSmoothness.velY
         }
             
-        console.log(`${this.cameraSmoothness.velX}, ${this.cameraSmoothness.velY}`);
-
         /* Offset smooth camera */
 
         let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
