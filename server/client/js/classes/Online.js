@@ -264,11 +264,11 @@ export default class Online extends Engine{
         let serverWidth = this.transformServerMagnitudesX(x)
         let serverHeight = this.transformServerMagnitudesY(y)
 
-        console.log(`${this.cartesianValueOfMovement.x} , ${this.cartesianValueOfMovement.y}`);
+        console.log(`${this.cameraSmoothness.limitX} , ${this.cameraSmoothness.limitY}`);
 
         /* X axis smoothness */
 
-        if(this.cameraSmoothness.offsetX < 100 && this.cameraSmoothness.offsetX > -100 && this.cartesianValueOfMovement.x){
+        if(this.cameraSmoothness.offsetX < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetX > -this.cameraSmoothness.limitX && this.cartesianValueOfMovement.x){
             this.cameraSmoothness.velX = (this.cameraSmoothness.velX > 1.8) ? 2 : this.cameraSmoothness.velX / this.cameraSmoothness.friction
             this.cameraSmoothness.offsetX += this.cameraSmoothness.velX *(this.cartesianValueOfMovement.x)
         }
@@ -283,7 +283,7 @@ export default class Online extends Engine{
 
         /* Y axis smootheness */
 
-        if(this.cameraSmoothness.offsetY < 100 && this.cameraSmoothness.offsetY > -100 && this.cartesianValueOfMovement.y){
+        if(this.cameraSmoothness.offsetY < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetY > -this.cameraSmoothness.limitX && this.cartesianValueOfMovement.y){
             this.cameraSmoothness.velY = (this.cameraSmoothness.velY > 1.7) ? 2 : this.cameraSmoothness.velY / this.cameraSmoothness.friction
             this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.cartesianValueOfMovement.y * -1)
         }

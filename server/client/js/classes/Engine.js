@@ -114,7 +114,7 @@ export default class Engine{
             velY: 2,
             friction: .98,
             offsetX: 0,
-            offsetY: 0
+            offsetY: 0,
         }
         /*TODO: Add values to the cartesian movement -> moving left => x= -1 -> moving right => x = 1, same for Y axis
         then increase progressively the camera acceleration to hundred and then stop. If the movement 
@@ -208,11 +208,15 @@ export default class Engine{
         this.tileMap.width = this.tileMap.tiles[0].length * this.tile.width
         this.tileMap.height = this.tileMap.tiles.length * this.tile.height
 
-        this.canvas.height = (this.tileMap.height > window.innerHeight) ? window.innerHeight : this.tileMap.height
+        this.canvas.height = this.canvas.width * this.frameRatio
 
         /* Start points responsive -> rule of 3*/
         this.tileMap.startX = (this.tileMap.startX * this.tileMap.width) / tempWidth
         this.tileMap.startY = (this.tileMap.startY * this.tileMap.height) / tempHeight
+
+        /* Camera smoothness ratio */
+        this.cameraSmoothness.limitX = this.canvas.width * .05
+        this.cameraSmoothness.limitY = this.canvas.height * .05
 
         /* Set player's position */
         this.playerRelativePosition = this.getPlayerRelativePosition()
