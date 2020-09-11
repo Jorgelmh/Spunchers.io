@@ -143,6 +143,7 @@ export default class Online extends Engine{
         this.drawObjects()
         this.drawOtherPlayers()
 
+        this.context.font = '16px cursive'
         this.context.fillStyle = 'black'
         this.drawBullets()
 

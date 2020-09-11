@@ -208,15 +208,15 @@ export default class Engine{
         this.tileMap.width = this.tileMap.tiles[0].length * this.tile.width
         this.tileMap.height = this.tileMap.tiles.length * this.tile.height
 
-        this.canvas.height = this.canvas.width * this.frameRatio
+        this.canvas.height = (this.canvas.width * this.frameRatio < window.innerHeight) ? this.canvas.width * this.frameRatio : window.innerHeight
 
         /* Start points responsive -> rule of 3*/
         this.tileMap.startX = (this.tileMap.startX * this.tileMap.width) / tempWidth
         this.tileMap.startY = (this.tileMap.startY * this.tileMap.height) / tempHeight
 
         /* Camera smoothness ratio */
-        this.cameraSmoothness.limitX = this.canvas.width * .05
-        this.cameraSmoothness.limitY = this.canvas.height * .05
+        this.cameraSmoothness.limitX = this.canvas.width * .04
+        this.cameraSmoothness.limitY = this.canvas.height * .04
 
         /* Set player's position */
         this.playerRelativePosition = this.getPlayerRelativePosition()
