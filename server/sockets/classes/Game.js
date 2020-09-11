@@ -66,7 +66,7 @@ class Game {
 
         switch (data.skin) {
             case 'blade':
-                this.players[socketID] = new Blade(600, 400, data.character, data.name)
+                this.players[socketID] = new Blade(600, 200, data.character, data.name)
                 break
 
             case 'mikaela':

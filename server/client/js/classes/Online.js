@@ -49,14 +49,6 @@ export default class Online extends Engine{
             }
 
             this.serverDelay = Date.now() - data.serverTime
-
-            if(currentPlayerPos){
-                let startPoints = this.calculateLocalMap(currentPlayerPos.posX, currentPlayerPos.posY)
-                
-                this.tileMap.startX = startPoints.posX
-                this.tileMap.startY = startPoints.posY   
-            }
-            
         })
 
         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
@@ -128,14 +120,10 @@ export default class Online extends Engine{
      */ 
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        let playerPosition = this.getPlayerRelativePosition()
 
-        if(this.playerStats){
-            let startPoints = this.calculateLocalMap(this.playerStats.posX, this.playerStats.posY)
-            
-            this.tileMap.startX = startPoints.posX
-            this.tileMap.startY = startPoints.posY   
-        }
+        console.log(this.playerStats);
+        if(this.playerStats)
+            this.calculateLocalMap()
 
         this.animateCharacter()
         this.calculateOffset()
@@ -261,11 +249,11 @@ export default class Online extends Engine{
     }
 
     /* Calculates the position of the map in the browser => startX and startY */
-    calculateLocalMap(x, y){
-        let serverWidth = this.transformServerMagnitudesX(x)
-        let serverHeight = this.transformServerMagnitudesY(y)
+    calculateLocalMap(){
+        let serverWidth = this.transformServerMagnitudesX(this.playerStats.posX)
+        let serverHeight = this.transformServerMagnitudesY(this.playerStats.posY)
 
-        console.log(`${this.cameraSmoothness.limitX} , ${this.cameraSmoothness.limitY}`);
+        console.log(`${this.cartesianValueOfMovement.x}`);
 
         /* X axis smoothness */
 
@@ -299,14 +287,8 @@ export default class Online extends Engine{
             
         /* Offset smooth camera */
 
-        let posX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
-        let posY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraSmoothness.offsetY
-
-
-        return {
-            posX, 
-            posY
-        }
+        this.tileMap.startX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
+        this.tileMap.startY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraSmoothness.offsetY  
     }
 
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */

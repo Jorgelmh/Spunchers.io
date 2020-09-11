@@ -225,26 +225,27 @@ export default class Engine{
 
     /* Listeners for Controls */
     addControls(){
+
         window.addEventListener('keydown', () => {
             switch (event.key.toLowerCase()){
                 case 'arrowup':
                     this.controls.goUp = true
-                    this.cartesianValueOfMovement.y = 1
+                    this.cartesianValueOfMovement.y = (this.controls.goDown) ? 0 : 1
                     break
 
                 case 'arrowdown':
                     this.controls.goDown = true
-                    this.cartesianValueOfMovement.y = -1
+                    this.cartesianValueOfMovement.y = (this.controls.goUp) ? 0 : -1
                     break
 
                 case 'arrowleft':
                     this.controls.goLeft = true
-                    this.cartesianValueOfMovement.x = -1
+                    this.cartesianValueOfMovement.x = (this.controls.goRight) ? 0 : -1
                     break
 
                 case 'arrowright':
                     this.controls.goRight = true
-                    this.cartesianValueOfMovement.x = 1
+                    this.cartesianValueOfMovement.x = (this.controls.goLeft) ? 0 : 1
                     break
 
                 case 'a':
@@ -264,28 +265,28 @@ export default class Engine{
                 case 'arrowup':
                     this.character.onMovingStop()
                     this.controls.goUp = false
-                    this.cartesianValueOfMovement.y = 0
+                    this.cartesianValueOfMovement.y = (this.controls.goDown) ? -1 : 0
                     this.cartesianValueOfMovement.onChangeY = true
                     break
 
                 case 'arrowdown':
                     this.character.onMovingStop()
                     this.controls.goDown = false
-                    this.cartesianValueOfMovement.y = 0
+                    this.cartesianValueOfMovement.y = (this.controls.goUp) ? 1 : 0
                     this.cartesianValueOfMovement.onChangeY = true
                     break
 
                 case 'arrowleft':
                     this.character.onMovingStop()
                     this.controls.goLeft = false
-                    this.cartesianValueOfMovement.x = 0
+                    this.cartesianValueOfMovement.x = (this.controls.goRight) ? 1 : 0
                     this.cartesianValueOfMovement.onChangeX = true
                     break
 
                 case 'arrowright':
                     this.character.onMovingStop()
                     this.controls.goRight = false
-                    this.cartesianValueOfMovement.x = 0
+                    this.cartesianValueOfMovement.x = (this.controls.goLeft) ? -1 : 0
                     this.cartesianValueOfMovement.onChangeX = true
                     break
                 case 'a':
