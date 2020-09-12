@@ -287,6 +287,8 @@ export default class Online extends Engine{
 
         this.tileMap.startX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
         this.tileMap.startY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraSmoothness.offsetY
+
+        console.log(`${this.cameraSmoothness.offsetX}, ${this.cameraSmoothness.offsetY}`);
     }
 
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
