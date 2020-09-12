@@ -14,7 +14,7 @@ class Game {
         /* Arrays for players and active bullets */
         this.players = {}
         this.bullets = []
-        this.bulletSpeed = 400
+        this.bulletSpeed = 200
 
         this.characterSpeed = 0.75
 
@@ -70,26 +70,9 @@ class Game {
                 break
 
             case 'mikaela':
-                this.players[socketID] = new Mikaela(600, 400, data.character, data.name)
+                this.players[socketID] = new Mikaela(600, 200, data.character, data.name)
                 break
         }
-
-        /*
-        this.players[socketID] = {
-            posX: 600,
-            posY: 400,
-            life: 100,
-            character: {
-                currentSprite: data.character
-            },
-            shooting: null,
-            skin: data.skin,
-            playerName: data.name,
-            score: 0,
-            ableToShoot:  true,
-            lastDeath: Date.now()
-        }
-        */
     }
 
     /* Remove Player ->  recieves the socket id as the parameter */
@@ -326,8 +309,8 @@ class Game {
 
     respawnPlayerPosition(){
         return {
-            x: 0,
-            y: 0
+            x: 600,
+            y: 200
         }
     }
 
