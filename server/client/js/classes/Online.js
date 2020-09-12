@@ -49,7 +49,6 @@ export default class Online extends Engine{
             }
 
             this.serverDelay = Date.now() - data.serverTime
-
         })
 
         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
