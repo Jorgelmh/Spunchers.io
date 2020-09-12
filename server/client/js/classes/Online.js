@@ -120,8 +120,7 @@ export default class Online extends Engine{
      */ 
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
-        console.log(this.playerStats);
+        
         if(this.playerStats)
             this.calculateLocalMap()
 
