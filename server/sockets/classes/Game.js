@@ -85,6 +85,7 @@ class Game {
     onMovement = (data) => {
 
         let currentPlayer = this.players[data.id]
+        currentPlayer.cartesianValueOfMovement = data.cartisianMovement
 
         if(currentPlayer){
             currentPlayer.character = data.character
@@ -310,7 +311,7 @@ class Game {
     respawnPlayerPosition(){
         return {
             x: 600,
-            y: 400
+            y: 200
         }
     }
 

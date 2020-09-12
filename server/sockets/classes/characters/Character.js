@@ -21,6 +21,11 @@ class Character {
         this.life = 100
         this.shooting = null
 
+        this.cartesianValueOfMovement = {
+            x: 0,
+            y: 0
+        }
+
         /* Timing */
         this.lastDeath = Date.now()
         this.ableToShoot = true
@@ -52,7 +57,8 @@ class Character {
             skin: this.skin,
             playerName: this.playerName,
             ableToShoot: this.ableToShoot,
-            currentAmmo: this.bulletsCharger
+            currentAmmo: this.bulletsCharger,
+            cartesianValueOfMovement: this.cartesianValueOfMovement
         }
     }
 }

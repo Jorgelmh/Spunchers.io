@@ -239,6 +239,7 @@ export default class Online extends Engine{
         this.socketIO.emit('movement', {
             id: this.playerID,
             controls: this.controls,
+            cartisianMovement: this.cartesianValueOfMovement,
             character: {
                 currentSprite: {
                     x: this.character.currentSprite.x,
@@ -253,14 +254,15 @@ export default class Online extends Engine{
         let serverWidth = this.transformServerMagnitudesX(this.playerStats.posX)
         let serverHeight = this.transformServerMagnitudesY(this.playerStats.posY)
 
+        console.log(this.playerStats)
         /* X axis smoothness */
 
-        if(this.cameraSmoothness.offsetX < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetX > -this.cameraSmoothness.limitX && this.cartesianValueOfMovement.x){
+        if(this.cameraSmoothness.offsetX < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetX > -this.cameraSmoothness.limitX && this.playerStats.cartesianValueOfMovement.x){
             this.cameraSmoothness.velX = (this.cameraSmoothness.velX > 1.8) ? 2 : this.cameraSmoothness.velX / this.cameraSmoothness.friction
-            this.cameraSmoothness.offsetX += this.cameraSmoothness.velX *(this.cartesianValueOfMovement.x)
+            this.cameraSmoothness.offsetX += this.cameraSmoothness.velX *(this.playerStats.cartesianValueOfMovement.x)
         }
 
-        else if(this.cartesianValueOfMovement.x === 0 && this.cameraSmoothness.offsetX !== 0){
+        else if(this.playerStats.cartesianValueOfMovement.x === 0 && this.cameraSmoothness.offsetX !== 0){
             this.cameraSmoothness.velX = (this.cameraSmoothness.velX <= .4) ? .4 : this.cameraSmoothness.velX * this.cameraSmoothness.friction
             if(this.cameraSmoothness.offsetX < 0)
                 this.cameraSmoothness.offsetX += this.cameraSmoothness.velX
@@ -270,11 +272,11 @@ export default class Online extends Engine{
 
         /* Y axis smootheness */
 
-        if(this.cameraSmoothness.offsetY < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetY > -this.cameraSmoothness.limitX && this.cartesianValueOfMovement.y){
+        if(this.cameraSmoothness.offsetY < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetY > -this.cameraSmoothness.limitX && this.playerStats.cartesianValueOfMovement.y){
             this.cameraSmoothness.velY = (this.cameraSmoothness.velY > 1.7) ? 2 : this.cameraSmoothness.velY / this.cameraSmoothness.friction
-            this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.cartesianValueOfMovement.y * -1)
+            this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.playerStats.cartesianValueOfMovement.y * -1)
         }
-        else if(this.cartesianValueOfMovement.y === 0 && this.cameraSmoothness.offsetY !== 0){
+        else if(this.playerStats.cartesianValueOfMovement.y === 0 && this.cameraSmoothness.offsetY !== 0){
             this.cameraSmoothness.velY = (this.cameraSmoothness.velY <= .4) ? .4 : this.cameraSmoothness.velY * this.cameraSmoothness.friction
 
             if(this.cameraSmoothness.offsetY < 0)
