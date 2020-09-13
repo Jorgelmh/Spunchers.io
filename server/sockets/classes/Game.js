@@ -85,10 +85,10 @@ class Game {
     onMovement = (data) => {
 
         let currentPlayer = this.players[data.id]
-        currentPlayer.cartesianValueOfMovement = data.cartisianMovement
 
         if(currentPlayer){
             currentPlayer.character = data.character
+            currentPlayer.cartesianValueOfMovement = data.cartisianMovement
 
             if(currentPlayer.life > 0){
 
