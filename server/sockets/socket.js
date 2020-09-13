@@ -45,7 +45,9 @@ const socketListen = (app) => {
 
             /* Other players load tnew player's skin */
             socket.broadcast.emit('Load New Skin', {src: data.skin})
-            io.sockets.emit('state', serverGame.update())
+
+            if(serverGame.bullets.length === 0)
+                io.sockets.emit('state', serverGame.update())
 
             /* Send the score */
             io.sockets.emit('New leaderboard', serverGame.sortScores(serverGame.players))
@@ -55,13 +57,15 @@ const socketListen = (app) => {
         /* Listener of socket movement */
         socket.on('movement', (data) => {
             serverGame.onMovement(data)
-            io.sockets.emit('state', serverGame.update())
+            if(serverGame.bullets.length === 0)
+                io.sockets.emit('state', serverGame.update())
         } )
 
         socket.on('disconnect', (data) => {
             serverGame.removePlayer(socket.id) 
             if(Object.keys(serverGame.players).length === 0) serverGame.onlineChat.messages = []
-            io.sockets.emit('state', serverGame.update())  
+            if(serverGame.bullets.length === 0)
+                io.sockets.emit('state', serverGame.update())  
             io.sockets.emit('New leaderboard', serverGame.sortScores(serverGame.players))
               
         })
