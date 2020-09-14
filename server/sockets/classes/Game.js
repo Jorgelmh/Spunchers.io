@@ -16,7 +16,7 @@ class Game {
         this.bullets = []
         this.bulletSpeed = 200
 
-        this.characterSpeed = 0.75
+        this.characterSpeed = 1.5
 
         this.bulletWidth = 10
 
@@ -33,9 +33,6 @@ class Game {
         this.tileSet = map.tileSet
         this.map = map.tileMap
         this.collisionMatrix = map.collisionMap
-
-        /* Objects attached to a collisionable object -> for example: things attached to a wall */
-        this.collisionMatrixObjects = map.collisionMapObjects
 
         /* Dimensions of the server */
         this.width = map.dimensions.width
@@ -267,7 +264,8 @@ class Game {
         let bulletPosXMatrix = Math.floor(bullet.posX / this.tile.width) 
         let bulletPosYMatrix = Math.floor(bullet.posY / this.tile.height)
 
-        if((bulletPosYMatrix >= 0 && bulletPosYMatrix < this.tilesDimension.y) && (bulletPosXMatrix >= 0 && bulletPosXMatrix < this.tilesDimension.x ) && this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix] !== 0)
+        if((bulletPosYMatrix >= 0 && bulletPosYMatrix < this.tilesDimension.y) && (bulletPosXMatrix >= 0 && bulletPosXMatrix < this.tilesDimension.x ) 
+        && (!Array.isArray(this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix]) && this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix] !== 0))
             return true
 
         return false
@@ -379,7 +377,8 @@ class Game {
                 if(playerID){
                     delete this.players[playerID]
                     this.socketIO.to(playerID).emit('banned')
-                    this.socketIO.sockets.emit('state', this.update())
+                    if(this.bullets.length === 0)
+                        this.socketIO.sockets.emit('state', this.update())
                 }
             }
         }
@@ -416,7 +415,6 @@ class Game {
             lobby: {
                 map: this.map,
                 collisionMatrix: this.collisionMatrix,
-                collisionMatrixObjects: this.collisionMatrixObjects,
                 tileSet: this.tileSet,
                 server : {
                     width: this.width,

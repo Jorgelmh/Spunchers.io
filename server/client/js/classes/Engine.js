@@ -8,7 +8,7 @@ import character from '../character.js'
 
 export default class Engine{
 
-    constructor(map, collisionMatrix, collisionMatrixObjects, tileset, canvas, skin){
+    constructor(map, collisionMatrix, tileset, canvas, skin){
 
         /* General variables */
         this.canvas = canvas
@@ -96,7 +96,6 @@ export default class Engine{
 
         /* Collisionable */
         this.collisionMatrix = collisionMatrix
-        this.collisionMatrixObjects = collisionMatrixObjects
 
         this.shooting = false
 
@@ -138,6 +137,7 @@ export default class Engine{
 
         console.log(this.tileList)
         console.log(this.tileImages)
+        console.log(this.tileMap.tiles)
         console.log(this.collisionMatrix)
 
         const pushImg = (val) => {
@@ -157,7 +157,6 @@ export default class Engine{
             for(let j = 0; j < this.tileMap.tiles[0].length; j++){
                 pushImg(this.tileMap.tiles[i][j])
                 pushImg(this.collisionMatrix[i][j])
-                pushImg(this.collisionMatrixObjects[i][j])
             }
         }
 
@@ -330,12 +329,9 @@ export default class Engine{
     drawObjects(){
         for(let i =  this.offSet.y; i < this.offSet.yLimit; i++){
             for(let j = this.offSet.x; j < this.offSet.xLimit; j++){
-                if(this.collisionMatrix[i][j] != 0){
+                if(this.collisionMatrix[i][j] != 0)
                     this.drawTile(j, i, this.collisionMatrix)
-
-                    if(this.collisionMatrixObjects[i][j] !== 0)
-                        this.drawTile(j, i, this.collisionMatrixObjects)
-                }
+                
             }   
         }
     }

@@ -8,8 +8,8 @@ import OnlineChat from './OnlineChat.js'
  */
 export default class Online extends Engine{
 
-    constructor(map, colissionMatrix, collisionMatrixObjects, tileSet, canvas, socket, playerID, server, skin, name){
-        super(map, colissionMatrix, collisionMatrixObjects, tileSet, canvas, skin)
+    constructor(map, colissionMatrix, tileSet, canvas, socket, playerID, server, skin, name){
+        super(map, colissionMatrix, tileSet, canvas, skin)
 
         this.name = name
         this.serverDelay = null
@@ -254,7 +254,6 @@ export default class Online extends Engine{
         let serverWidth = this.transformServerMagnitudesX(this.playerStats.posX)
         let serverHeight = this.transformServerMagnitudesY(this.playerStats.posY)
 
-        console.log(this.playerStats)
         /* X axis smoothness */
 
         if(this.cameraSmoothness.offsetX < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetX > -this.cameraSmoothness.limitX && this.playerStats.cartesianValueOfMovement.x){
@@ -290,7 +289,6 @@ export default class Online extends Engine{
         this.tileMap.startX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
         this.tileMap.startY = ((this.screenTiles.y * this.tile.height)/2 - this.tile.height/2) - serverHeight + this.cameraSmoothness.offsetY
 
-        console.log(`${this.cameraSmoothness.offsetX}, ${this.cameraSmoothness.offsetY}`);
     }
 
     /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
