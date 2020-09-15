@@ -8,12 +8,6 @@ class Character {
     constructor(posX, posY, sprite, playerName){
 
         this.playerName = playerName
-        this.controls = {
-            goUp: false,
-            goDown: false,
-            goRight: false,
-            goLeft: false
-        }
         
         /* Position and state of the character */
         this.posX = posX
@@ -37,10 +31,6 @@ class Character {
         this.ableToShoot = true
 
         this.still = true
-
-        /* Flip Image */
-        this.flipImage = 1
-        this.orientationWhenQuite = 1
     }
 
     reduceAmmunition(emitReload, playerID){

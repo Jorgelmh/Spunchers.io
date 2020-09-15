@@ -84,7 +84,7 @@ class Game {
         let currentPlayer = this.players[data.id]
 
         if(currentPlayer){
-            
+
             currentPlayer.character = data.character
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
             currentPlayer.still = true
@@ -467,15 +467,15 @@ class Game {
         }
 
         if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 5)
-            posY += this.players[playerID].offsetYHorizontal(this.tile.width/2) 
+            posY += this.players[playerID].offsetYHorizontal(halfServerTileWidth) 
 
         if(this.players[playerID].character.currentSprite.y === 3){
-            posX += this.players[playerID].diagonalUpOffsetX(this.tile.width/2, this.players[playerID].character.currentSprite.flip) 
+            posX += this.players[playerID].diagonalUpOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
             posY += this.players[playerID].diagonalUpOffsetY(this.tile.height/2)
         }
 
         if(this.players[playerID].character.currentSprite.y === 4){
-            posX += this.players[playerID].diagonalDownOffsetX(this.tile.width/2, this.players[playerID].character.currentSprite.flip) 
+            posX += this.players[playerID].diagonalDownOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
             posY += this.players[playerID].diagonalDownOffsetY(this.tile.height/2)
         }
 
