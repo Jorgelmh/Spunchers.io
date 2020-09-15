@@ -8,6 +8,12 @@ class Character {
     constructor(posX, posY, sprite, playerName){
 
         this.playerName = playerName
+        this.controls = {
+            goUp: false,
+            goDown: false,
+            goRight: false,
+            goLeft: false
+        }
         
         /* Position and state of the character */
         this.posX = posX
@@ -29,6 +35,10 @@ class Character {
         /* Timing */
         this.lastDeath = Date.now()
         this.ableToShoot = true
+
+        /* Flip Image */
+        this.flipImage = 1
+        this.orientationWhenQuite = 1
     }
 
     reduceAmmunition(emitReload, playerID){
@@ -48,6 +58,11 @@ class Character {
 
     /* Return what the client needs in order to draw the player */
     playerState(){
+        let still = false
+
+        if(this.controls)
+            still = Object.keys(this.controls).every((k) => { return !this.controls[k] });
+
         return {
             posX: this.posX,
             posY: this.posY,
@@ -58,7 +73,8 @@ class Character {
             playerName: this.playerName,
             ableToShoot: this.ableToShoot,
             currentAmmo: this.bulletsCharger,
-            cartesianValueOfMovement: this.cartesianValueOfMovement
+            cartesianValueOfMovement: this.cartesianValueOfMovement,
+            still
         }
     }
 }

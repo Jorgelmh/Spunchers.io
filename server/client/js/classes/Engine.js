@@ -94,6 +94,12 @@ export default class Engine{
             shoot: false
         }
 
+        /* Static Animation */
+        this.staticAnimation = {
+            interval : null,
+            x: 0
+        }
+
         /* Collisionable */
         this.collisionMatrix = collisionMatrix
 
@@ -214,8 +220,8 @@ export default class Engine{
         this.tileMap.startY = (this.tileMap.startY * this.tileMap.height) / tempHeight
 
         /* Camera smoothness ratio */
-        this.cameraSmoothness.limitX = this.canvas.width * .04
-        this.cameraSmoothness.limitY = this.canvas.height * .04
+        this.cameraSmoothness.limitX = this.canvas.width * .045
+        this.cameraSmoothness.limitY = this.canvas.height * .045
 
         /* Set player's position */
         this.playerRelativePosition = this.getPlayerRelativePosition()
@@ -392,6 +398,23 @@ export default class Engine{
         let posY = y*this.tile.height + this.tileMap.startY
 
         return {posX, posY}
+    }
+
+    /* Set animation when static */
+
+    setAnimationWhenStatic(){
+        this.staticAnimation.interval = setInterval(() =>{
+            this.staticAnimation.x ++
+
+            if(this.staticAnimation.x === 3) 
+                this.staticAnimation.x = 0
+
+        }, this.character.animationSpeed)
+    }
+
+    endAnimationWhenStatic(){
+        clearInterval(this.staticAnimation.interval)
+        this.staticAnimation.interval = null
     }
 
     /* Draw life of an entity */

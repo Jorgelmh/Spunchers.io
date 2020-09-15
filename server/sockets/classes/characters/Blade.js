@@ -26,19 +26,19 @@ class Blade extends Character{
 
     /* diagonalUpOffset when player is going diagonal up */
     diagonalUpOffsetX(halfTileWidth, dirX){
-        return (halfTileWidth * dirX)
+        return (halfTileWidth/2 * dirX)
     }
 
-    diagonalUpOffsetY(halfTileWidth, dirY){
-        return (halfTileWidth * -dirY)
+    diagonalUpOffsetY(halfTileWidth){
+        return halfTileWidth - (halfTileWidth/4)
     }
 
     /* diagonalUpOffset when player is going diagonal down */
     diagonalDownOffsetX(halfTileWidth, dirX){
-        return (halfTileWidth * dirX)
+        return (halfTileWidth/6 * dirX)
     }
-    diagonalDownOffsetY(halfTileWidth, dirY){
-        return (halfTileWidth + halfTileWidth * dirY)
+    diagonalDownOffsetY(halfTileWidth){
+        return halfTileWidth + (halfTileWidth/4)
     }
 }
 

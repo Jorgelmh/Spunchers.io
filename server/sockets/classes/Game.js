@@ -86,6 +86,7 @@ class Game {
         if(currentPlayer){
             currentPlayer.character = data.character
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
+            currentPlayer.controls = data.controls
 
             if(currentPlayer.life > 0){
 
@@ -437,71 +438,41 @@ class Game {
                 posY+= halfServerTileWidth*2
                 break
             case 1:
-                dirX = -1
                 dirY = 0
+                dirX = 1 * this.players[playerID].character.currentSprite.flip
                 break
             case 2:
-                dirX = 1
-                dirY = 0
+                dirX = 0
+                dirY = -1
+                posX += this.tile.width/6
                 break
             case 3:
-                dirY = -1
-                dirX = 0
-                posX+=(halfServerTileWidth/4)
+                dirY = -Math.sin(Math.PI / 4)
+                dirX = Math.sin(Math.PI / 4) * this.players[playerID].character.currentSprite.flip
                 break
             case 4:
-                if(this.players[playerID].character.currentSprite.x == 0){
-                    dirX = 1
-                    dirY = 0
-                }else{
-                    dirX = Math.sin(Math.PI / 4)
-                    dirY = - Math.sin(Math.PI / 4)
-                }
+                dirY = Math.sin(Math.PI / 4)
+                dirX = Math.sin(Math.PI / 4) * this.players[playerID].character.currentSprite.flip
                 break
-
             case 5: 
-                if(this.players[playerID].character.currentSprite.x == 0){
-                    dirX = -1
-                    dirY = 0
-                }else{
-                    dirX = -Math.sin(Math.PI / 4)
-                    dirY = - Math.sin(Math.PI / 4)
-                }
+                dirX = 1 * this.players[playerID].character.currentSprite.flip
+                dirY = 0
                 break
-            case 6:
-                if(this.players[playerID].character.currentSprite.x == 0){
-                    dirX = 1
-                    dirY = 0
-                }else{
-                    dirX = Math.sin(Math.PI / 4)
-                    dirY = Math.sin(Math.PI / 4)
-                }
-                break
-            case 7:
-                if(this.players[playerID].character.currentSprite.x == 0){
-                    dirX = -1
-                    dirY = 0
-                }else{
-                    dirX = -Math.sin(Math.PI / 4)
-                    dirY = Math.sin(Math.PI / 4)
-                }
-                break
-
         }
 
-        if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 2 
-            || (this.players[playerID].character.currentSprite.y >= 4 && this.players[playerID].character.currentSprite.x === 0))
-            posY+=this.players[playerID].offsetYHorizontal(halfServerTileWidth)
+        if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 5)
+            posY += this.players[playerID].offsetYHorizontal(this.tile.width/2) 
 
-        if((this.players[playerID].character.currentSprite.y === 4 || this.players[playerID].character.currentSprite.y === 5) && this.players[playerID].character.currentSprite.x != 0){
-            posX+=this.players[playerID].diagonalUpOffsetX(halfServerTileWidth, dirX)
-            posY+=this.players[playerID].diagonalUpOffsetY(halfServerTileWidth, dirY)
+        if(this.players[playerID].character.currentSprite.y === 3){
+            posX += this.players[playerID].diagonalUpOffsetX(this.tile.width/2, this.players[playerID].character.currentSprite.flip) 
+            posY += this.players[playerID].diagonalUpOffsetY(this.tile.height/2)
         }
 
-        if((this.players[playerID].character.currentSprite.y === 6 || this.players[playerID].character.currentSprite.y === 7) && this.players[playerID].character.currentSprite.x != 0){
-            posX+=this.players[playerID].diagonalDownOffsetX(halfServerTileWidth, dirX)
-            posY+=this.players[playerID].diagonalDownOffsetY(halfServerTileWidth, dirY)
+        if(this.players[playerID].character.currentSprite.y === 4){
+            posX += this.players[playerID].diagonalDownOffsetX(this.tile.width/2, this.players[playerID].character.currentSprite.flip) 
+            posY += this.players[playerID].diagonalDownOffsetY(this.tile.height/2)
         }
+
 
         let bullet = {
             posX,

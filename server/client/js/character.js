@@ -12,7 +12,8 @@ const character = {
     /* Sprites */
     currentSprite: {
         x: 0,
-        y: 2
+        y: 5,
+        flip: 1
     },
     spriteSheet: {
         img: null,
@@ -68,57 +69,67 @@ const character = {
 
     /* Change the image when moving forward */
     onMovingForward: function() {
-        this.currentSprite.y = 3
+        this.currentSprite.y = 2
+        this.currentSprite.flip = 1
 
         this.createInterval()
     },
 
     onMovingBackwards: function(){
         this.currentSprite.y = 0
+        this.currentSprite.flip = 1
 
         this.createInterval()
     },
 
     onMovingLeft: function(){
         this.currentSprite.y = 1
+        this.currentSprite.flip = -1
 
         this.createInterval()
     },
 
     onMovingRight: function(){
-        this.currentSprite.y = 2
+        this.currentSprite.y = 1
+        this.currentSprite.flip = 1
 
         this.createInterval()
     },
 
     onMovingForwardLeft: function(){
-        this.currentSprite.y = 5
+        this.currentSprite.y = 3
+        this.currentSprite.flip = -1
 
         this.createInterval()
     },
 
     onMovingForwardRight: function(){
-        this.currentSprite.y = 4
+        this.currentSprite.y = 3
+        this.currentSprite.flip = 1
+
         this.createInterval()
     },
 
     onMovingBackwardsRight: function(){
-        this.currentSprite.y = 6
+        this.currentSprite.y = 4
+        this.currentSprite.flip = 1
+
         this.createInterval()
     },
 
     onMovingBackwardsLeft: function(){
-        this.currentSprite.y = 7
+        this.currentSprite.y = 4
+        this.currentSprite.flip = -1
+
         this.createInterval()
     },
     
     createInterval : function(){
-        this.currentSprite.x = 1
+        this.currentSprite.x = 0
         this.moveInterval = setInterval(() =>{
             this.currentSprite.x ++
-
-            if(this.currentSprite.x > 4) 
-                this.currentSprite.x = 1
+            if(this.currentSprite.x > 3) 
+                this.currentSprite.x = 0
 
         }, this.animationSpeed)  
     },
@@ -127,6 +138,7 @@ const character = {
     onMovingStop: function(){
         clearInterval(this.moveInterval)
         this.currentSprite.x = 0
+        this.currentSprite.y = 5
         this.moveInterval = null
     }
 

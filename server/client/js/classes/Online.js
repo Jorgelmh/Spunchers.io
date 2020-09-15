@@ -166,28 +166,28 @@ export default class Online extends Engine{
         let emitPos = false
 
         if(this.controls.goUp && this.controls.goLeft){
-            if(this.character.currentSprite.y != 5){
+            if(this.character.currentSprite.y != 3){
                 this.character.onMovingStop()
                 this.character.onMovingForwardLeft()
             } 
         }
 
         if(this.controls.goUp && this.controls.goRight){
-            if(this.character.currentSprite.y != 4){
+            if(this.character.currentSprite.y != 3){
                 this.character.onMovingStop()
                 this.character.onMovingForwardRight()
             } 
         }
 
         if(this.controls.goDown && this.controls.goRight){
-            if(this.character.currentSprite.y != 6){
+            if(this.character.currentSprite.y != 4){
                 this.character.onMovingStop()
                 this.character.onMovingBackwardsRight()
             } 
         }
 
         if(this.controls.goDown && this.controls.goLeft){
-            if(this.character.currentSprite.y != 7){
+            if(this.character.currentSprite.y != 4){
                 this.character.onMovingStop()
                 this.character.onMovingBackwardsLeft()
             } 
@@ -241,10 +241,7 @@ export default class Online extends Engine{
             controls: this.controls,
             cartisianMovement: this.cartesianValueOfMovement,
             character: {
-                currentSprite: {
-                    x: this.character.currentSprite.x,
-                    y: this.character.currentSprite.y
-                }
+                currentSprite: this.character.currentSprite
             }
         })
     }
@@ -295,6 +292,7 @@ export default class Online extends Engine{
     drawOtherPlayers(){
         if(this.state.players){
 
+            let quitePlayers = false
             for(let playerID in this.state.players){
 
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
@@ -306,37 +304,61 @@ export default class Online extends Engine{
                         let skin
 
                         if(this.state.players[playerID].skin == this.skin){
-                            if(this.state.players[playerID].shooting)
+                            if(this.state.players[playerID].shooting && this.state.players[playerID].life > 0)
                                 skin = this.character.spriteImages.shooting
                             else
                                 skin = this.character.spriteImages.normal
                         }else{
-                            if(this.state.players[playerID].shooting)
+                            if(this.state.players[playerID].shooting && this.state.players[playerID].life > 0)
                                 skin = this.onlineSkins[this.state.players[playerID].skin].shooting
                             else
                                 skin = this.onlineSkins[this.state.players[playerID].skin].normal
                         }
 
-                        if(this.state.players[playerID].life === 0)
-                            this.state.players[playerID].character.currentSprite = {x: 1, y: 8}
+                        if(this.state.players[playerID].life === 0){
+                            let tempFlip = this.state.players[playerID].character.currentSprite.flip
+                            this.state.players[playerID].character.currentSprite = {x: 0, y: 6, flip: tempFlip}
+                        }
+
+
+                        /* Check if any player is still */
+                        if(this.state.players[playerID].still)
+                            quitePlayers = true
 
                         if(skin){
                             this.drawLife(characterX, characterY -6, this.state.players[playerID].life)
-                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, this.state.players[playerID].character, skin, this.state.players[playerID].playerName )
+                            let character = {
+                                y: this.state.players[playerID].character.currentSprite.y,
+                                x: (this.state.players[playerID].still && this.state.players[playerID].life > 0) ? this.staticAnimation.x : this.state.players[playerID].character.currentSprite.x,
+                                flip: this.state.players[playerID].character.currentSprite.flip
+                            }
+                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName )
                         }
                 }
             }
+
+            if(quitePlayers && !this.staticAnimation.interval)
+                this.setAnimationWhenStatic()
+            else if (!quitePlayers)
+                this.endAnimationWhenStatic()
         }
     }
 
     /* Draws the online players with the info from the server */
     drawOnlineCharacter(player, onlineCharacter, skin, name){
+        console.log(onlineCharacter);
 
         this.context.textAlign = 'center'
         this.context.fillStyle = 'black'
         this.context.fillText(name, player.posX + this.tile.width/2, player.posY - 10)
-        this.context.drawImage(skin, onlineCharacter.currentSprite.x * this.character.spriteSheet.width, onlineCharacter.currentSprite.y * this.character.spriteSheet.height
-                                , this.character.spriteSheet.width, this.character.spriteSheet.height, player.posX, player.posY, this.tile.width, this.tile.height)
+        this.context.save()
+        this.context.scale(onlineCharacter.flip, 1)
+
+        let posX = (onlineCharacter.flip === 1) ?  player.posX : player.posX * onlineCharacter.flip - this.tile.width
+        
+        this.context.drawImage(skin, onlineCharacter.x * this.character.spriteSheet.width, onlineCharacter.y * this.character.spriteSheet.height
+                                , this.character.spriteSheet.width, this.character.spriteSheet.height, posX, player.posY, this.tile.width, this.tile.height)
+        this.context.restore()
     }
 
     /* Uses the rule of three mathematic formula to transform values from the server */
