@@ -84,13 +84,15 @@ class Game {
         let currentPlayer = this.players[data.id]
 
         if(currentPlayer){
+            
             currentPlayer.character = data.character
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
-            currentPlayer.controls = data.controls
+            currentPlayer.still = true
 
             if(currentPlayer.life > 0){
 
                 if(data.controls.goUp){
+                    currentPlayer.still = false
                     let oldPosition = currentPlayer.posY
                     currentPlayer.posY -= this.characterSpeed
     
@@ -100,6 +102,7 @@ class Game {
                 }
     
                 if(data.controls.goDown){
+                    currentPlayer.still = false
                     let oldPosition = currentPlayer.posY
                     currentPlayer.posY += this.characterSpeed
     
@@ -109,6 +112,7 @@ class Game {
                 }
     
                 if(data.controls.goLeft){
+                    currentPlayer.still = false
                     let oldPosition = currentPlayer.posX
                     currentPlayer.posX -= this.characterSpeed
     
@@ -119,6 +123,7 @@ class Game {
                     
     
                 if(data.controls.goRight){
+                    currentPlayer.still = false
                     let oldPosition = currentPlayer.posX
                     currentPlayer.posX += this.characterSpeed
     
@@ -298,7 +303,8 @@ class Game {
                 currentPlayer.life = 100
                 currentPlayer.posX = newPosition.x
                 currentPlayer.posY = newPosition.y
-                this.socketIO.sockets.emit('state', this.update())
+                if(this.bullets.length === 0)
+                    this.socketIO.sockets.emit('state', this.update())
             }, 1000) 
         }
 

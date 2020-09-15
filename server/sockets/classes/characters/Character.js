@@ -36,6 +36,8 @@ class Character {
         this.lastDeath = Date.now()
         this.ableToShoot = true
 
+        this.still = true
+
         /* Flip Image */
         this.flipImage = 1
         this.orientationWhenQuite = 1
@@ -58,10 +60,6 @@ class Character {
 
     /* Return what the client needs in order to draw the player */
     playerState(){
-        let still = false
-
-        if(this.controls)
-            still = Object.keys(this.controls).every((k) => { return !this.controls[k] });
 
         return {
             posX: this.posX,
@@ -74,7 +72,7 @@ class Character {
             ableToShoot: this.ableToShoot,
             currentAmmo: this.bulletsCharger,
             cartesianValueOfMovement: this.cartesianValueOfMovement,
-            still
+            still:  this.still
         }
     }
 }
