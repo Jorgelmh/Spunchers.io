@@ -28,7 +28,6 @@ const character = {
 
     /* Animations */
     animationSpeed: 250,
-    staticInterval: undefined,
     moveInterval: undefined,
 
     /* Matrix position */
