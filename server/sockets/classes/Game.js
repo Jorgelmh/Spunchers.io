@@ -166,30 +166,24 @@ class Game {
         let currentPlayer = this.players[playerID]
         let bullet = this.emitBullet(playerID)
 
-        this.socketIO.to(playerID).emit('reduce ammo')
+        if(Date.now() - currentPlayer.lastShot > currentPlayer.shootingDelay){
+            this.socketIO.to(playerID).emit('reduce ammo')
 
-        currentPlayer.shooting = true
-        currentPlayer.reduceAmmunition(this.emitReload, playerID)
+            currentPlayer.shooting = true
+            currentPlayer.reduceAmmunition(this.emitReload, playerID)
 
-        setTimeout(() => {
-            currentPlayer.shooting = false
-        }, 90)
+            setTimeout(() => {
+                currentPlayer.shooting = false
+            }, 90)
 
-        this.bullets.push({
-                ownerID: playerID,
-                posX: bullet.posX,
-                posY: bullet.posY,
-                dirX: bullet.dirX,
-                dirY: bullet.dirY
-        }) 
-
-        currentPlayer.ableToShoot = false
-
-        setTimeout(() => {
-            currentPlayer.ableToShoot = true
-
-            this.socketIO.to(playerID).emit('able to shoot')
-        }, this.players[playerID].shootingDelay)
+            this.bullets.push({
+                    ownerID: playerID,
+                    posX: bullet.posX,
+                    posY: bullet.posY,
+                    dirX: bullet.dirX,
+                    dirY: bullet.dirY
+            }) 
+        }
     }
 
     update(date){
@@ -411,7 +405,8 @@ class Game {
         return {
             srcArray,
             characterInfo: {
-                bullets: this.players[playerID].ammunition
+                bullets: this.players[playerID].ammunition,
+                shootingDelay: this.players[playerID].shootingDelay
             }
         }
     }

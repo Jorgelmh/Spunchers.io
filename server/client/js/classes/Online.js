@@ -61,13 +61,9 @@ export default class Online extends Engine{
 
             this.playerAmmunition = data.characterInfo.bullets
             this.currentAmmo = this.playerAmmunition
+            this.shootingDelay = data.characterInfo.shootingDelay
 
             this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
-        })
-
-        /* When the gun is able to shoot */
-        this.socketIO.on('able to shoot', (data) => {
-            this.playerStats.ableToShoot = true
         })
 
         /* when a new player enters, other people must load his skin */
@@ -226,7 +222,7 @@ export default class Online extends Engine{
                 this.character.onMovingLeft()
         }
 
-        if(this.playerStats.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading)
+        if(this.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading)
             this.triggerShooting()
 
         if(emitPos)

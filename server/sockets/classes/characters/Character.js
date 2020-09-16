@@ -31,6 +31,7 @@ class Character {
         this.ableToShoot = true
 
         this.still = true
+        this.lastShot = Date.now()
     }
 
     reduceAmmunition(emitReload, playerID){

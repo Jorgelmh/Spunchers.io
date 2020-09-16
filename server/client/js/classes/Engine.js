@@ -26,6 +26,8 @@ export default class Engine{
         this.playerAmmunition = null
         this.currentAmmo = null
         this.reloading = false
+        this.shootingDelay = null
+        this.ableToShoot = true
 
         /* Html <p> that shows the amount of bullets in the charger */
         this.bulletsHTMLElement = document.getElementById('charger')
@@ -444,6 +446,12 @@ export default class Engine{
 
     /* Shooting timing */
     triggerShooting(){
+
+        this.ableToShoot = false
+
+        setTimeout(() => {
+            this.ableToShoot = true
+        }, this.shootingDelay)
 
         /* Fire animation */
         setTimeout(() => {
