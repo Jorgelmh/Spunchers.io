@@ -125,11 +125,11 @@ export default class Online extends Engine{
         this.calculateOffset()
         this.drawMap()
         this.drawObjects()
+        this.drawBullets()
         this.drawOtherPlayers()
 
         this.context.font = '16px cursive'
         this.context.fillStyle = 'black'
-        this.drawBullets()
 
         //this.drawCharacter()
 

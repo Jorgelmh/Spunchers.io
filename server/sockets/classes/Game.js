@@ -4,6 +4,7 @@ const OnlineChatServer = require('./OnlineChatServer')
 /* Import character classes */
 const Mikaela = require('./characters/Mikaela.js');
 const Blade = require('./characters/Blade.js');
+const Rider = require('./characters/Rider.js')
 
 class Game {
     constructor(map, io){
@@ -69,6 +70,9 @@ class Game {
             case 'mikaela':
                 this.players[socketID] = new Mikaela(600, 200, data.character, data.name)
                 break
+            case 'rider':
+                this.players[socketID] = new Rider(600, 200, data.character, data.name)
+            
         }
     }
 
