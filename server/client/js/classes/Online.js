@@ -292,7 +292,7 @@ export default class Online extends Engine{
             for(let playerID in this.state.players){
 
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
-                    let characterY = this.transformServerMagnitudesX(this.state.players[playerID].posY)+this.tileMap.startY
+                    let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
@@ -342,7 +342,6 @@ export default class Online extends Engine{
 
     /* Draws the online players with the info from the server */
     drawOnlineCharacter(player, onlineCharacter, skin, name){
-        console.log(onlineCharacter);
 
         this.context.textAlign = 'center'
         this.context.fillStyle = 'black'
@@ -393,9 +392,38 @@ export default class Online extends Engine{
 
         if(this.state.bullets.length > 0){
             this.state.bullets.map((element) => {
-                this.context.beginPath()
-                this.context.arc(this.transformServerMagnitudesX(element.posX)+this.tileMap.startX, this.transformServerMagnitudesY(element.posY) +this.tileMap.startY, 5, 0, 2 * Math.PI)
-                this.context.fill()
+
+                let bulletX = this.transformServerMagnitudesX(element.posX)+this.tileMap.startX
+                let bulletY = this.transformServerMagnitudesY(element.posY)+this.tileMap.startY
+
+                if(bulletX >= 0 && bulletX < this.screenTiles.x * this.tile.width && bulletY >= 0 && bulletY < this.screenTiles.y * this.tile.height){
+                    this.context.save()
+                    this.context.scale(element.flip, 1)
+    
+                    let posX = (element.flip === 1) ? bulletX : bulletX  * element.flip
+
+                    let spritePosX = 0
+                    let spritePosY = element.spriteY * 16
+
+                    if(element.spriteY === 0)
+                        spritePosX+=5
+                    else if(element.spriteY === 1)
+                        posX-=(this.canvas.width*.015)
+                    else if(element.spriteY === 2)
+                        bulletY-=(this.canvas.width * .01)
+    
+                    this.context.drawImage(this.bulletSprite.img, spritePosX, spritePosY, 16, 16, 
+                        posX,  bulletY, this.bulletSprite.width, this.bulletSprite.height)
+
+                    this.context.restore()
+                    
+                    
+                    /* Draw actual trayectory of the bullet
+                    this.context.beginPath()
+                    this.context.arc(this.transformServerMagnitudesX(element.posX)+this.tileMap.startX, this.transformServerMagnitudesY(element.posY) +this.tileMap.startY, 5, 0, 2 * Math.PI)
+                    this.context.fill()
+                    */
+                }
             })
         }
     }

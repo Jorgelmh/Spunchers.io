@@ -6,7 +6,7 @@ class Rider extends Character{
 
         /* Specific data about this character */
         this.skin = 'rider'
-        this.shootingDelay = 125
+        this.shootingDelay = 175
         this.impactDamage = 33.4
 
         /* Full charger bullets */

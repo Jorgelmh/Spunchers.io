@@ -123,9 +123,13 @@ export default class Engine{
             offsetX: 0,
             offsetY: 0,
         }
-        /*TODO: Add values to the cartesian movement -> moving left => x= -1 -> moving right => x = 1, same for Y axis
-        then increase progressively the camera acceleration to hundred and then stop. If the movement 
-        */
+ 
+        /* Bullets Image */
+        this.bulletSprite = {
+            width: null,
+            height: null,
+            img: null
+        }
 
         /* Get the timings of the animation 0-4 */
         this.animationTiming = 1
@@ -174,8 +178,13 @@ export default class Engine{
 
             let tileImage = new Image()
             tileImage.onload = () => {
-                if(++loadedImages >= this.tileList.length)
-                    this.loadCharacter()
+                if(++loadedImages >= this.tileList.length){
+                    this.bulletSprite.img = new Image()
+                    this.bulletSprite.img.onload = () => {
+                        this.loadCharacter()
+                    }
+                    this.bulletSprite.img.src = '../assets/resources/bullets.png'
+                }
             }
 
             tileImage.src = `../assets/tiles/${this.tileMap.tileSet}/tile_00${(this.tileList[i]<10) ? '0'+this.tileList[i]: this.tileList[i]}.png`
@@ -189,7 +198,6 @@ export default class Engine{
 
     loadCharacter(){
         this.character.load(`${this.skin}.png`, () => {
-            console.log(this.animatedSprites);
             if(this.animatedSprites)
                 this.setAnimationTiming()
 
@@ -224,6 +232,10 @@ export default class Engine{
         /* Camera smoothness ratio */
         this.cameraSmoothness.limitX = this.canvas.width * .045
         this.cameraSmoothness.limitY = this.canvas.height * .045
+
+        /* Bullet's size */
+        this.bulletSprite.width = this.canvas.width * .02
+        this.bulletSprite.height = this.canvas.width * .02
 
         /* Set player's position */
         this.playerRelativePosition = this.getPlayerRelativePosition()

@@ -185,7 +185,9 @@ class Game {
                     posX: bullet.posX,
                     posY: bullet.posY,
                     dirX: bullet.dirX,
-                    dirY: bullet.dirY
+                    dirY: bullet.dirY,
+                    flip: this.players[playerID].character.currentSprite.flip,
+                    spriteY: bullet.spriteY
             }) 
         }
     }
@@ -435,33 +437,41 @@ class Game {
     emitBullet(playerID){
         let halfServerTileWidth = this.tile.width/2
         let dirX, dirY, posX = this.players[playerID].posX + halfServerTileWidth, posY = this.players[playerID].posY
+        /* Bullet y position in the spritesheet */
+        let spriteY
 
         switch (this.players[playerID].character.currentSprite.y){
             case 0:
                 dirX = 0
                 dirY = 1 
+                spriteY = 0
                 posY+= halfServerTileWidth*2
                 break
             case 1:
                 dirY = 0
                 dirX = 1 * this.players[playerID].character.currentSprite.flip
+                spriteY = 2
                 break
             case 2:
                 dirX = 0
                 dirY = -1
                 posX += this.tile.width/6
+                spriteY = 0
                 break
             case 3:
                 dirY = -Math.sin(Math.PI / 4)
                 dirX = Math.sin(Math.PI / 4) * this.players[playerID].character.currentSprite.flip
+                spriteY = 1
                 break
             case 4:
                 dirY = Math.sin(Math.PI / 4)
                 dirX = Math.sin(Math.PI / 4) * this.players[playerID].character.currentSprite.flip
+                spriteY = 3
                 break
             case 5: 
                 dirX = 1 * this.players[playerID].character.currentSprite.flip
                 dirY = 0
+                spriteY = 2
                 break
         }
 
@@ -479,14 +489,13 @@ class Game {
         }
 
 
-        let bullet = {
+        return {
             posX,
             posY,
             dirX: dirX,
-            dirY: dirY
+            dirY: dirY,
+            spriteY
         }
-
-        return bullet
     }
 
 }

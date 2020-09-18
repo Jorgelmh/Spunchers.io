@@ -7,7 +7,7 @@ class Blade extends Character{
 
         /* Specific data about this character */
         this.skin = 'blade'
-        this.shootingDelay = 200
+        this.shootingDelay = 150
         this.impactDamage = 25
 
         /* Full charger bullets */
