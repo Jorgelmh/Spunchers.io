@@ -178,6 +178,8 @@ class Game {
 
             setTimeout(() => {
                 currentPlayer.shooting = false
+                if(this.bullets.length === 0)
+                    this.socketIO.emit('state', this.update())
             }, 90)
 
             this.bullets.push({
@@ -251,8 +253,8 @@ class Game {
             for(let playerID in this.players){
 
                 /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
-                if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/4) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
-                    && (this.players[playerID].posY + (this.tile.width/4) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
+                if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/2) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
+                    && (this.players[playerID].posY + (this.tile.width/2) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
 
                         this.players[playerID].life = (this.players[playerID].life - this.players[bullet.ownerID].impactDamage < 0) ? 0 : this.players[playerID].life - this.players[bullet.ownerID].impactDamage
 
