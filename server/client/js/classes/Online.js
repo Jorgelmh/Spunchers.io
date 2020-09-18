@@ -421,10 +421,11 @@ export default class Online extends Engine{
                     
                     
                     /* Draw actual trayectory of the bullet */
+                    /*
                     this.context.beginPath()
                     this.context.arc(this.transformServerMagnitudesX(element.posX)+this.tileMap.startX, this.transformServerMagnitudesY(element.posY) +this.tileMap.startY, 5, 0, 2 * Math.PI)
                     this.context.fill()
-                    
+                    */
                 }
             })
         }
