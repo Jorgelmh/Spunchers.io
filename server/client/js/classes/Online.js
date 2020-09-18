@@ -405,8 +405,10 @@ export default class Online extends Engine{
                     let spritePosX = 0
                     let spritePosY = element.spriteY * 16
 
-                    if(element.spriteY === 0)
+                    if(element.spriteY === 0){
                         spritePosX+=5
+                        posX-=(this.canvas.width*.005)
+                    }
                     else if(element.spriteY === 1)
                         posX-=(this.canvas.width*.015)
                     else if(element.spriteY === 2)
@@ -418,11 +420,11 @@ export default class Online extends Engine{
                     this.context.restore()
                     
                     
-                    /* Draw actual trayectory of the bullet
+                    /* Draw actual trayectory of the bullet */
                     this.context.beginPath()
                     this.context.arc(this.transformServerMagnitudesX(element.posX)+this.tileMap.startX, this.transformServerMagnitudesY(element.posY) +this.tileMap.startY, 5, 0, 2 * Math.PI)
                     this.context.fill()
-                    */
+                    
                 }
             })
         }
