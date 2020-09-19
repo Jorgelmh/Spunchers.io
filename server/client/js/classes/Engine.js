@@ -8,7 +8,7 @@ import character from '../character.js'
 
 export default class Engine{
 
-    constructor(map, collisionMatrix, tileset, canvas, skin){
+    constructor(map, collisionMatrix, shadowMatrix, tileset, canvas, skin){
 
         /* General variables */
         this.canvas = canvas
@@ -105,6 +105,9 @@ export default class Engine{
         /* Collisionable */
         this.collisionMatrix = collisionMatrix
 
+        /* Shadow matrix */
+        this.shadowMatrix = shadowMatrix
+
         this.shooting = false
 
         /* Animation? */
@@ -151,6 +154,7 @@ export default class Engine{
         console.log(this.tileImages)
         console.log(this.tileMap.tiles)
         console.log(this.collisionMatrix)
+        console.log(this.shadowMatrix);
 
         const pushImg = (val) => {
 
@@ -169,6 +173,7 @@ export default class Engine{
             for(let j = 0; j < this.tileMap.tiles[0].length; j++){
                 pushImg(this.tileMap.tiles[i][j])
                 pushImg(this.collisionMatrix[i][j])
+                pushImg(this.shadowMatrix)
             }
         }
 
@@ -345,11 +350,19 @@ export default class Engine{
         }
     }
 
+    drawShadows(){
+        for(let i =  this.offSet.y; i < this.offSet.yLimit; i++){
+            for(let j = this.offSet.x; j < this.offSet.xLimit; j++)
+                if(this.shadowMatrix[i][j])
+                    this.drawTile(j, i, this.shadowMatrix)
+        }
+    }
+
     /* Draw objects from collision matrix */
     drawObjects(){
         for(let i =  this.offSet.y; i < this.offSet.yLimit; i++){
             for(let j = this.offSet.x; j < this.offSet.xLimit; j++){
-                if(this.collisionMatrix[i][j] != 0)
+                if(this.collisionMatrix[i][j])
                     this.drawTile(j, i, this.collisionMatrix)
                 
             }   

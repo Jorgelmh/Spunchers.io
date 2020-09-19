@@ -34,6 +34,7 @@ class Game {
         this.tileSet = map.tileSet
         this.map = map.tileMap
         this.collisionMatrix = map.collisionMap
+        this.shadowMap = map.shadowMatrix
 
         /* Dimensions of the server */
         this.width = map.dimensions.width
@@ -425,6 +426,7 @@ class Game {
             lobby: {
                 map: this.map,
                 collisionMatrix: this.collisionMatrix,
+                shadowMap: this.shadowMap,
                 tileSet: this.tileSet,
                 server : {
                     width: this.width,

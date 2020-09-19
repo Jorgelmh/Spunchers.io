@@ -8,8 +8,8 @@ import OnlineChat from './OnlineChat.js'
  */
 export default class Online extends Engine{
 
-    constructor(map, colissionMatrix, tileSet, canvas, socket, playerID, server, skin, name){
-        super(map, colissionMatrix, tileSet, canvas, skin)
+    constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name){
+        super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
 
         this.name = name
         this.serverDelay = null
@@ -124,6 +124,7 @@ export default class Online extends Engine{
         this.animateCharacter()
         this.calculateOffset()
         this.drawMap()
+        this.drawShadows()
         this.drawObjects()
         this.drawBullets()
         this.drawOtherPlayers()
