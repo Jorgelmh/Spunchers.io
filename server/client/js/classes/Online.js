@@ -112,7 +112,7 @@ export default class Online extends Engine{
      *      RENDER FUNCTION
      * ==========================
      * 
-     * Called when the sprites are loaded by the engine
+     * Called once sprites are loaded by the engine
      */ 
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -156,8 +156,7 @@ export default class Online extends Engine{
         })
     }
 
-    /* Animating the local character with the info from the server */
-
+    /* Animating local character using data from server */
     animateCharacter(){
         
         let emitPos = false
@@ -231,7 +230,7 @@ export default class Online extends Engine{
 
     }
 
-    /* Send the info back to the server */
+    /* Send data back to the server */
     emitPlayerPosition = () =>{
         this.socketIO.emit('movement', {
             id: this.playerID,
@@ -249,7 +248,6 @@ export default class Online extends Engine{
         let serverHeight = this.transformServerMagnitudesY(this.playerStats.posY)
 
         /* X axis smoothness */
-
         if(this.cameraSmoothness.offsetX < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetX > -this.cameraSmoothness.limitX && this.playerStats.cartesianValueOfMovement.x){
             this.cameraSmoothness.velX = (this.cameraSmoothness.velX > 1.8) ? 2 : this.cameraSmoothness.velX / this.cameraSmoothness.friction
             this.cameraSmoothness.offsetX += this.cameraSmoothness.velX *(this.playerStats.cartesianValueOfMovement.x)
@@ -264,7 +262,6 @@ export default class Online extends Engine{
         }
 
         /* Y axis smootheness */
-
         if(this.cameraSmoothness.offsetY < this.cameraSmoothness.limitX && this.cameraSmoothness.offsetY > -this.cameraSmoothness.limitX && this.playerStats.cartesianValueOfMovement.y){
             this.cameraSmoothness.velY = (this.cameraSmoothness.velY > 1.7) ? 2 : this.cameraSmoothness.velY / this.cameraSmoothness.friction
             this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.playerStats.cartesianValueOfMovement.y * -1)
@@ -285,7 +282,7 @@ export default class Online extends Engine{
 
     }
 
-    /* Loops the other players and calls the drawOnlineCharacter to draw each player with the info from the socket */
+    /* Loops server players and calls the drawOnlineCharacter to draw each player with the data from the socket */
     drawOtherPlayers(){
         if(this.state.players){
 
@@ -341,7 +338,7 @@ export default class Online extends Engine{
         }
     }
 
-    /* Draws the online players with the info from the server */
+    /* Draws online players from server's data */
     drawOnlineCharacter(player, onlineCharacter, skin, name){
 
         this.context.textAlign = 'center'
@@ -432,7 +429,7 @@ export default class Online extends Engine{
         }
     }
 
-    /* Emit bullet to the server */
+    /* Emit bullet to server */
 
     emitBullet(){
 

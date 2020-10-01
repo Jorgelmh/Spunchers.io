@@ -369,7 +369,7 @@ export default class Engine{
         }
     }
 
-    /* Draw single tile on the canvas */
+    /* Draw single tile on canvas */
     drawTile(xi, yi, matrix){
 
         let indexImage = (Array.isArray(matrix[yi][xi])) ? this.tileImages.findIndex((elem) => elem.id === matrix[yi][xi][this.animationTiming]) : this.tileImages.findIndex((elem) => elem.id === matrix[yi][xi])
@@ -419,7 +419,7 @@ export default class Engine{
         return {posX, posY}
     }
 
-    /* returns position of a given position in the matrix realtive to the screen */
+    /* returns position of a given position in the matrix relative to the screen */
     getTilesRelativePosition(x, y){
         let posX = x*this.tile.width + this.tileMap.startX
         let posY = y*this.tile.height + this.tileMap.startY
