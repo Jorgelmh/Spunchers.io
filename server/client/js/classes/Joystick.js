@@ -171,6 +171,7 @@ export default class Joystick{
 
     handleStart = (e) => {
         /* Determine if user is clicking the inner circle -> implemented using pythagoras */
+        e.preventDefault()
         let pos = (window.mobileCheck()) ? e.changedTouches[0] : e
 
         console.log(pos);
@@ -180,7 +181,7 @@ export default class Joystick{
 
     /* When clicked then starts draggin */
     handleMovement = (e) => {
-
+        e.preventDefault()
         /* if clicked */
         if(this.dragging){
             let source = (window.mobileCheck()) ? e.changedTouches[0] : e
@@ -225,6 +226,7 @@ export default class Joystick{
     }
 
     handleReleased = (e) => {
+        e.preventDefault()
         /* When released click then return to original position */
         this.dragging = false
         this.innerCircle.x = this.position.x
