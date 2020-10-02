@@ -56,7 +56,7 @@ const socketListen = (app) => {
 
         /* Listener of socket movement */
         socket.on('movement', (data) => {
-            serverGame.onMovement(data)
+            serverGame.onMovement(socket.id, data)
             if(serverGame.bullets.length === 0)
                 io.sockets.emit('state', serverGame.update())
         } )

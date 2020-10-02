@@ -84,9 +84,9 @@ class Game {
     }
 
     /* change position of players when the movement events on the client are triggered */
-    onMovement = (data) => {
+    onMovement = (socketID, data) => {
 
-        let currentPlayer = this.players[data.id]
+        let currentPlayer = this.players[socketID]
 
         if(currentPlayer){
 
@@ -94,49 +94,23 @@ class Game {
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
             currentPlayer.still = true
 
-            if(currentPlayer.life > 0){
+            if(currentPlayer.life > 0 && (data.movement.x !== 0 || data.movement.y !== 0)){
 
-                if(data.controls.goUp){
-                    currentPlayer.still = false
-                    let oldPosition = currentPlayer.posY
-                    currentPlayer.posY -= this.characterSpeed
-    
-                    if(this.detectCollisions(currentPlayer)){
-                        currentPlayer.posY = oldPosition
-                    }
-                }
-    
-                if(data.controls.goDown){
-                    currentPlayer.still = false
-                    let oldPosition = currentPlayer.posY
-                    currentPlayer.posY += this.characterSpeed
-    
-                    if(this.detectCollisions(currentPlayer)){
-                        currentPlayer.posY = oldPosition
-                    }
-                }
-    
-                if(data.controls.goLeft){
-                    currentPlayer.still = false
-                    let oldPosition = currentPlayer.posX
-                    currentPlayer.posX -= this.characterSpeed
-    
-                    if(this.detectCollisions(currentPlayer)){
-                        currentPlayer.posX = oldPosition
-                    }
-                }
-                    
-    
-                if(data.controls.goRight){
-                    currentPlayer.still = false
-                    let oldPosition = currentPlayer.posX
-                    currentPlayer.posX += this.characterSpeed
-    
-                    if(this.detectCollisions(currentPlayer)){
-                        currentPlayer.posX = oldPosition
-                    }
-    
-                }
+                currentPlayer.still = false
+
+                /* Movement on X */
+                let oldPositionX = currentPlayer.posX
+                currentPlayer.posX += data.movement.x
+
+                if(this.detectCollisions(currentPlayer))
+                    currentPlayer.posX = oldPositionX
+
+                /* Movement on Y */
+                let oldPositionY = currentPlayer.posY
+                currentPlayer.posY += data.movement.y
+
+                if(this.detectCollisions(currentPlayer))
+                    currentPlayer.posY = oldPositionY
             }
         }
     }

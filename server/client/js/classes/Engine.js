@@ -53,7 +53,6 @@ export default class Engine{
         }
 
         /* Tiles per screen */
-
         this.screenTiles= {
             x: 16,
             y: 9
@@ -86,15 +85,6 @@ export default class Engine{
 
         this.lastFrameTime = 0
         this.FPS = 0
-
-        /* Controls */
-        this.controls= {
-            goUp: false,
-            goDown: false,
-            goRight: false,
-            goLeft: false,
-            shoot: false
-        }
 
         /* Static Animation */
         this.staticAnimation = {
@@ -136,7 +126,7 @@ export default class Engine{
 
         /* Get the timings of the animation 0-4 */
         this.animationTiming = 1
-
+        
         window.addEventListener('resize', this.resizeCanvas)
         this.resizeCanvas()
         this.load()
@@ -207,7 +197,6 @@ export default class Engine{
                 this.setAnimationTiming()
 
             requestAnimationFrame(this.render)
-            this.addControls()
         })
     }
 
@@ -245,82 +234,6 @@ export default class Engine{
         /* Set player's position */
         this.playerRelativePosition = this.getPlayerRelativePosition()
 
-    }
-
-    /* Listeners for Controls */
-    addControls(){
-
-        window.addEventListener('keydown', () => {
-            switch (event.key.toLowerCase()){
-                case 'arrowup':
-                    this.controls.goUp = true
-                    this.cartesianValueOfMovement.y = (this.controls.goDown) ? 0 : 1
-                    break
-
-                case 'arrowdown':
-                    this.controls.goDown = true
-                    this.cartesianValueOfMovement.y = (this.controls.goUp) ? 0 : -1
-                    break
-
-                case 'arrowleft':
-                    this.controls.goLeft = true
-                    this.cartesianValueOfMovement.x = (this.controls.goRight) ? 0 : -1
-                    break
-
-                case 'arrowright':
-                    this.controls.goRight = true
-                    this.cartesianValueOfMovement.x = (this.controls.goLeft) ? 0 : 1
-                    break
-
-                case 'a':
-                    this.controls.shoot = true                    
-                    break
-                case 'r':
-                    if(this.currentAmmo !== this.playerAmmunition){
-                        this.reloading = true
-                        this.emitReload()
-                    }
-                    break
-            }
-        })
-
-        window.addEventListener('keyup', () => {
-            switch (event.key.toLowerCase()){
-                case 'arrowup':
-                    this.character.onMovingStop()
-                    this.controls.goUp = false
-                    this.cartesianValueOfMovement.y = (this.controls.goDown) ? -1 : 0
-                    this.cartesianValueOfMovement.onChangeY = true
-                    break
-
-                case 'arrowdown':
-                    this.character.onMovingStop()
-                    this.controls.goDown = false
-                    this.cartesianValueOfMovement.y = (this.controls.goUp) ? 1 : 0
-                    this.cartesianValueOfMovement.onChangeY = true
-                    break
-
-                case 'arrowleft':
-                    this.character.onMovingStop()
-                    this.controls.goLeft = false
-                    this.cartesianValueOfMovement.x = (this.controls.goRight) ? 1 : 0
-                    this.cartesianValueOfMovement.onChangeX = true
-                    break
-
-                case 'arrowright':
-                    this.character.onMovingStop()
-                    this.controls.goRight = false
-                    this.cartesianValueOfMovement.x = (this.controls.goLeft) ? -1 : 0
-                    this.cartesianValueOfMovement.onChangeX = true
-                    break
-                case 'a':
-                    this.controls.shoot = false
-                    this.character.spriteSheet.img = this.character.spriteImages.normal
-                    break
-            }
-
-            this.emitPlayerPosition()
-        })
     }
 
     /**
