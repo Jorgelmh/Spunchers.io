@@ -55,8 +55,6 @@ play.onclick = (event) => {
 
     let name = document.getElementById('playerName').value || 'unnamed'
 
-    document.getElementsByTagName('body').style.overflow = 'hidden'
-
     document.getElementById('site-game').style.display = 'block'
     body.removeChild(document.getElementById('login-frame'))
     const engine = new Online(game.lobby.map, game.lobby.collisionMatrix, game.lobby.shadowMap ,game.lobby.tileSet , document.getElementById('game'), socket, game.playerID, game.lobby.server, characterSkins[glide.index], name)
