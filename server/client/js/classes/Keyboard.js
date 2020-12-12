@@ -15,10 +15,9 @@ export default class Keyboard {
             goDown: false,
             goRight: false,
             goLeft: false,
-            shoot: false
         }
 
-        console.log(emitPosition)
+        this.shoot = false
 
         /* Cartesian Value of movement */
         this.cartesianValueOfMovement = {
@@ -59,7 +58,7 @@ export default class Keyboard {
                     break
 
                 case 'a':
-                    this.controls.shoot = true                    
+                    this.shoot = true                    
                     break
                 case 'r':
                     this.emitReload()
@@ -94,7 +93,7 @@ export default class Keyboard {
                     this.cartesianValueOfMovement.x = (this.controls.goLeft) ? -1 : 0
                     break
                 case 'a':
-                    this.controls.shoot = false
+                    this.shoot = false
                     this.character.spriteSheet.img = this.character.spriteImages.normal
                     break
 
@@ -151,7 +150,7 @@ export default class Keyboard {
         }
 
         if(this.controls.goUp){
-            movement.y = movement.y || -1
+            movement.y = (this.controls.goDown) ? 0 : -1
 
             if(!this.character.moveInterval)
                 this.character.onMovingForward()
@@ -159,14 +158,14 @@ export default class Keyboard {
         
 
         if(this.controls.goDown){
-            movement.y = movement.y || 1
+            movement.y = (this.controls.goUp) ? 0 : 1
 
             if(!this.character.moveInterval)
                 this.character.onMovingBackwards()
         }
 
         if(this.controls.goRight){
-            movement.x = movement.x || 1
+            movement.x = (this.controls.goLeft) ? 0 : 1
 
             if(!this.character.moveInterval)
                 this.character.onMovingRight()
@@ -174,13 +173,12 @@ export default class Keyboard {
         
         if(this.controls.goLeft){
 
-            movement.x = movement.x || -1
+            movement.x = (this.controls.goRight) ? 0 : -1
 
             if(!this.character.moveInterval)
                 this.character.onMovingLeft()
         }
 
-        if(movement.x || movement.y)
-            this.emitPosition(movement)
+        this.emitPosition(movement)
     }
 }

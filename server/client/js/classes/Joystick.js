@@ -20,36 +20,13 @@ export default class Joystick{
         this.canvas = canvas
         this.context = canvas.getContext("2d")
 
-        /* radius of outter circle */
-        this.radius = this.canvas.width * .07
-
-        /* Stablishing dimensions */
-        this.position = {
-            x: this.radius + this.canvas.width * .04,
-            y: this.canvas.height - (this.radius + this.canvas.width * 0.03)
-        }
-
-        /* Outer circle */
-        this.outterCircle = {
-            x: this.position.x,
-            y: this.position.y,
-            radius: this.radius
-        }
-
-        /* Inner circle */
-        this.innerCircle = {
-            x: this.position.x,
-            y: this.position.y,
-            radius: this.radius * .60
-        }
-
         /* Cos and sin */
         this.movement = {
             cos: 0,
             sin: 0
         }
 
-        this.angle = 0
+        this.angleInDegrees = 0
 
         /* Dragging */
         this.dragging = false
@@ -102,6 +79,10 @@ export default class Joystick{
     /* Event listener to detect if the user is dragging */
     addListeners(){
 
+        window.addEventListener('resize', this.resize)
+
+        this.resize()
+
         if(window.mobileCheck()){
             this.canvas.addEventListener('touchstart', this.handleStart)
             this.canvas.addEventListener('touchmove', this.handleMovement)
@@ -111,6 +92,36 @@ export default class Joystick{
             this.canvas.addEventListener('mouseup', this.handleReleased)
             this.canvas.addEventListener('mousemove', this.handleMovement)
         }  
+    }
+
+    /* Resize joystick -> Responsive */
+
+    resize = () => {
+        /* radius of outter circle */
+        this.radius = this.canvas.width * .07
+
+        /* Stablishing dimensions */
+        this.position = {
+            x: this.radius + this.canvas.width * .07,
+            y: this.canvas.height - (this.radius + this.canvas.height * 0.1)
+        }
+
+        /* Outer circle */
+        this.outterCircle = {
+            x: this.position.x,
+            y: this.position.y,
+            radius: this.radius
+        }
+
+        /* Inner circle */
+        this.innerCircle = {
+            x: this.position.x,
+            y: this.position.y,
+            radius: this.radius * .60
+        }
+        
+        this.drawJoystick()
+
     }
 
     /**
@@ -133,17 +144,29 @@ export default class Joystick{
         /* Get porcentage of movement regards to inner circle's radius */
         let proportionOfMovement = hypotenuse * 100 / this.outterCircle.radius
 
+        let degreeAngle = angle * 180 / Math.PI
+
         if( x >= 0 ){
-            if(y >= 0)
+            if(y >= 0){
                 movement = {x: Math.cos(angle), y: Math.sin(angle)}
-            else
+                degreeAngle = -degreeAngle
+            }
+            else{
                 movement = {x: Math.cos(angle), y: Math.sin(angle)}
+                degreeAngle = 360 - degreeAngle
+            }
         }else{
-            if(y >= 0)  
+            if(y >= 0){
                 movement = {x: -Math.cos(angle), y: -Math.sin(angle)}
-            else
+                degreeAngle = 180 - degreeAngle
+            }
+            else{
                 movement = {x: -Math.cos(angle), y: -Math.sin(angle)}
+                degreeAngle -= 180
+                degreeAngle = -degreeAngle
+            }
         }
+
 
         /* apply proportion of movement */
         movement.x *= proportionOfMovement/100
@@ -154,13 +177,82 @@ export default class Joystick{
 
         this.movement.x = movement.x
         this.movement.y = movement.y 
+
+        this.cartesianValueOfMovement.x = this.movement.x
+        this.cartesianValueOfMovement.y = -this.movement.y
+
+        this.angleInDegrees = degreeAngle
     }
 
     /* Animate -> emitPosition */
 
     animate(){
-        if(this.movement.x !== 0 || this.movement.y !== 0)
+        if(this.movement.x || this.movement.y){
+
+            //Calculate character animation
+            
+            let angle = 22.5
+
+            if((this.angleInDegrees <= angle || this.angleInDegrees > 337.5) && this.character.currentSprite.y != 1){
+                this.character.onMovingStop()
+                this.character.onMovingRight()
+            }
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 3){
+                this.character.onMovingStop()
+                this.character.onMovingForwardRight()
+            }
+
+            //Next animation if doesn't match
+            angle += 45
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 2){
+                this.character.onMovingStop()
+                this.character.onMovingForward()
+            }
+
+            //Next animation if doesn't match
+            angle += 45
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 3){
+                this.character.onMovingStop()
+                this.character.onMovingForwardLeft()
+            }
+
+            //Next animation if doesn't match
+            angle += 45
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 1){
+                this.character.onMovingStop()
+                this.character.onMovingLeft()
+            }
+
+            //Next animation if doesn't match
+            angle += 45
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 4){
+                this.character.onMovingStop()
+                this.character.onMovingBackwardsLeft()
+            }
+
+            //Next animation if doesn't match
+            angle += 45
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 0){
+                this.character.onMovingStop()
+                this.character.onMovingBackwards()
+            }
+
+            //Next animation if doesn't match
+            angle += 45
+
+            if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 4){
+                this.character.onMovingStop()
+                this.character.onMovingBackwardsRight()
+            }
+
             this.emitPosition(this.movement)
+        }
     }
 
     /** 
@@ -174,7 +266,7 @@ export default class Joystick{
         e.preventDefault()
         let pos = (window.mobileCheck()) ? e.changedTouches[0] : e
 
-        console.log(pos);
+        //console.log(pos);
         if(Math.pow(pos.pageX - this.innerCircle.x, 2) + Math.pow(pos.pageY - this.innerCircle.y, 2) <= Math.pow(this.innerCircle.radius, 2))
             this.dragging = true
     }
@@ -232,5 +324,15 @@ export default class Joystick{
         this.innerCircle.x = this.position.x
         this.innerCircle.y = this.position.y
         this.movement = {x: 0, y: 0}
+
+        /* Stop animation */
+
+        if(this.character.moveInterval)
+            this.character.onMovingStop()
+
+        /* Reset cartesian value */
+        this.cartesianValueOfMovement = {x: 0, y: 0}
+
+        this.emitPosition(this.movement)
     }
 }

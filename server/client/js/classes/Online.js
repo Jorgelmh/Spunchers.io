@@ -48,10 +48,17 @@ export default class Online extends Engine{
         /* Skins array of images */
         this.onlineSkins = {}
 
+        /* Check change on cartesian value of movement */
+        this.cartesianChange = {
+            x: false,
+            y: false
+        }
+
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
             this.state = data
             let currentPlayerPos = this.state.players[this.playerID]
+
             this.playerStats = currentPlayerPos
 
             if(this.currentAmmo !== this.playerStats.bulletsCharger){
@@ -172,6 +179,10 @@ export default class Online extends Engine{
 
     animateCharacter(){
         this.controls.animate()
+
+        // Testing variables for shooting
+        console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
+
         if(this.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading)
             this.triggerShooting()
 
@@ -199,7 +210,9 @@ export default class Online extends Engine{
             this.cameraSmoothness.offsetX += this.cameraSmoothness.velX *(this.playerStats.cartesianValueOfMovement.x)
         }
 
-        else if(this.playerStats.cartesianValueOfMovement.x === 0 && this.cameraSmoothness.offsetX !== 0){
+        else if(((this.playerStats.cartesianValueOfMovement.x > 0 && this.cameraSmoothness.offsetX < 0) || (this.playerStats.cartesianValueOfMovement.x < 0 && this.cameraSmoothness.offsetX > 0) 
+        || (this.playerStats.cartesianValueOfMovement.x === 0)) && this.cameraSmoothness.offsetX !== 0){
+
             this.cameraSmoothness.velX = (this.cameraSmoothness.velX <= .4) ? .4 : this.cameraSmoothness.velX * this.cameraSmoothness.friction
             if(this.cameraSmoothness.offsetX < 0)
                 this.cameraSmoothness.offsetX += this.cameraSmoothness.velX
@@ -212,7 +225,8 @@ export default class Online extends Engine{
             this.cameraSmoothness.velY = (this.cameraSmoothness.velY > 1.7) ? 2 : this.cameraSmoothness.velY / this.cameraSmoothness.friction
             this.cameraSmoothness.offsetY += this.cameraSmoothness.velY *(this.playerStats.cartesianValueOfMovement.y * -1)
         }
-        else if(this.playerStats.cartesianValueOfMovement.y === 0 && this.cameraSmoothness.offsetY !== 0){
+        else if(((this.playerStats.cartesianValueOfMovement.y < 0 && this.cameraSmoothness.offsetY < 0) || (this.playerStats.cartesianValueOfMovement.y > 0 && this.cameraSmoothness.offsetY > 0) 
+        || (this.playerStats.cartesianValueOfMovement.y === 0)) && this.cameraSmoothness.offsetY !== 0){
             this.cameraSmoothness.velY = (this.cameraSmoothness.velY <= .4) ? .4 : this.cameraSmoothness.velY * this.cameraSmoothness.friction
 
             if(this.cameraSmoothness.offsetY < 0)
