@@ -20,6 +20,7 @@ body{
     text-align: center;
     margin: 15px 30px;
     border-bottom: 1px solid black;
+    text-transform: capitalize;
 }
 
 .background-connect-frame{
@@ -55,10 +56,16 @@ body{
 
 .single-character-skin img{
     width: 100%;
-    max-width: 250px;
+    max-width: 110px;
     display: block;
     margin: 0 auto;
     border-radius: 15%;
+}
+
+@media (min-height: 550px){
+    .single-character-skin img{
+        max-width: 250px;
+    }
 }
 
 #play:hover{
@@ -186,3 +193,20 @@ body{
     transform: translate(-50%, 10%);
     font-size: 3vw;
 }
+
+
+/* Keyboard controls */
+.keyboard-controls{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.keyboard-controls img{
+    width: 100%;
+    max-width: 40px;
+    display: block;
+    padding: 10px;
+}
+
+
