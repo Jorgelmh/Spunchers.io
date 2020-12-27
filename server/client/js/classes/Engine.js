@@ -383,25 +383,30 @@ export default class Engine{
     */
 
     /* Shooting timing */
-    triggerShooting(){
+    triggerShooting  = () => {
 
-        this.ableToShoot = false
+        // Testing variables for shooting
+        console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
+        
+        if(this.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading){
+            this.ableToShoot = false
 
-        setTimeout(() => {
-            this.ableToShoot = true
-        }, this.shootingDelay)
-
-        /* Fire animation */
-        setTimeout(() => {
-            this.emitBullet()
-
-            if(this.playerStats.life > 0)
-                this.character.spriteSheet.img =  this.character.spriteImages.shooting
-            
             setTimeout(() => {
-                this.character.spriteSheet.img = this.character.spriteImages.normal
-            }, 90)
-
-        }, 70)
+                this.ableToShoot = true
+            }, this.shootingDelay)
+    
+            /* Fire animation */
+            setTimeout(() => {
+                this.emitBullet()
+    
+                if(this.playerStats.life > 0)
+                    this.character.spriteSheet.img =  this.character.spriteImages.shooting
+                
+                setTimeout(() => {
+                    this.character.spriteSheet.img = this.character.spriteImages.normal
+                }, 90)
+    
+            }, 70)
+        }
     }
 }

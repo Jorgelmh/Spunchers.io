@@ -179,6 +179,9 @@ export default class Keyboard {
                 this.character.onMovingLeft()
         }
 
+        if(this.shoot)
+            this.emitBullet()
+
         this.emitPosition(movement)
     }
 }

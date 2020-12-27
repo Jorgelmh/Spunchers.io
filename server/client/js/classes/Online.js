@@ -13,7 +13,7 @@ export default class Online extends Engine{
     constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name){
         super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
 
-        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition) : new Keyboard(this.character, this.emitPlayerPosition, this.emitBullet, this.emitReload)
+        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload)
 
         this.name = name
         this.serverDelay = null
@@ -132,7 +132,7 @@ export default class Online extends Engine{
             this.calculateLocalMap()
 
 
-        this.animateCharacter()
+        this.controls.animate()
         this.calculateOffset()
         this.drawMap()
         this.drawShadows()
@@ -168,17 +168,6 @@ export default class Online extends Engine{
             this.lastFrameTime = now
             this.FPS = Math.floor(1/(timeSinceLastFrame/1000)) 
         })
-    }
-
-    animateCharacter(){
-        this.controls.animate()
-
-        // Testing variables for shooting
-        console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
-
-        if(this.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading)
-            this.triggerShooting()
-
     }
 
     /* Send data back to the server */
@@ -386,6 +375,7 @@ export default class Online extends Engine{
 
     emitBullet(){
 
+        
         this.socketIO.emit('shoot', {
             shootTime: Date.now() - this.serverDelay
         })
