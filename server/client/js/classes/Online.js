@@ -13,7 +13,7 @@ export default class Online extends Engine{
     constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name){
         super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
 
-        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload)
+        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload)
 
         this.name = name
         this.serverDelay = null
@@ -54,9 +54,11 @@ export default class Online extends Engine{
 
             this.playerStats = currentPlayerPos
 
-            if(this.currentAmmo !== this.playerStats.bulletsCharger){
-                this.currentAmmo = this.playerStats.currentAmmo
-                this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+            if(this.playerStats){
+                if(this.currentAmmo !== this.playerStats.bulletsCharger){
+                    this.currentAmmo = this.playerStats.currentAmmo
+                    this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+                }
             }
 
             this.serverDelay = Date.now() - data.serverTime
@@ -373,15 +375,20 @@ export default class Online extends Engine{
 
     /* Emit bullet to server */
 
-    emitBullet(){
+    emitBullet(dir, spriteY){
 
-        
         this.socketIO.emit('shoot', {
+            bullet: {
+                dir,
+                spriteY
+            },
             shootTime: Date.now() - this.serverDelay
         })
     }
 
-    emitReload(){
+    emitReload = () => {
+
+        console.log(`Ammo: ${this.currentAmmo} , total ammo: ${this.playerAmmunition}`);
         if(this.currentAmmo !== this.playerAmmunition){
             this.reloading = true
             this.socketIO.emit('reload weapon')

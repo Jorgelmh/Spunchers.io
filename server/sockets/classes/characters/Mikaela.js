@@ -17,6 +17,7 @@ class Mikaela extends Character{
         this.bulletsCharger = 2
 
         this.reloadTime = 1000
+
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */

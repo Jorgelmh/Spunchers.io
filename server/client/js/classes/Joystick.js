@@ -14,7 +14,7 @@
  */
 
 export default class Joystick{
-    constructor(canvas, character, emitPosition ,internalFillColor, internalStrokeColor){
+    constructor(canvas, character, emitPosition, emitBullet ,internalFillColor, internalStrokeColor){
 
         /* Drawing canvas */
         this.canvas = canvas
@@ -30,6 +30,7 @@ export default class Joystick{
 
         /* Dragging */
         this.dragging = false
+        this.shoot = false
 
         /* Color and Design */
         this.internalFillColor = internalFillColor || "#00AA00"
@@ -43,6 +44,7 @@ export default class Joystick{
 
         /* Callbacks */
         this.emitPosition = emitPosition
+        this.emitBullet = emitBullet
 
          /* Cartesian Value of movement */
          this.cartesianValueOfMovement = {
@@ -54,6 +56,16 @@ export default class Joystick{
         /* Touch index */
         this.touchIndexJoystick = 0
         this.touchIndexFireButton = 0
+
+        /* Bullet direction */
+        this.bulletDir = {
+            x: 0,
+            y: 0
+        }
+
+        /* Manage indexes of touch events */
+        this.indexJoystick = 0
+        this.indexShootButton = 0
 
         this.addListeners()
     }
@@ -75,9 +87,16 @@ export default class Joystick{
         grd.addColorStop(1, this.internalStrokeColor)
 
         /* Filling the circle */
-        this.context.fillStyle = grd;
+        this.context.fillStyle = grd
         this.context.fill()
         this.context.stroke()
+
+        /* Draw shooting circle */
+        this.context.beginPath()
+        this.context.arc(this.shootButton.x, this.shootButton.y, this.shootButton.radius, 0, Math.PI * 2)
+        this.context.fill()
+        this.context.stroke()
+
     }
 
     /* Event listener to detect if the user is dragging */
@@ -122,6 +141,13 @@ export default class Joystick{
             x: this.position.x,
             y: this.position.y,
             radius: this.radius * .60
+        }
+
+        /* Shoot button */
+        this.shootButton = {
+            x: this.canvas.width - this.radius - this.canvas.width * .07,
+            y: this.position.y,
+            radius: this.radius * .6
         }
         
         this.drawJoystick()
@@ -170,6 +196,9 @@ export default class Joystick{
                 degreeAngle = -degreeAngle
             }
         }
+
+        /* Set bullet direction for future shooting */
+        this.bulletDir = movement
 
 
         /* apply proportion of movement */
@@ -257,6 +286,42 @@ export default class Joystick{
 
             this.emitPosition(this.movement)
         }
+
+        if(this.shoot)
+            this.createBullet()
+    }
+
+    /* Create bullet trayectory and sprite of the animation */
+    createBullet(){
+
+        /* Direction of bullet's trayectory */
+        let dir = {
+            x: 0,
+            y: 0
+        }
+
+        let spriteY = 0
+
+        /* Set trayectory */
+        if(this.character.currentSprite.y === 5)
+            dir.x = 1 * this.character.currentSprite.flip
+
+        else
+            dir = this.bulletDir
+
+        /* Set bullet's sprite position in Y axis */
+        if(this.character.currentSprite.y === 1 || this.character.currentSprite.y === 5)
+            spriteY = 2
+
+        if(this.character.currentSprite.y === 3)
+            spriteY = 1
+        
+        if(this.character.currentSprite.y === 4)
+            spriteY = 3
+
+
+        this.emitBullet(dir, spriteY)
+
     }
 
     /** 
@@ -270,10 +335,28 @@ export default class Joystick{
         e.preventDefault()
         let pos = (window.mobileCheck()) ? e.touches[this.touchIndexJoystick] : e
 
+
+        /* If touching the joystick */
         if(Math.pow(pos.pageX - this.innerCircle.x, 2) + Math.pow(pos.pageY - this.innerCircle.y, 2) <= Math.pow(this.innerCircle.radius, 2)){
             this.dragging = true
-            this.touchIndexFireButton ++
 
+            /* Set index on touch event's array */
+            if(!this.shoot){
+                this.indexJoystick = 0
+                this.indexShootButton = 1
+            }
+
+        }
+
+        /* If touching the shoot button */
+        if(Math.pow(pos.pageX - this.shootButton.x, 2) + Math.pow(pos.pageY - this.shootButton.y, 2) <= Math.pow(this.shootButton.radius, 2)){
+            this.shoot = true 
+
+            /* Set index on touch event's array */
+            if(!this.dragging){
+                this.indexShootButton = 0
+                this.indexJoystick = 1
+            }
         }
 
     }
@@ -283,7 +366,7 @@ export default class Joystick{
         e.preventDefault()
         /* if clicked */
         if(this.dragging){
-            let source = (window.mobileCheck()) ? e.touches[0] : e
+            let source = (window.mobileCheck()) ? e.touches[this.indexJoystick] : e
             let mx = source.pageX
             let my = source.pageY
 
@@ -326,8 +409,25 @@ export default class Joystick{
 
     handleReleased = (e) => {
         e.preventDefault()
+
+        if(e.changedTouches[0] == e.touches[this.indexJoystick]){
+            this.dragging = false
+            if(this.shoot){
+                this.indexShootButton = 0
+                this.indexJoystick = 1
+            }
+
+        }else if (e.changedTouches[0] == e.touches[this.indexShootButton]){
+            this.shoot = false
+            if(this.dragging){
+                this.indexJoystick = 0
+                this.indexShootButton = 1
+            }
+        }
+
+
         /* When released click then return to original position */
-        this.dragging = false
+        
         this.innerCircle.x = this.position.x
         this.innerCircle.y = this.position.y
         this.movement = {x: 0, y: 0}

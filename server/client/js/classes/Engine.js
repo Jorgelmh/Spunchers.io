@@ -383,7 +383,7 @@ export default class Engine{
     */
 
     /* Shooting timing */
-    triggerShooting  = () => {
+    triggerShooting  = (dir, spriteY) => {
 
         // Testing variables for shooting
         console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
@@ -397,7 +397,7 @@ export default class Engine{
     
             /* Fire animation */
             setTimeout(() => {
-                this.emitBullet()
+                this.emitBullet(dir, spriteY)
     
                 if(this.playerStats.life > 0)
                     this.character.spriteSheet.img =  this.character.spriteImages.shooting

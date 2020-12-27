@@ -140,10 +140,10 @@ class Game {
      * ========================
      */
 
-    addBullet(playerID){
+    addBullet(playerID, bullet){
 
         let currentPlayer = this.players[playerID]
-        let bullet = this.emitBullet(playerID)
+        let bulletPosition = this.emitBullet(playerID)
 
         if(Date.now() - currentPlayer.lastShot > currentPlayer.shootingDelay){
             this.socketIO.to(playerID).emit('reduce ammo')
@@ -159,10 +159,10 @@ class Game {
 
             this.bullets.push({
                     ownerID: playerID,
-                    posX: bullet.posX,
-                    posY: bullet.posY,
-                    dirX: bullet.dirX,
-                    dirY: bullet.dirY,
+                    posX: bulletPosition.x,
+                    posY: bulletPosition.y,
+                    dirX: bullet.dir.x,
+                    dirY: bullet.dir.y,
                     flip: this.players[playerID].character.currentSprite.flip,
                     spriteY: bullet.spriteY
             }) 
@@ -413,67 +413,38 @@ class Game {
 
     /* Emit Bullet */
     emitBullet(playerID){
-        let halfServerTileWidth = this.tile.width/2
-        let dirX, dirY, posX = this.players[playerID].posX + halfServerTileWidth, posY = this.players[playerID].posY
-        /* Bullet y position in the spritesheet */
-        let spriteY
 
-        switch (this.players[playerID].character.currentSprite.y){
-            case 0:
-                dirX = 0
-                dirY = 1 
-                spriteY = 0
-                posY+= halfServerTileWidth*2
-                break
-            case 1:
-                dirY = 0
-                dirX = 1 * this.players[playerID].character.currentSprite.flip
-                spriteY = 2
-                break
-            case 2:
-                dirX = 0
-                dirY = -1
-                posX += this.tile.width/6
-                spriteY = 0
-                break
-            case 3:
-                dirY = -Math.sin(Math.PI / 4)
-                dirX = Math.sin(Math.PI / 4) * this.players[playerID].character.currentSprite.flip
-                spriteY = 1
-                break
-            case 4:
-                dirY = Math.sin(Math.PI / 4)
-                dirX = Math.sin(Math.PI / 4) * this.players[playerID].character.currentSprite.flip
-                spriteY = 3
-                break
-            case 5: 
-                dirX = 1 * this.players[playerID].character.currentSprite.flip
-                dirY = 0
-                spriteY = 2
-                break
+        /* Reference width to calculate offset*/
+        let halfServerTileWidth = this.tile.width/2
+        let halfServerTileHeight = this.tile.height/2
+
+        let pos = {
+            x: this.players[playerID].posX + halfServerTileWidth,
+            y: this.players[playerID].posY
         }
 
+        /* Adding extra offset to bullets position*/
+
+        if(this.players[playerID].character.currentSprite.y === 0)
+            pos.y += halfServerTileWidth*2
+
+        if(this.players[playerID].character.currentSprite.y === 2)
+            pos.x += this.tile.width/6
+
         if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 5)
-            posY += this.players[playerID].offsetYHorizontal(halfServerTileWidth) 
+            pos.y += this.players[playerID].offsetYHorizontal(halfServerTileWidth) 
 
         if(this.players[playerID].character.currentSprite.y === 3){
-            posX += this.players[playerID].diagonalUpOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
-            posY += this.players[playerID].diagonalUpOffsetY(this.tile.height/2)
+            pos.x += this.players[playerID].diagonalUpOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
+            pos.y += this.players[playerID].diagonalUpOffsetY(halfServerTileHeight)
         }
 
         if(this.players[playerID].character.currentSprite.y === 4){
-            posX += this.players[playerID].diagonalDownOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
-            posY += this.players[playerID].diagonalDownOffsetY(this.tile.height/2)
+            pos.x += this.players[playerID].diagonalDownOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
+            pos.y += this.players[playerID].diagonalDownOffsetY(halfServerTileHeight)
         }
 
-
-        return {
-            posX,
-            posY,
-            dirX: dirX,
-            dirY: dirY,
-            spriteY
-        }
+        return pos
     }
 
 }

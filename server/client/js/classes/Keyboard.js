@@ -180,8 +180,54 @@ export default class Keyboard {
         }
 
         if(this.shoot)
-            this.emitBullet()
+            this.createBullet()
 
         this.emitPosition(movement)
+    }
+
+    createBullet(){
+
+        /* Position on bullet sprite (Y) */
+        let spriteY = 0
+
+        /* Direction of bullet */
+        let dir = {
+            x: 0,
+            y: 0
+        }
+
+        switch (this.character.currentSprite.y){
+            case 0:
+                dir.x = 0
+                dir.y = 1 
+                spriteY = 0
+                break
+            case 1:
+                dir.y = 0
+                dir.x = 1 * this.character.currentSprite.flip
+                spriteY = 2
+                break
+            case 2:
+                dir.x = 0
+                dir.y = -1
+                spriteY = 0
+                break
+            case 3:
+                dir.y = -Math.sin(Math.PI / 4)
+                dir.x = Math.sin(Math.PI / 4) * this.character.currentSprite.flip
+                spriteY = 1
+                break
+            case 4:
+                dir.y = Math.sin(Math.PI / 4)
+                dir.x = Math.sin(Math.PI / 4) * this.character.currentSprite.flip
+                spriteY = 3
+                break
+            case 5: 
+                dir.x = 1 * this.character.currentSprite.flip
+                dir.y = 0
+                spriteY = 2
+                break
+        }
+        this.emitBullet(dir, spriteY)
     }
 }
