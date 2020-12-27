@@ -53,10 +53,6 @@ export default class Joystick{
             shoot: false
         }
 
-        /* Touch index */
-        this.touchIndexJoystick = 0
-        this.touchIndexFireButton = 0
-
         /* Bullet direction */
         this.bulletDir = {
             x: 0,
@@ -333,11 +329,10 @@ export default class Joystick{
     handleStart = (e) => {
         /* Determine if user is clicking the inner circle -> implemented using pythagoras */
         e.preventDefault()
-        let pos = (window.mobileCheck()) ? e.touches[this.touchIndexJoystick] : e
-
+        let posJoystick = (window.mobileCheck()) ? e.touches[this.indexJoystick] : e
 
         /* If touching the joystick */
-        if(Math.pow(pos.pageX - this.innerCircle.x, 2) + Math.pow(pos.pageY - this.innerCircle.y, 2) <= Math.pow(this.innerCircle.radius, 2)){
+        if( posJoystick && Math.pow(posJoystick.pageX - this.innerCircle.x, 2) + Math.pow(posJoystick.pageY - this.innerCircle.y, 2) <= Math.pow(this.innerCircle.radius, 2)){
             this.dragging = true
 
             /* Set index on touch event's array */
@@ -348,8 +343,11 @@ export default class Joystick{
 
         }
 
+        let posShootButton = (window.mobileCheck()) ? e.touches[this.indexShootButton] : posJoystick
+
+        console.log(` Joystick: ${posJoystick} AND shootButton: ${posShootButton}`);
         /* If touching the shoot button */
-        if(Math.pow(pos.pageX - this.shootButton.x, 2) + Math.pow(pos.pageY - this.shootButton.y, 2) <= Math.pow(this.shootButton.radius, 2)){
+        if(posJoystick && Math.pow(posShootButton.pageX - this.shootButton.x, 2) + Math.pow(posShootButton.pageY - this.shootButton.y, 2) <= Math.pow(this.shootButton.radius, 2)){
             this.shoot = true 
 
             /* Set index on touch event's array */
@@ -410,21 +408,8 @@ export default class Joystick{
     handleReleased = (e) => {
         e.preventDefault()
 
-        if(e.changedTouches[0] == e.touches[this.indexJoystick]){
-            this.dragging = false
-            if(this.shoot){
-                this.indexShootButton = 0
-                this.indexJoystick = 1
-            }
-
-        }else if (e.changedTouches[0] == e.touches[this.indexShootButton]){
-            this.shoot = false
-            if(this.dragging){
-                this.indexJoystick = 0
-                this.indexShootButton = 1
-            }
-        }
-
+        this.dragging = false
+        this.shoot = false
 
         /* When released click then return to original position */
         
