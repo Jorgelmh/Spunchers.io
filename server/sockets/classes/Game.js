@@ -58,6 +58,10 @@ class Game {
 
         /* Create chat object */
         this.onlineChat = new OnlineChatServer()
+
+        /* Manage updates */
+        this.updateInterval = null
+        this.sendState = false
     }
     /* Add Players */
 
@@ -140,24 +144,28 @@ class Game {
      * ========================
      */
 
-    addBullet(playerID, bullet){
+    addBullet = (playerID, bullet, shootTime) => {
 
-        let currentPlayer = this.players[playerID]
-        let bulletPosition = this.emitBullet(playerID)
+        if(shootTime > this.players[playerID].lastDeath && this.players[playerID].life > 0 
+            && this.players[playerID].ableToShoot && this.players[playerID].bulletsCharger > 0){
 
-        if(Date.now() - currentPlayer.lastShot > currentPlayer.shootingDelay){
-            this.socketIO.to(playerID).emit('reduce ammo')
+                let currentPlayer = this.players[playerID]
+                let bulletPosition = this.emitBullet(playerID)
 
-            currentPlayer.shooting = true
-            currentPlayer.reduceAmmunition(this.emitReload, playerID)
+            if(Date.now() - currentPlayer.lastShot > currentPlayer.shootingDelay){
 
-            setTimeout(() => {
-                currentPlayer.shooting = false
-                if(this.bullets.length === 0)
-                    this.socketIO.emit('state', this.update())
-            }, 90)
 
-            this.bullets.push({
+                currentPlayer.shooting = true
+                currentPlayer.reduceAmmunition(this.emitReload, playerID)
+
+                currentPlayer.lastShot = Date.now()
+
+                setTimeout(() => {
+                    currentPlayer.shooting = false
+                }, 90)
+
+                /* Push bullet onto the array of bullets */
+                this.bullets.push({
                     ownerID: playerID,
                     posX: bulletPosition.x,
                     posY: bulletPosition.y,
@@ -165,7 +173,8 @@ class Game {
                     dirY: bullet.dir.y,
                     flip: this.players[playerID].character.currentSprite.flip,
                     spriteY: bullet.spriteY
-            }) 
+                }) 
+            }
         }
     }
 
@@ -189,14 +198,75 @@ class Game {
 
     }
 
-    updateBulletsPosition(dt){
-        this.bullets.forEach((element, index) => {
-            element.posX += dt * this.bulletSpeed * element.dirX
-            element.posY += dt * this.bulletSpeed * element.dirY
+    /** 
+     * =================================
+     *        Update Game state
+     * =================================
+    */
 
-            if(this.checkCollisionsWithBullets(element) || (element.posX > this.width || element.posX < 0 || element.posY < 0 || element.posY > this.height))
-                this.bullets.splice(index, 1)
-        })
+    setUpdate(){
+        this.updateInterval = setInterval(() => {
+
+            /* Send state to sockets */
+            let state = this.update()
+            
+            if(this.sendState){
+                this.socketIO.sockets.emit('state', state)
+                this.sendState = false
+            }
+            else
+                this.sendState = true
+
+        }, 1000 / 60)
+    }
+
+    updateBulletsPosition(dt){
+
+        /* Loop each bullet to see if they've hit any target while this update */
+        for(let i = 0; i < this.bullets.length; i++){
+
+            let bullet = this.bullets[i]
+            let removeBullet = false
+
+            /* Update current position of each bullet */
+            bullet.posX += dt * this.bulletSpeed * bullet.dirX
+            bullet.posY += dt * this.bulletSpeed * bullet.dirY
+
+            /* Check collisions between bullets and objects in the tile map -> using the coordinates of the bullet at the moment of collision */
+            let bulletPosXMatrix = Math.floor(bullet.posX / this.tile.width) 
+            let bulletPosYMatrix = Math.floor(bullet.posY / this.tile.height)
+
+            /* If it didn't collide with a sturcture then apply further checks to see if it does to a player */
+            if(!((bulletPosYMatrix >= 0 && bulletPosYMatrix < this.tilesDimension.y) && (bulletPosXMatrix >= 0 && bulletPosXMatrix < this.tilesDimension.x ) 
+                && (!Array.isArray(this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix]) && this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix] !== 0))){
+
+                    /* Check collisions with players */
+                    for(let playerID in this.players){
+
+                        if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/2) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
+                            && (this.players[playerID].posY + (this.tile.width/2) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
+        
+                                this.players[playerID].life = (this.players[playerID].life - this.players[bullet.ownerID].impactDamage < 0) ? 0 : this.players[playerID].life - this.players[bullet.ownerID].impactDamage
+        
+                                if(this.players[playerID].life <= 0){
+                                    this.players[bullet.ownerID].score ++
+                                    this.playerHasDied(playerID)
+                                }
+                                removeBullet = true
+                                break
+                        }
+        
+                    }
+            }else
+                removeBullet = true
+            
+
+            if(removeBullet){
+                this.bullets.splice(i, 1)
+                i--
+            }
+            
+        }
     }
 
     /**
@@ -243,15 +313,7 @@ class Game {
         }
 
 
-        /* Check collisions between bullets and objects in the tile map -> using the coordinates of the bullet at the moment of collision */
-        let bulletPosXMatrix = Math.floor(bullet.posX / this.tile.width) 
-        let bulletPosYMatrix = Math.floor(bullet.posY / this.tile.height)
-
-        if((bulletPosYMatrix >= 0 && bulletPosYMatrix < this.tilesDimension.y) && (bulletPosXMatrix >= 0 && bulletPosXMatrix < this.tilesDimension.x ) 
-        && (!Array.isArray(this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix]) && this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix] !== 0))
-            return true
-
-        return false
+        
     }
 
     /** 

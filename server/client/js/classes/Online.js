@@ -388,7 +388,6 @@ export default class Online extends Engine{
 
     emitReload = () => {
 
-        console.log(`Ammo: ${this.currentAmmo} , total ammo: ${this.playerAmmunition}`);
         if(this.currentAmmo !== this.playerAmmunition){
             this.reloading = true
             this.socketIO.emit('reload weapon')

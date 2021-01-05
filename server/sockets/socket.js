@@ -33,6 +33,8 @@ const socketListen = (app) => {
 
     io.on('connection', function(socket) {
 
+        serverGame.setUpdate()
+
         /* Add websockets in here */
         socket.emit('loadMap', serverGame.onLoadMap(socket.id))
 
@@ -56,9 +58,9 @@ const socketListen = (app) => {
 
         /* Listener of socket movement */
         socket.on('movement', (data) => {
+
+            /* Change position */
             serverGame.onMovement(socket.id, data)
-            if(serverGame.bullets.length === 0)
-                io.sockets.emit('state', serverGame.update())
         } )
 
         socket.on('disconnect', (data) => {
@@ -77,23 +79,8 @@ const socketListen = (app) => {
         /* Listener of players shooting */
         socket.on('shoot',(data) => {
 
-            if(data.shootTime > serverGame.players[socket.id].lastDeath && serverGame.players[socket.id].life > 0 
-                && serverGame.players[socket.id].ableToShoot && serverGame.players[socket.id].bulletsCharger > 0)
-                serverGame.addBullet(socket.id, data.bullet)
-
-            if(shootingInterval === null && serverGame.bullets.length > 0 ){
-                io.sockets.emit('state', serverGame.update(Date.now()))
-                shootingInterval = setInterval(() => {
-
-                    io.sockets.emit('state', serverGame.update())
-
-                    if(serverGame.bullets.length === 0){
-                        clearInterval(shootingInterval)
-                        shootingInterval = null
-                    }
-                }, 1000 / 60)
-            }
-            
+            /* Call functions and send bullet's details and id of the player */
+            serverGame.addBullet(socket.id, data.bullet, data.shootTime)
         })
 
         /** 

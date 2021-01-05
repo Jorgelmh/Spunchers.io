@@ -386,7 +386,7 @@ export default class Engine{
     triggerShooting  = (dir, spriteY) => {
 
         // Testing variables for shooting
-        console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
+        //console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
         
         if(this.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading){
             this.ableToShoot = false
