@@ -63,6 +63,9 @@ export default class Joystick{
         this.indexJoystick = 0
         this.indexShootButton = 0
 
+        /* Keep track of fingers touching the screen */
+        this.touchingFingers = []
+
         this.addListeners()
     }
 
@@ -329,10 +332,13 @@ export default class Joystick{
     handleStart = (e) => {
         /* Determine if user is clicking the inner circle -> implemented using pythagoras */
         e.preventDefault()
-        let posJoystick = (window.mobileCheck()) ? e.touches[this.indexJoystick] : e
+
+        /* Push the new finger onto the buffer */
+        this.touchingFingers.push(e.changedTouches[0].identifier)
+        let posJoystick = this.touchingFingers[this.indexJoystick]
 
         /* If touching the joystick */
-        if( posJoystick && Math.pow(posJoystick.pageX - this.innerCircle.x, 2) + Math.pow(posJoystick.pageY - this.innerCircle.y, 2) <= Math.pow(this.innerCircle.radius, 2)){
+        if( !isNaN(posJoystick) && Math.pow(e.changedTouches[0].pageX - this.innerCircle.x, 2) + Math.pow(e.changedTouches[0].pageY - this.innerCircle.y, 2) <= Math.pow(this.innerCircle.radius, 2)){
             this.dragging = true
 
             /* Set index on touch event's array */
@@ -343,11 +349,10 @@ export default class Joystick{
 
         }
 
-        let posShootButton = (window.mobileCheck()) ? e.touches[this.indexShootButton] : posJoystick
+        let posShootButton = this.touchingFingers[this.indexShootButton]
 
-        console.log(` Joystick: ${posJoystick} AND shootButton: ${posShootButton}`);
         /* If touching the shoot button */
-        if(posJoystick && Math.pow(posShootButton.pageX - this.shootButton.x, 2) + Math.pow(posShootButton.pageY - this.shootButton.y, 2) <= Math.pow(this.shootButton.radius, 2)){
+        if( !isNaN(posShootButton) && Math.pow(e.changedTouches[0].pageX - this.shootButton.x, 2) + Math.pow(e.changedTouches[0].pageY - this.shootButton.y, 2) <= Math.pow(this.shootButton.radius, 2)){
             this.shoot = true 
 
             /* Set index on touch event's array */
@@ -356,10 +361,9 @@ export default class Joystick{
                 this.indexJoystick = 1
             }
         }
-
     }
 
-    /* When clicked then starts draggin */
+    /* When clicked then starts dragging */
     handleMovement = (e) => {
         e.preventDefault()
         /* if clicked */
@@ -408,22 +412,47 @@ export default class Joystick{
     handleReleased = (e) => {
         e.preventDefault()
 
-        this.dragging = false
-        this.shoot = false
+        /* If the finger touching the joystick's been released */
+        if(this.touchingFingers[this.indexJoystick] == e.changedTouches[0].identifier || this.touchingFingers[this.indexShootButton] == e.changedTouches[0].identifier){
 
-        /* When released click then return to original position */
-        
-        this.innerCircle.x = this.position.x
-        this.innerCircle.y = this.position.y
-        this.movement = {x: 0, y: 0}
+            //console.log(` Joystick: ${this.indexJoystick} AND shootButton: ${this.indexShootButton}`);
 
-        /* Stop animation */
+            if(this.touchingFingers[this.indexJoystick] === e.changedTouches[0].identifier){
+                this.dragging = false
+                this.touchingFingers.splice(this.indexJoystick, 1)
+                
+                 /* When released click then return to original position */
+                this.innerCircle.x = this.position.x
+                this.innerCircle.y = this.position.y
+                this.movement = {x: 0, y: 0}
 
-        if(this.character.moveInterval)
-            this.character.onMovingStop()
+                /* Stop animation */
 
-        /* Reset cartesian value */
-        this.cartesianValueOfMovement = {x: 0, y: 0}
+                if(this.character.moveInterval)
+                    this.character.onMovingStop()
+
+                /* Reset cartesian value */
+                this.cartesianValueOfMovement = {x: 0, y: 0}
+
+            }else if(this.touchingFingers[this.indexShootButton] === e.changedTouches[0].identifier){
+                this.touchingFingers.splice(this.indexShootButton, 1)
+                this.shoot = false
+            }
+
+            //console.log(`Shooting: ${this.shoot} , Dragging: ${this.dragging}`);
+
+            /* If no finger is touching the screen then both indexes are 0; both will be waiting in the first position */
+            if(this.touchingFingers.length == 0){
+                this.indexJoystick = 0
+                this.indexShootButton = 0
+            }else{
+                let temp = this.indexJoystick
+                this.indexJoystick = this.indexShootButton
+                this.indexShootButton = temp
+            }  
+
+        }
+
 
         this.emitPosition(this.movement)
     }

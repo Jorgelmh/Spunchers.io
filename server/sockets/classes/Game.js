@@ -283,38 +283,6 @@ class Game {
         this.socketIO.to(playerID).emit('Reload Weapon')
     }
 
-    /**
-     *  =========================================
-     *      Detect if a bullet impacts a player
-     *  =========================================
-     * 
-     */
-
-    checkCollisionsWithBullets(bullet){
-
-        if(Object.keys(this.players).length > 1){
-
-            /* Use for loop instead of array methods so the loop is broken whenever the colission happens -> don't keep looping if there's a colission */
-            for(let playerID in this.players){
-
-                /* Check if exists a colission => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
-                if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/2) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
-                    && (this.players[playerID].posY + (this.tile.width/2) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
-
-                        this.players[playerID].life = (this.players[playerID].life - this.players[bullet.ownerID].impactDamage < 0) ? 0 : this.players[playerID].life - this.players[bullet.ownerID].impactDamage
-
-                        if(this.players[playerID].life <= 0){
-                            this.players[bullet.ownerID].score ++
-                            this.playerHasDied(playerID)
-                        }
-                        return true
-                }
-            }
-        }
-
-
-        
-    }
 
     /** 
      *  ==================================================
