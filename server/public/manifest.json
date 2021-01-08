@@ -1,0 +1,22 @@
+{
+    "name": "Tile Game JS",
+    "short_name": "shooting game",
+    "description": "Progressive Web App that allows to donwload this game on mobile devices",
+    "icons": [
+      {
+        "src": "icons/icon-32.png",
+        "sizes": "32x32",
+        "type": "image/png"
+      },
+      {
+        "src": "icons/icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/online",
+    "display": "fullscreen",
+    "orientation": "landscape",
+    "theme_color": "#B12A34",
+    "background_color": "#B12A34"
+  }

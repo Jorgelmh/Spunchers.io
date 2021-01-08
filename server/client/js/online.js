@@ -1,6 +1,6 @@
 import Online from '../js/classes/Online.js'
 import Glide from '@glidejs/glide'
-import { dirname } from 'path'
+
 /**
  *  ============================
  *      Multiplayer TILE Game
@@ -117,6 +117,18 @@ if(!window.mobileCheck()){
     arrows.onload = loadCallback
     keyA.onload = loadCallback
     
+}
+
+
+/**
+ *  ==============================
+ *     Register Service Worker
+ *  ==============================
+ */
+
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./ServiceWorker.js').
+        then(() => console.log('Service Worker successfully registered'))
 }
 
 

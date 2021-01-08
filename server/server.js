@@ -24,6 +24,10 @@ app.get('/online', (req, res) => {
     res.sendFile(path.join(__dirname + '/public/Pages/online.html'))
 })
 
+app.get('/offline', (req, res) => {
+    res.sendFile(path.join(__dirname + '/public/pages/offline.html'))
+})
+
 server.listen(process.env.PORT ,() => {
     console.log(`Listening port: ${process.env.PORT}`);
 })

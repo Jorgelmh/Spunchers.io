@@ -33,8 +33,7 @@ export default class Joystick{
         this.shoot = false
 
         /* Color and Design */
-        this.internalFillColor = internalFillColor || "#00AA00"
-        this.internalStrokeColor = internalStrokeColor || "#003300"
+        this.internalFillColor = internalFillColor || "rgba(255,255,255,0.8)"
 
         /* Character sprite */
         this.character = character
@@ -71,6 +70,11 @@ export default class Joystick{
 
     drawJoystick(){
 
+        this.context.lineWidth = 2
+
+        /* Filling style */
+        this.context.fillStyle = this.internalFillColor
+
         /* Draw outer circle */
         this.context.beginPath()
         this.context.arc(this.outterCircle.x, this.outterCircle.y, this.outterCircle.radius, 0, Math.PI * 2)
@@ -79,14 +83,6 @@ export default class Joystick{
         /* Draw inner circle */
         this.context.beginPath()
         this.context.arc(this.innerCircle.x, this.innerCircle.y, this.innerCircle.radius, 0, Math.PI * 2)
-
-        /* Creating a gradient */
-        let grd = this.context.createRadialGradient(this.innerCircle.x, this.innerCircle.y, 5, this.innerCircle.x, this.innerCircle.y, 200)
-        grd.addColorStop(0, this.internalFillColor)
-        grd.addColorStop(1, this.internalStrokeColor)
-
-        /* Filling the circle */
-        this.context.fillStyle = grd
         this.context.fill()
         this.context.stroke()
 
@@ -95,6 +91,10 @@ export default class Joystick{
         this.context.arc(this.shootButton.x, this.shootButton.y, this.shootButton.radius, 0, Math.PI * 2)
         this.context.fill()
         this.context.stroke()
+
+        /* Draw text under shoot circle */
+        this.context.textAlign = 'center'
+        this.context.strokeText('Shoot', this.shootButton.x, this.shootButton.y + 3)
 
     }
 
@@ -197,7 +197,10 @@ export default class Joystick{
         }
 
         /* Set bullet direction for future shooting */
-        this.bulletDir = movement
+        this.bulletDir = {
+            x: movement.x,
+            y: movement.y
+        }
 
 
         /* apply proportion of movement */
@@ -440,7 +443,8 @@ export default class Joystick{
             }
 
 
-        }else if(this.touchingFingers[this.indexShootButton] === e.changedTouches[0].identifier){
+        }
+        if(this.touchingFingers[this.indexShootButton] === e.changedTouches[0].identifier){
             this.touchingFingers.splice(this.indexShootButton, 1)
             this.shoot = false
 
