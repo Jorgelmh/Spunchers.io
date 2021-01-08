@@ -412,47 +412,53 @@ export default class Joystick{
     handleReleased = (e) => {
         e.preventDefault()
 
-        /* If the finger touching the joystick's been released */
-        if(this.touchingFingers[this.indexJoystick] == e.changedTouches[0].identifier || this.touchingFingers[this.indexShootButton] == e.changedTouches[0].identifier){
+        //console.log(` Joystick: ${this.indexJoystick} AND shootButton: ${this.indexShootButton}`);
 
-            //console.log(` Joystick: ${this.indexJoystick} AND shootButton: ${this.indexShootButton}`);
+        if(this.touchingFingers[this.indexJoystick] === e.changedTouches[0].identifier){
 
-            if(this.touchingFingers[this.indexJoystick] === e.changedTouches[0].identifier){
-                this.dragging = false
-                this.touchingFingers.splice(this.indexJoystick, 1)
+            this.dragging = false
+            this.touchingFingers.splice(this.indexJoystick, 1)
                 
-                 /* When released click then return to original position */
-                this.innerCircle.x = this.position.x
-                this.innerCircle.y = this.position.y
-                this.movement = {x: 0, y: 0}
+            /* When released click then return to original position */
+            this.innerCircle.x = this.position.x
+            this.innerCircle.y = this.position.y
+            this.movement = {x: 0, y: 0}
 
-                /* Stop animation */
+            /* Stop animation */
 
-                if(this.character.moveInterval)
-                    this.character.onMovingStop()
+            if(this.character.moveInterval)
+                this.character.onMovingStop()
 
-                /* Reset cartesian value */
-                this.cartesianValueOfMovement = {x: 0, y: 0}
+            /* Reset cartesian value */
+            this.cartesianValueOfMovement = {x: 0, y: 0}
 
-            }else if(this.touchingFingers[this.indexShootButton] === e.changedTouches[0].identifier){
-                this.touchingFingers.splice(this.indexShootButton, 1)
-                this.shoot = false
-            }
-
-            //console.log(`Shooting: ${this.shoot} , Dragging: ${this.dragging}`);
-
-            /* If no finger is touching the screen then both indexes are 0; both will be waiting in the first position */
-            if(this.touchingFingers.length == 0){
-                this.indexJoystick = 0
-                this.indexShootButton = 0
-            }else{
+            /* Only swap indexes when the one released is smaller */
+            if(this.indexJoystick < this.indexShootButton){
                 let temp = this.indexJoystick
                 this.indexJoystick = this.indexShootButton
                 this.indexShootButton = temp
-            }  
+            }
 
+
+        }else if(this.touchingFingers[this.indexShootButton] === e.changedTouches[0].identifier){
+            this.touchingFingers.splice(this.indexShootButton, 1)
+            this.shoot = false
+
+            /* Only swap indexes when the one released is smaller */
+            if(this.indexShootButton < this.indexShootButton){
+                let temp = this.indexJoystick
+                this.indexJoystick = this.indexShootButton
+                this.indexShootButton = temp
+            }
         }
 
+        //console.log(`Shooting: ${this.shoot} , Dragging: ${this.dragging}`);
+
+        /* If no finger is touching the screen then both indexes are 0; both will be waiting in the first position */
+        if(this.touchingFingers.length == 0){
+            this.indexJoystick = 0
+            this.indexShootButton = 0
+        }
 
         this.emitPosition(this.movement)
     }
