@@ -47,19 +47,33 @@ export default class Online extends Engine{
             y: false
         }
 
+        /* INTERPOLATION */
+        this.buffer = []
+
+        /* Constant of interpolation delay */
+        this.interpolationDelay = 100
+
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
-            this.state = data
-            let currentPlayerPos = this.state.players[this.playerID]
 
-            this.playerStats = currentPlayerPos
-
-            if(this.playerStats){
-                if(this.currentAmmo !== this.playerStats.bulletsCharger){
-                    this.currentAmmo = this.playerStats.currentAmmo
-                    this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
-                }
+            if(this.buffer.length === 0){
+                this.state = data
+                this.updateState()
             }
+
+            this.buffer.push(data)
+
+            /* Add interpolation */
+            setTimeout(() => {
+
+                /* Dequeue from buffer */
+                this.state = this.buffer[0]
+                this.buffer.splice(0, 1)
+                
+                this.updateState()
+
+            }, this.interpolationDelay)
+            
 
             this.serverDelay = Date.now() - data.serverTime
         })
@@ -371,6 +385,23 @@ export default class Online extends Engine{
                 }
             })
         }
+    }
+
+    /** Update state */
+    updateState(){
+
+        /* Set player stats when packet's been interpolated */
+        let currentPlayerPos = this.state.players[this.playerID]
+
+        this.playerStats = currentPlayerPos
+
+        if(this.playerStats){
+            if(this.currentAmmo !== this.playerStats.bulletsCharger){
+                this.currentAmmo = this.playerStats.currentAmmo
+                this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+            }
+        }
+
     }
 
     /* Emit bullet to server */

@@ -32,6 +32,21 @@ class Character {
 
         this.still = true
         this.lastShot = Date.now()
+
+        this.lastUpdate = 0
+
+        /* Interpolation */
+        this.buffer = []
+    }
+    
+    /* dequeue interpolated state */
+    dequeueState(){
+        let state = this.buffer[0]
+        this.buffer.splice(0,1)
+
+        this.lastUpdate = Date.now()
+
+        return state
     }
 
     reduceAmmunition(emitReload, playerID){

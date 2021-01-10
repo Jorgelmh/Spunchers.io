@@ -449,7 +449,7 @@ export default class Joystick{
             this.shoot = false
 
             /* Only swap indexes when the one released is smaller */
-            if(this.indexShootButton < this.indexShootButton){
+            if(this.indexShootButton < this.indexJoystick){
                 let temp = this.indexJoystick
                 this.indexJoystick = this.indexShootButton
                 this.indexShootButton = temp

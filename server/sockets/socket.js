@@ -16,8 +16,6 @@ const socketListen = (app) => {
     //Lobby of the currrent game
     const serverGame = new Game(map, io)
     
-    let shootingInterval = null
-
     /**
      * ====================================
      *      Socket Listeners (Logic)
@@ -61,7 +59,7 @@ const socketListen = (app) => {
 
             /* Change position */
             serverGame.onMovement(socket.id, data)
-        } )
+        })
 
         socket.on('disconnect', (data) => {
             serverGame.removePlayer(socket.id) 

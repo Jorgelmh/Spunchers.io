@@ -23,6 +23,9 @@ class Game {
 
         this.shootingInterval = null
 
+        /* Constant of interpolation */
+        this.interpolationDelay = 100
+
         /* 
              ====================
                 Map features 
@@ -90,6 +93,17 @@ class Game {
     /* change position of players when the movement events on the client are triggered */
     onMovement = (socketID, data) => {
 
+        if(this.players[socketID].lastUpdate === 0)
+            this.calculateMovement(socketID, data)
+
+        /* Push onto buffer */
+        this.players[socketID].buffer.push(data)
+        
+    }
+
+    /* Trigger movement of players */
+    calculateMovement(socketID, data){
+
         let currentPlayer = this.players[socketID]
 
         if(currentPlayer){
@@ -117,6 +131,7 @@ class Game {
                     currentPlayer.posY = oldPositionY
             }
         }
+
     }
 
     /* Detect colission between players and objects on the server */
@@ -186,10 +201,17 @@ class Game {
         this.lastRefresh = now
 
         if(this.bullets.length > 0)
-            this.updateBulletsPosition(dt)
+            this.updateBulletsPosition(dt)        
 
         /* return only the info the user needs to know about the players */
-        let clientPlayers = Object.fromEntries(Object.entries(this.players).map(([id, player]) => [id, player.playerState()]))
+        let clientPlayers = Object.fromEntries(Object.entries(this.players).map(([id, player]) => {
+
+            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
+                this.calculateMovement(id, player.dequeueState())
+
+            return [id, player.playerState()]
+        }))
+
         return {
             players: clientPlayers,
             bullets: this.bullets,
