@@ -417,53 +417,58 @@ export default class Joystick{
 
         //console.log(` Joystick: ${this.indexJoystick} AND shootButton: ${this.indexShootButton}`);
 
-        if(this.touchingFingers[this.indexJoystick] === e.changedTouches[0].identifier){
+        for(let i = 0; i < e.changedTouches.length; i++){
+            
+            if(this.touchingFingers[this.indexJoystick] === e.changedTouches[i].identifier){
 
-            this.dragging = false
-            this.touchingFingers.splice(this.indexJoystick, 1)
-                
-            /* When released click then return to original position */
-            this.innerCircle.x = this.position.x
-            this.innerCircle.y = this.position.y
-            this.movement = {x: 0, y: 0}
-
-            /* Stop animation */
-
-            if(this.character.moveInterval)
-                this.character.onMovingStop()
-
-            /* Reset cartesian value */
-            this.cartesianValueOfMovement = {x: 0, y: 0}
-
-            /* Only swap indexes when the one released is smaller */
-            if(this.indexJoystick < this.indexShootButton){
-                let temp = this.indexJoystick
-                this.indexJoystick = this.indexShootButton
-                this.indexShootButton = temp
+                this.dragging = false
+                this.touchingFingers.splice(this.indexJoystick, 1)
+                    
+                /* When released click then return to original position */
+                this.innerCircle.x = this.position.x
+                this.innerCircle.y = this.position.y
+                this.movement = {x: 0, y: 0}
+    
+                /* Stop animation */
+    
+                if(this.character.moveInterval)
+                    this.character.onMovingStop()
+    
+                /* Reset cartesian value */
+                this.cartesianValueOfMovement = {x: 0, y: 0}
+    
+                /* Only swap indexes when the one released is smaller */
+                if(this.indexJoystick < this.indexShootButton){
+                    let temp = this.indexJoystick
+                    this.indexJoystick = this.indexShootButton
+                    this.indexShootButton = temp
+                }
+    
+    
             }
-
-
-        }
-        if(this.touchingFingers[this.indexShootButton] === e.changedTouches[0].identifier){
-            this.touchingFingers.splice(this.indexShootButton, 1)
-            this.shoot = false
-
-            /* Only swap indexes when the one released is smaller */
-            if(this.indexShootButton < this.indexJoystick){
-                let temp = this.indexJoystick
-                this.indexJoystick = this.indexShootButton
-                this.indexShootButton = temp
+            if(this.touchingFingers[this.indexShootButton] === e.changedTouches[i].identifier){
+                this.touchingFingers.splice(this.indexShootButton, 1)
+                this.shoot = false
+    
+                /* Only swap indexes when the one released is smaller */
+                if(this.indexShootButton < this.indexJoystick){
+                    let temp = this.indexJoystick
+                    this.indexJoystick = this.indexShootButton
+                    this.indexShootButton = temp
+                }
             }
+    
+            //console.log(`Shooting: ${this.shoot} , Dragging: ${this.dragging}`);
+    
+            /* If no finger is touching the screen then both indexes are 0; both will be waiting in the first position */
+            if(this.touchingFingers.length == 0){
+                this.indexJoystick = 0
+                this.indexShootButton = 0
+            }
+    
+            this.emitPosition(this.movement)
+
         }
-
-        //console.log(`Shooting: ${this.shoot} , Dragging: ${this.dragging}`);
-
-        /* If no finger is touching the screen then both indexes are 0; both will be waiting in the first position */
-        if(this.touchingFingers.length == 0){
-            this.indexJoystick = 0
-            this.indexShootButton = 0
-        }
-
-        this.emitPosition(this.movement)
+        
     }
 }

@@ -5,6 +5,7 @@ const OnlineChatServer = require('./OnlineChatServer')
 const Mikaela = require('./characters/Mikaela.js');
 const Blade = require('./characters/Blade.js');
 const Rider = require('./characters/Rider.js')
+const ip = require('dns')
 
 class Game {
     constructor(map, io){
@@ -24,7 +25,7 @@ class Game {
         this.shootingInterval = null
 
         /* Constant of interpolation */
-        this.interpolationDelay = 100
+        this.interpolationDelay = (process.env.AdminKey === 200) ? 5 : 100
 
         /* 
              ====================
