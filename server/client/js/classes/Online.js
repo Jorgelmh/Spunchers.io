@@ -51,15 +51,30 @@ export default class Online extends Engine{
         this.buffer = []
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = (location.host === '127.0.0.1:3000') ? 10 : 100
-
-        /* Last time the server state has been changed */
-        this.lastInterpolation = 0
+        this.interpolationDelay = 100
 
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
 
+            if(this.buffer.length == 0){
+                this.state = data
+                this.updateState()
+            }
+
             this.buffer.push(data)
+
+            /* Add interpolation */
+            setTimeout(() => {
+
+                /* Dequeue from buffer */
+                this.state = this.buffer[0]
+                this.buffer.splice(0, 1)
+                
+                this.updateState()
+
+            }, this.interpolationDelay)
+            
+
             this.serverDelay = Date.now() - data.serverTime
         })
 
@@ -129,11 +144,9 @@ export default class Online extends Engine{
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
-        /* Apply interpolation */
-        this.interpolateState()
-
         if(this.playerStats)
             this.calculateLocalMap()
+
 
         this.controls.animate()
         this.calculateOffset()
@@ -171,29 +184,6 @@ export default class Online extends Engine{
             this.lastFrameTime = now
             this.FPS = Math.floor(1/(timeSinceLastFrame/1000)) 
         })
-    }
-
-    /* Interpolate packets of information */
-    interpolateState(){
-
-        console.log(this.buffer);
-
-        if(this.buffer.length > 0 && Date.now() - this.lastInterpolation >= this.interpolationDelay){
-
-            /* Dequeue from buffer */
-            if(this.buffer.length > 5){
-                this.state = this.buffer[this.buffer.length - 5]
-                this.buffer.splice(0, this.buffer.length - 5)
-            }else{
-                this.state = this.buffer[0]
-                this.buffer.splice(0, 1)
-            }
-            
-            /* Set new interpolation time */
-            this.lastInterpolation = Date.now()
-            
-            this.updateState()
-        }
     }
 
     /* Send data back to the server */
