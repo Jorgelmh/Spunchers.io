@@ -69,14 +69,12 @@ const character = {
     /* Change the image when moving forward */
     onMovingForward: function() {
         this.currentSprite.y = 2
-        this.currentSprite.flip = 1
 
         this.createInterval()
     },
 
     onMovingBackwards: function(){
         this.currentSprite.y = 0
-        this.currentSprite.flip = 1
 
         this.createInterval()
     },

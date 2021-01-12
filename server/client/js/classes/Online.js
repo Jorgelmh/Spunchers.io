@@ -233,6 +233,7 @@ export default class Online extends Engine{
                 this.cameraSmoothness.offsetY -= this.cameraSmoothness.velY
         }
             
+        //console.log(`x: ${this.cameraSmoothness.offsetX}, y: ${this.cameraSmoothness.offsetY}`)
         /* Offset smooth camera */
 
         this.tileMap.startX = ((this.screenTiles.x * this.tile.width)/2 - this.tile.width/2) - serverWidth + this.cameraSmoothness.offsetX
@@ -282,7 +283,7 @@ export default class Online extends Engine{
                             let character = {
                                 y: this.state.players[playerID].character.currentSprite.y,
                                 x: (this.state.players[playerID].still && this.state.players[playerID].life > 0) ? this.staticAnimation.x : this.state.players[playerID].character.currentSprite.x,
-                                flip: this.state.players[playerID].character.currentSprite.flip
+                                flip: (this.state.players[playerID].character.currentSprite.y === 0 || this.state.players[playerID].character.currentSprite.y === 2) ? 1 : this.state.players[playerID].character.currentSprite.flip
                             }
                             this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName )
                         }
@@ -303,6 +304,7 @@ export default class Online extends Engine{
         this.context.fillStyle = 'black'
         this.context.fillText(name, player.posX + this.tile.width/2, player.posY - 10)
         this.context.save()
+
         this.context.scale(onlineCharacter.flip, 1)
 
         let posX = (onlineCharacter.flip === 1) ?  player.posX : player.posX * onlineCharacter.flip - this.tile.width

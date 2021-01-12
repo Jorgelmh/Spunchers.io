@@ -25,7 +25,7 @@ app.get('/online', (req, res) => {
 })
 
 app.get('/offline', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/pages/offline.html'))
+    res.sendFile(path.join(__dirname + '/public/Pages/offline.html'))
 })
 
 server.listen(process.env.PORT ,() => {
