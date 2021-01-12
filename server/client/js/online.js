@@ -51,12 +51,12 @@ characterSkins.map((skin) => {
 const play = document.getElementById('play')
 
 play.onclick = (event) => {
-    let body =document.getElementsByTagName('body')[0]
-    body.classList.remove('background-connect-frame')
 
+    document.getElementById('site-ajax-loader').style.display = 'block'
+
+    let body =document.getElementsByTagName('body')[0]
     let name = document.getElementById('playerName').value || 'unnamed'
 
-    document.getElementById('site-game').style.display = 'block'
     body.removeChild(document.getElementById('login-frame'))
     const engine = new Online(game.lobby.map, game.lobby.collisionMatrix, game.lobby.shadowMap ,game.lobby.tileSet , document.getElementById('game'), socket, game.playerID, game.lobby.server, characterSkins[glide.index], name)
 }

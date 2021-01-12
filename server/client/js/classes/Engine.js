@@ -196,8 +196,21 @@ export default class Engine{
             if(this.animatedSprites)
                 this.setAnimationTiming()
 
+            this.closeLoadingScreen()
             requestAnimationFrame(this.render)
         })
+    }
+
+    /* Shut loading screen once every element's been downloaded */
+
+    closeLoadingScreen(){
+        /* Show game */
+        let body =document.getElementsByTagName('body')[0]
+        body.classList.remove('background-connect-frame')
+        document.getElementById('site-ajax-loader').style.display = 'none'
+        document.getElementById('site-game').style.display = 'block'
+
+        document.getElementById('background-frame').style.display = 'none'
     }
 
     /* Auto resize the canvas when the screen is resized */
