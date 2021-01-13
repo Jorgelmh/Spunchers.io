@@ -2,10 +2,10 @@
 const OnlineChatServer = require('./OnlineChatServer')
 
 /* Import character classes */
-const Mikaela = require('./characters/Mikaela.js');
-const Blade = require('./characters/Blade.js');
+const Mikaela = require('./characters/Mikaela.js')
+const Blade = require('./characters/Blade.js')
 const Rider = require('./characters/Rider.js')
-const ip = require('dns')
+const Liz = require('./characters/Liz.js')
 
 class Game {
     constructor(map, io){
@@ -34,7 +34,6 @@ class Game {
         */
 
         /* Matrix for map and collisionMap */
-
         this.tileSet = map.tileSet
         this.map = map.tileMap
         this.collisionMatrix = map.collisionMap
@@ -48,6 +47,9 @@ class Game {
             x: this.map[0].length,
             y: this.map.length
         }
+
+        /* respawn vectors */
+        this.respawnPoints = map.respawns
 
         /* Dimension of a tile on the game running on the server */
         this.tile = {
@@ -81,6 +83,9 @@ class Game {
                 break
             case 'rider':
                 this.players[socketID] = new Rider(600, 200, data.character, data.name)
+                break
+            case 'liz':
+                this.players[socketID] = new Liz(600, 200, data.character, data.name)
             
         }
     }
@@ -210,6 +215,10 @@ class Game {
             if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
                 this.calculateMovement(id, player.dequeueState())
 
+            /* Death animation */
+            if(player.life === 0 && Date.now() - player.lastDeath >= 300 && player.character.currentSprite.x === 0)
+                player.character.currentSprite.x ++
+
             return [id, player.playerState()]
         }))
 
@@ -325,7 +334,16 @@ class Game {
         let currentPlayer = this.players[playerID]
         let newPosition = this.respawnPlayerPosition()
 
-        this.bullets = this.bullets.filter((elem) => elem.ownerID !== playerID )
+        this.bullets = this.bullets.filter((elem) => elem.ownerID !== playerID)
+
+        let tempFlip = currentPlayer.character.currentSprite.flip
+
+        /* Set death animations */
+        currentPlayer.character.currentSprite = {
+            x: 0,
+            y: 12,
+            flip: tempFlip
+        }
 
         if(currentPlayer){
 
@@ -333,8 +351,13 @@ class Game {
                 currentPlayer.life = 100
                 currentPlayer.posX = newPosition.x
                 currentPlayer.posY = newPosition.y
-                if(this.bullets.length === 0)
-                    this.socketIO.sockets.emit('state', this.update())
+
+                currentPlayer.character.currentSprite = {
+                    x: 0,
+                    y: 5,
+                    flip: tempFlip
+                }
+
             }, 1000) 
         }
 
@@ -344,10 +367,10 @@ class Game {
     }
 
     respawnPlayerPosition(){
-        return {
-            x: 600,
-            y: 200
-        }
+
+        let randomIndex = Math.floor(Math.random() * 6)
+
+        return this.respawnPoints[randomIndex]
     }
 
     /**

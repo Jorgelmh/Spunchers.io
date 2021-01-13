@@ -21,11 +21,6 @@ const character = {
         height: 64
     },
 
-    spriteImages: {
-        normal: null,
-        shooting: null
-    },
-
     /* Animations */
     animationSpeed: 250,
     moveInterval: undefined,
@@ -37,32 +32,14 @@ const character = {
 
     /* Load the sprites for the given character */
     load: function(name, callback) {
-        let loadedImages = 0
 
-        /* Loading normal spritesheet */
+        /* Load sprite for character */
         let sprite = new Image()
         sprite.onload = () =>{
             this.spriteSheet.img = sprite
-            this.spriteImages.normal = sprite
-
-            if(++loadedImages == 2)
-                callback()
+            callback()
         }
         sprite.src = `../assets/characters/${name}`
-
-
-        /* Loading shooting spritesheet */
-        let spriteShooting = new Image()
-
-        spriteShooting.onload = () => {
-            this.spriteImages.shooting = spriteShooting
-
-            if(++loadedImages == 2)
-                callback()
-        }
-
-        spriteShooting.src = `../assets/characters/shooting/${name}`
-
 
     },
 

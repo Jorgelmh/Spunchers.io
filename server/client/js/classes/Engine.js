@@ -412,13 +412,6 @@ export default class Engine{
             setTimeout(() => {
                 this.emitBullet(dir, spriteY)
     
-                if(this.playerStats.life > 0)
-                    this.character.spriteSheet.img =  this.character.spriteImages.shooting
-                
-                setTimeout(() => {
-                    this.character.spriteSheet.img = this.character.spriteImages.normal
-                }, 90)
-    
             }, 70)
         }
     }

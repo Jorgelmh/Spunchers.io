@@ -94,7 +94,6 @@ export default class Keyboard {
                     break
                 case 'a':
                     this.shoot = false
-                    this.character.spriteSheet.img = this.character.spriteImages.normal
                     break
 
             }

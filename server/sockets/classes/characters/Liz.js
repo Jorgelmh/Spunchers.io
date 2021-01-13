@@ -1,17 +1,17 @@
 /* Import super class */
 const Character = require('./Character.js')
 
-class Mikaela extends Character{
+class Liz extends Character{
     constructor(posX, posY, sprite, playerName){
         super(posX, posY, sprite, playerName)
 
         /* Specific data about this character */
-        this.skin = 'mikaela'
-        this.shootingDelay = 400
-        this.impactDamage = 65
+        this.skin = 'liz'
+        this.shootingDelay = 200
+        this.impactDamage = 40
 
         /* Full charger bullets */
-        this.ammunition = 2
+        this.ammunition = 25
 
         /* Current state of the charger */
         this.bulletsCharger = this.ammunition
@@ -43,4 +43,4 @@ class Mikaela extends Character{
     }
 }
 
-module.exports = Mikaela
+module.exports = Liz

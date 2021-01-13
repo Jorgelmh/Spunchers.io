@@ -248,6 +248,9 @@ export default class Online extends Engine{
             let quitePlayers = false
             for(let playerID in this.state.players){
 
+                if(playerID === this.playerID)
+                    console.log(`${this.state.players[playerID].posX}, ${this.state.players[playerID].posY}`)    
+
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
 
@@ -256,36 +259,27 @@ export default class Online extends Engine{
 
                         let skin
 
-                        if(this.state.players[playerID].skin == this.skin){
-                            if(this.state.players[playerID].shooting && this.state.players[playerID].life > 0)
-                                skin = this.character.spriteImages.shooting
-                            else
-                                skin = this.character.spriteImages.normal
-                        }else{
-                            if(this.state.players[playerID].shooting && this.state.players[playerID].life > 0)
-                                skin = this.onlineSkins[this.state.players[playerID].skin].shooting
-                            else
-                                skin = this.onlineSkins[this.state.players[playerID].skin].normal
-                        }
-
-                        if(this.state.players[playerID].life === 0){
-                            let tempFlip = this.state.players[playerID].character.currentSprite.flip
-                            this.state.players[playerID].character.currentSprite = {x: 0, y: 6, flip: tempFlip}
-                        }
-
-
+                        if(this.state.players[playerID].skin == this.skin)
+                                skin = this.character.spriteSheet.img
+                        else
+                            skin = this.onlineSkins[this.state.players[playerID].skin]
+                        
+                      
                         /* Check if any player is still */
                         if(this.state.players[playerID].still)
                             quitePlayers = true
 
+                        if(this.state.players[playerID].life === 0)
+                            console.log(this.state.players[playerID])
+
                         if(skin){
                             this.drawLife(characterX, characterY -6, this.state.players[playerID].life)
                             let character = {
-                                y: this.state.players[playerID].character.currentSprite.y,
+                                flip: (this.state.players[playerID].character.currentSprite.y === 0 || this.state.players[playerID].character.currentSprite.y === 2) ? 1 : this.state.players[playerID].character.currentSprite.flip,
+                                y: (this.state.players[playerID].shooting && this.state.players[playerID].life > 0) ? this.state.players[playerID].character.currentSprite.y + 6 : this.state.players[playerID].character.currentSprite.y,
                                 x: (this.state.players[playerID].still && this.state.players[playerID].life > 0) ? this.staticAnimation.x : this.state.players[playerID].character.currentSprite.x,
-                                flip: (this.state.players[playerID].character.currentSprite.y === 0 || this.state.players[playerID].character.currentSprite.y === 2) ? 1 : this.state.players[playerID].character.currentSprite.flip
                             }
-                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName )
+                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName, playerID)
                         }
                 }
             }
@@ -298,12 +292,15 @@ export default class Online extends Engine{
     }
 
     /* Draws online players from server's data */
-    drawOnlineCharacter(player, onlineCharacter, skin, name){
+    drawOnlineCharacter(player, onlineCharacter, skin, name, id){
 
         this.context.textAlign = 'center'
         this.context.fillStyle = 'black'
         this.context.fillText(name, player.posX + this.tile.width/2, player.posY - 10)
         this.context.save()
+
+        if(id !== this.playerID)
+            console.log(`Pos: ${player.posX}, ${player.posY} -- Character: ${onlineCharacter.flip}, ${onlineCharacter.y}, ${onlineCharacter.x} -- skin: ${skin}`);
 
         this.context.scale(onlineCharacter.flip, 1)
 
@@ -329,13 +326,7 @@ export default class Online extends Engine{
         let characterSkin = new Image()
         characterSkin.src = `../assets/characters/${src}.png`
 
-        let shootingSkin = new Image()
-        shootingSkin.src = `../assets/characters/shooting/${src}.png`
-
-        this.onlineSkins[src] = {
-            normal: characterSkin,
-            shooting: shootingSkin
-        }
+        this.onlineSkins[src] = characterSkin
     }
 
     /** 
