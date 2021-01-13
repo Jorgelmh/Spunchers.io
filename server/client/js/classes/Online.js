@@ -248,29 +248,17 @@ export default class Online extends Engine{
             let quitePlayers = false
             for(let playerID in this.state.players){
 
-                if(playerID === this.playerID)
-                    console.log(`${this.state.players[playerID].posX}, ${this.state.players[playerID].posY}`)    
-
                     let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
                     let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
 
                     /* If the character is outside the screen don't draw it */
                     if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
 
-                        let skin
-
-                        if(this.state.players[playerID].skin == this.skin)
-                                skin = this.character.spriteSheet.img
-                        else
-                            skin = this.onlineSkins[this.state.players[playerID].skin]
-                        
+                        let skin = (this.state.players[playerID].skin == this.skin) ? this.character.spriteSheet.img : this.onlineSkins[this.state.players[playerID].skin]
                       
                         /* Check if any player is still */
                         if(this.state.players[playerID].still)
                             quitePlayers = true
-
-                        if(this.state.players[playerID].life === 0)
-                            console.log(this.state.players[playerID])
 
                         if(skin){
                             this.drawLife(characterX, characterY -6, this.state.players[playerID].life)

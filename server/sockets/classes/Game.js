@@ -216,8 +216,8 @@ class Game {
                 this.calculateMovement(id, player.dequeueState())
 
             /* Death animation */
-            if(player.life === 0 && Date.now() - player.lastDeath >= 300 && player.character.currentSprite.x === 0)
-                player.character.currentSprite.x ++
+            if(this.players[id].life === 0 && Date.now() - this.players[id].lastDeath >= 300 && this.players[id].character.currentSprite.x === 0)
+                this.players[id].character.currentSprite.x ++
 
             return [id, player.playerState()]
         }))
@@ -324,7 +324,7 @@ class Game {
 
     playerHasDied(playerID){
 
-        /* Synn check time */
+        /* Sync check time */
         this.players[playerID].lastDeath = Date.now()
 
         /* Reload user's weapon when died */
