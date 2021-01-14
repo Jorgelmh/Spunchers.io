@@ -175,7 +175,7 @@ class Game {
 
             if(Date.now() - currentPlayer.lastShot > currentPlayer.shootingDelay){
 
-
+                /* Set shooting state which is translated to a shooting animation on the client */
                 currentPlayer.shooting = true
                 currentPlayer.reduceAmmunition(this.emitReload, playerID)
 
@@ -185,16 +185,11 @@ class Game {
                     currentPlayer.shooting = false
                 }, 90)
 
-                /* Push bullet onto the array of bullets */
-                this.bullets.push({
-                    ownerID: playerID,
-                    posX: bulletPosition.x,
-                    posY: bulletPosition.y,
-                    dirX: bullet.dir.x,
-                    dirY: bullet.dir.y,
-                    flip: this.players[playerID].character.currentSprite.flip,
-                    spriteY: bullet.spriteY
-                }) 
+                /* Create bullet based on the character -> Different characters different kind of bullets */
+                let characterBullet = currentPlayer.createBullet(playerID, bulletPosition, bullet)
+
+                /* Push bullet/s onto the array of bullets */
+                this.bullets.push(...characterBullet) 
             }
         }
     }

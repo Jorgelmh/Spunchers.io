@@ -49,6 +49,19 @@ class Character {
         return state
     }
 
+    /* Standard method for creating bullets -> it returns only one bullet based on the movement of the player*/
+    createBullet(playerID, position,bullet){
+        return [{
+                ownerID: playerID,
+                posX: position.x,
+                posY: position.y,
+                dirX: bullet.dir.x,
+                dirY: bullet.dir.y,
+                flip: this.character.currentSprite.flip,
+                spriteY: bullet.spriteY
+        }]
+    }
+
     reduceAmmunition(emitReload, playerID){
         this.bulletsCharger --
 
