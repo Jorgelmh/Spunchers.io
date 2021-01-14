@@ -7,14 +7,17 @@ class Mikaela extends Character{
 
         /* Specific data about this character */
         this.skin = 'mikaela'
-        this.shootingDelay = 400
-        this.impactDamage = 65
+        this.shootingDelay = 350
+        this.impactDamage = 50
 
         /* Full charger bullets */
         this.ammunition = 2
 
         /* Current state of the charger */
         this.bulletsCharger = this.ammunition
+
+        /* Maximum distance a bullet can travel*/
+        this.range = 125
 
         this.reloadTime = 1000
 
@@ -34,28 +37,43 @@ class Mikaela extends Character{
                 ownerID: playerID,
                 posX: position.x,
                 posY: position.y,
+                initialPos: {
+                    x: position.x,
+                    y: position.y
+                },
                 dirX: bullet.dir.x,
                 dirY: bullet.dir.y,
                 flip: this.character.currentSprite.flip,
-                spriteY: bullet.spriteY
+                spriteY: bullet.spriteY,
+                range: this.range
             },
             {
                 ownerID: playerID,
                 posX: position.x,
                 posY: position.y,
+                initialPos: {
+                    x: position.x,
+                    y: position.y
+                },
                 dirX: Math.cos(bullet2),
                 dirY: Math.sin(bullet2),
                 flip: this.character.currentSprite.flip,
-                spriteY: bullet.spriteY
+                spriteY: bullet.spriteY,
+                range: this.range
             },
             {
                 ownerID: playerID,
                 posX: position.x,
                 posY: position.y,
+                initialPos: {
+                    x: position.x,
+                    y: position.y
+                },
                 dirX: Math.cos(bullet3),
                 dirY: Math.sin(bullet3),
                 flip: this.character.currentSprite.flip,
-                spriteY: bullet.spriteY
+                spriteY: bullet.spriteY,
+                range: this.range
             }
             
         ]

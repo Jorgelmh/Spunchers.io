@@ -13,7 +13,7 @@ export default class Online extends Engine{
     constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name){
         super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
 
-        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload)
+        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload, this.playerStats)
 
         this.name = name
         this.serverDelay = null
@@ -146,9 +146,9 @@ export default class Online extends Engine{
 
         if(this.playerStats)
             this.calculateLocalMap()
-
-
+        
         this.controls.animate()
+
         this.calculateOffset()
         this.drawMap()
         this.drawShadows()
@@ -257,17 +257,21 @@ export default class Online extends Engine{
                         let skin = (this.state.players[playerID].skin == this.skin) ? this.character.spriteSheet.img : this.onlineSkins[this.state.players[playerID].skin]
                       
                         /* Check if any player is still */
-                        if(this.state.players[playerID].still)
+                        if(this.state.players[playerID].still && this.state.players[playerID].life > 0)
                             quitePlayers = true
+
+                        if(playerID != this.playerID)
+                            console.log(this.state.players[playerID].character.currentSprite)
 
                         if(skin){
                             this.drawLife(characterX, characterY -6, this.state.players[playerID].life)
+
                             let character = {
                                 flip: (this.state.players[playerID].character.currentSprite.y === 0 || this.state.players[playerID].character.currentSprite.y === 2) ? 1 : this.state.players[playerID].character.currentSprite.flip,
                                 y: (this.state.players[playerID].shooting && this.state.players[playerID].life > 0) ? this.state.players[playerID].character.currentSprite.y + 6 : this.state.players[playerID].character.currentSprite.y,
                                 x: (this.state.players[playerID].still && this.state.players[playerID].life > 0) ? this.staticAnimation.x : this.state.players[playerID].character.currentSprite.x,
                             }
-                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName, playerID)
+                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName)
                         }
                 }
             }
@@ -280,15 +284,12 @@ export default class Online extends Engine{
     }
 
     /* Draws online players from server's data */
-    drawOnlineCharacter(player, onlineCharacter, skin, name, id){
+    drawOnlineCharacter(player, onlineCharacter, skin, name){
 
         this.context.textAlign = 'center'
         this.context.fillStyle = 'black'
         this.context.fillText(name, player.posX + this.tile.width/2, player.posY - 10)
         this.context.save()
-
-        if(id !== this.playerID)
-            console.log(`Pos: ${player.posX}, ${player.posY} -- Character: ${onlineCharacter.flip}, ${onlineCharacter.y}, ${onlineCharacter.x} -- skin: ${skin}`);
 
         this.context.scale(onlineCharacter.flip, 1)
 

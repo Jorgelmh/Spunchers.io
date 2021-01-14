@@ -1,28 +1,28 @@
 /* Import super class */
-const Character = require('./Character.js')
+const Character = require('./Character')
 
-class Liz extends Character{
+class Ezrael extends Character{
     constructor(posX, posY, sprite, playerName){
         super(posX, posY, sprite, playerName)
 
         /* Specific data about this character */
-        this.skin = 'liz'
-        this.shootingDelay = 200
-        this.impactDamage = 40
+        this.skin = 'ezrael'
+        this.shootingDelay = 350
+        this.impactDamage = 100
 
         /* Full charger bullets */
-        this.ammunition = 25
+        this.ammunition = 1
 
         /* Current state of the charger */
         this.bulletsCharger = this.ammunition
 
-        this.reloadTime = 1000
+        this.reloadTime = 1200
 
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */
     offsetYHorizontal(halfTileWidth){
-        return halfTileWidth + (halfTileWidth/4)
+        return halfTileWidth + (halfTileWidth/3)
     }
 
     /* diagonalUpOffset when player is going diagonal up */
@@ -41,6 +41,7 @@ class Liz extends Character{
     diagonalDownOffsetY(halfTileWidth){
         return halfTileWidth + (halfTileWidth/4)
     }
+
 }
 
-module.exports = Liz
+module.exports = Ezrael

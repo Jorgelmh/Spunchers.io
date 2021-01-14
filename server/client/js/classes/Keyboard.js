@@ -180,8 +180,9 @@ export default class Keyboard {
 
         if(this.shoot)
             this.createBullet()
-
-        this.emitPosition(movement)
+            
+        if(movement.x !== 0 || movement.y !== 0)
+            this.emitPosition(movement)
     }
 
     createBullet(){

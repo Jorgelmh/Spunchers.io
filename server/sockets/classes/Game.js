@@ -5,7 +5,9 @@ const OnlineChatServer = require('./OnlineChatServer')
 const Mikaela = require('./characters/Mikaela.js')
 const Blade = require('./characters/Blade.js')
 const Rider = require('./characters/Rider.js')
-const Liz = require('./characters/Liz.js')
+const Lisa = require('./characters/Lisa.js')
+const Ezrael = require('./characters/Ezrael')
+const Sydnie = require('./characters/Sydnie')
 
 class Game {
     constructor(map, io){
@@ -77,16 +79,21 @@ class Game {
             case 'blade':
                 this.players[socketID] = new Blade(600, 200, data.character, data.name)
                 break
-
             case 'mikaela':
                 this.players[socketID] = new Mikaela(600, 200, data.character, data.name)
                 break
             case 'rider':
                 this.players[socketID] = new Rider(600, 200, data.character, data.name)
                 break
-            case 'liz':
-                this.players[socketID] = new Liz(600, 200, data.character, data.name)
-            
+            case 'lisa':
+                this.players[socketID] = new Lisa(600, 200, data.character, data.name)
+                break
+            case 'ezrael':
+                this.players[socketID] = new Ezrael(600, 200, data.character, data.name)
+                break
+            case 'sydnie':
+                this.players[socketID] = new Sydnie(600, 200, data.character, data.name)
+                break
         }
     }
 
@@ -99,11 +106,13 @@ class Game {
     /* change position of players when the movement events on the client are triggered */
     onMovement = (socketID, data) => {
 
-        if(this.players[socketID].lastUpdate === 0)
-            this.calculateMovement(socketID, data)
-
-        /* Push onto buffer */
-        this.players[socketID].buffer.push(data)
+        /* Only store user's state when they are alive */
+        if(this.players[socketID].life > 0){
+            if(this.players[socketID].lastUpdate === 0)
+                this.calculateMovement(socketID, data)
+            
+            this.players[socketID].buffer.push(data)
+        }
         
     }
 
@@ -258,6 +267,22 @@ class Game {
             /* Update current position of each bullet */
             bullet.posX += dt * this.bulletSpeed * bullet.dirX
             bullet.posY += dt * this.bulletSpeed * bullet.dirY
+
+            /* Check distance travelled by bullet -> if it has a limit */
+            if(bullet.range){
+
+                /* calculate vector from point 0,0*/
+                let vector = {
+                    x: bullet.posX - bullet.initialPos.x,
+                    y: bullet.posY - bullet.initialPos.y
+                }
+                
+                let distanceTravelled = Math.sqrt(Math.pow(vector.x, 2) + Math.pow(vector.y, 2))
+
+                if(distanceTravelled > bullet.range)
+                    removeBullet = true
+                
+            }
 
             /* Check collisions between bullets and objects in the tile map -> using the coordinates of the bullet at the moment of collision */
             let bulletPosXMatrix = Math.floor(bullet.posX / this.tile.width) 
