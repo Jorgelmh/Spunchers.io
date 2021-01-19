@@ -5,7 +5,8 @@
  */
 
 const socketIO = require('socket.io')
-const Game = require('./classes/Game')
+const FreeforAll = require('./classes/games/FreeforAll')
+const TeamDeathmatch = require('./classes/games/TeamDeathmatch')
 const map = require('./maps/castle.json')
 
 /* Scoket listener */
@@ -13,8 +14,11 @@ const socketListen = (app) => {
 
     const io = socketIO(app, {pingInterval: 1000})
 
-    //Lobby of the currrent game
-    const serverGame = new Game(map, io)
+    //Lobby for freeforall game
+    const freeforall = new FreeforAll(map, io)
+    
+    /* Lobby for team deathmatch game */
+    const teamDeathmatch = new TeamDeathmatch(map, io)
     
     /**
      * ====================================
@@ -29,28 +33,63 @@ const socketListen = (app) => {
         });
     });
 
-    io.on('connection', function(socket) {
+    io.on('connection', function(socket) {        
 
-        serverGame.setUpdate()
+        let socketAddress = socket.handshake.headers.referer
+        let gamemode = socketAddress.split('/')[3]
 
-        /* Add websockets in here */
-        socket.emit('loadMap', serverGame.onLoadMap(socket.id))
+        /* return map for each game lobby*/
+        if(gamemode === 'online'){
+            socket.emit('loadMap', freeforall.onLoadMap(socket.id))
+            socket.join(freeforall.roomname)
+        }
+
+        else if(gamemode === 'teams'){
+            socket.emit('loadMap', teamDeathmatch.onLoadMap(socket.id))
+            socket.join(teamDeathmatch.roomname)
+        }
 
         /* When a new player enters the lobby => Note: Validations on repetitions are in the client version of the game*/
         socket.on('New Player', (data) => {
-            serverGame.addPlayers(data, socket.id)
 
-            /* load previous players' skins and send ammunition for the character selected */
-            socket.emit('Load Skins and ammunition', serverGame.getSkins(socket.id))
+            /* Skins needed to be loaded on the engine */
+            let skins
+            let roomname
+            let scores
+
+            /* 0 -> Free for all */
+            if(data.game.mode === 0){
+                freeforall.addPlayers(data, socket.id)
+                skins = freeforall.getSkins(socket.id)
+
+                /* set roomname */
+                roomname = freeforall.roomname
+
+                /* Return new scores */
+                scores = freeforall.sortScores(freeforall.players)
+
+            }
+
+            /* 1 -> Team deathmatch */
+            else if(data.game.mode === 1){
+                teamDeathmatch.addPlayers(data, socket.id, data.game.team)
+                skins = teamDeathmatch.getSkins(socket.id)
+
+                /* set roomname */
+                roomname = teamDeathmatch.roomname
+
+               
+            }
 
             /* Other players load tnew player's skin */
-            socket.broadcast.emit('Load New Skin', {src: data.skin})
-
-            if(serverGame.bullets.length === 0)
-                io.sockets.emit('state', serverGame.update())
+            socket.to(roomname).emit('Load New Skin', {src: data.skin})
 
             /* Send the score */
-            io.sockets.emit('New leaderboard', serverGame.sortScores(serverGame.players))
+            if(gamemode === 'online')
+                io.to(roomname).emit('New leaderboard', scores)
+
+            /* load previous players' skins and send ammunition for the character selected */
+            socket.emit('Load Skins and ammunition', skins)
 
         })
 
@@ -58,27 +97,42 @@ const socketListen = (app) => {
         socket.on('movement', (data) => {
 
             /* Change position */
-            serverGame.onMovement(socket.id, data)
+            if(gamemode === 'online')
+                freeforall.onMovement(freeforall.players[socket.id], data, socket.id)
+
+            else if(gamemode === 'teams')
+                teamDeathmatch.onMovement(teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id], data, socket.id)
+            
         })
 
         socket.on('disconnect', (data) => {
-            serverGame.removePlayer(socket.id) 
-            if(Object.keys(serverGame.players).length === 0) serverGame.onlineChat.messages = []
-            if(serverGame.bullets.length === 0)
-                io.sockets.emit('state', serverGame.update())  
-            io.sockets.emit('New leaderboard', serverGame.sortScores(serverGame.players))
+            if(gamemode === 'online'){
+                freeforall.removePlayer(socket.id) 
+                if(Object.keys(freeforall.players).length === 0) freeforall.onlineChat.messages = []
+                io.sockets.emit('New leaderboard', freeforall.sortScores(freeforall.players))
+
+            }else if(gamemode === 'teams'){
+                teamDeathmatch.removePlayer(socket.id)
+            }
+            
+ 
               
         })
 
         socket.on('reload weapon', (data) => {
-            serverGame.reloadPlayerWeapon(socket.id)
+            freeforall.reloadPlayerWeapon(socket.id)
         })
 
         /* Listener of players shooting */
         socket.on('shoot',(data) => {
 
             /* Call functions and send bullet's details and id of the player */
-            serverGame.addBullet(socket.id, data.bullet, data.shootTime)
+            if(gamemode === 'online')
+                freeforall.addBullet(freeforall.players[socket.id], data.bullet, data.shootTime, socket.id)
+            else if(gamemode === 'teams'){
+                let teamBullet = (teamDeathmatch.team1[socket.id]) ? {player: teamDeathmatch.team1[socket.id], bullets: teamDeathmatch.bulletsTeam1} : {player: teamDeathmatch.team2[socket.id], bullets: teamDeathmatch.bulletsTeam2}
+                teamDeathmatch.addBullet(teamBullet.player, data.bullet, data.shootTime, socket.id, teamBullet.bullets)
+            }
         })
 
         /** 
@@ -88,7 +142,7 @@ const socketListen = (app) => {
         */
 
         socket.on('Chat Message', (data) => {
-            let name = serverGame.addChatMessage(data.text, socket, data.adminID)
+            let name = freeforall.addChatMessage(data.text, socket, data.adminID)
 
             if(name)
                 io.sockets.emit('new Chat Message', {name, text: data.text})

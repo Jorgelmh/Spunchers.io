@@ -10,7 +10,7 @@ import Keyboard from './Keyboard.js'
  */
 export default class Online extends Engine{
 
-    constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name){
+    constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name, game){
         super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
 
         this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload, this.playerStats)
@@ -29,7 +29,8 @@ export default class Online extends Engine{
         this.socketIO.emit('New Player', {
             name: this.name,
             skin: this.skin,
-            character: this.character.currentSprite
+            character: this.character.currentSprite,
+            game
         })
 
         this.state = null
@@ -243,44 +244,58 @@ export default class Online extends Engine{
 
     /* Loops server players and calls the drawOnlineCharacter to draw each player with the data from the socket */
     drawOtherPlayers(){
-        if(this.state.players){
+        if(Array.isArray(this.state.players)){
+            let colors = (this.state.players[0][this.playerID]) ? [this.colors.ally, this.colors.enemy] : [this.colors.enemy, this.colors.ally]
 
             let quitePlayers = false
-            for(let playerID in this.state.players){
-
-                    let characterX = this.transformServerMagnitudesX(this.state.players[playerID].posX)+this.tileMap.startX
-                    let characterY = this.transformServerMagnitudesY(this.state.players[playerID].posY)+this.tileMap.startY
-
-                    /* If the character is outside the screen don't draw it */
-                    if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && this.state.players[playerID].character){
-
-                        let skin = (this.state.players[playerID].skin == this.skin) ? this.character.spriteSheet.img : this.onlineSkins[this.state.players[playerID].skin]
-                      
-                        /* Check if any player is still */
-                        if(this.state.players[playerID].still && this.state.players[playerID].life > 0)
-                            quitePlayers = true
-
-                        if(playerID != this.playerID)
-                            console.log(this.state.players[playerID].character.currentSprite)
-
-                        if(skin){
-                            this.drawLife(characterX, characterY -6, this.state.players[playerID].life)
-
-                            let character = {
-                                flip: (this.state.players[playerID].character.currentSprite.y === 0 || this.state.players[playerID].character.currentSprite.y === 2) ? 1 : this.state.players[playerID].character.currentSprite.flip,
-                                y: (this.state.players[playerID].shooting && this.state.players[playerID].life > 0) ? this.state.players[playerID].character.currentSprite.y + 6 : this.state.players[playerID].character.currentSprite.y,
-                                x: (this.state.players[playerID].still && this.state.players[playerID].life > 0) ? this.staticAnimation.x : this.state.players[playerID].character.currentSprite.x,
-                            }
-                            this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, this.state.players[playerID].playerName)
-                        }
-                }
-            }
+            
+            quitePlayers = this.drawPlayers(this.state.players[0], colors[0])
+            quitePlayers = this.drawPlayers(this.state.players[1], colors[1])
 
             if(quitePlayers && !this.staticAnimation.interval)
                 this.setAnimationWhenStatic()
             else if (!quitePlayers)
                 this.endAnimationWhenStatic()
+
+        }else{
+            this.drawPlayers(this.state.players)
         }
+    }
+
+    drawPlayers(players, lifeColor = this.colors.enemy){
+
+        let quitePlayers = false
+
+        for(let playerID in players){
+
+            let characterX = this.transformServerMagnitudesX(players[playerID].posX)+this.tileMap.startX
+            let characterY = this.transformServerMagnitudesY(players[playerID].posY)+this.tileMap.startY
+
+            /* If the character is outside the screen don't draw it */
+            if(characterX + this.tile.width >= 0 && characterX < this.screenTiles.x * this.tile.width && characterY+ this.tile.height >= 0 && characterY < this.screenTiles.y * this.tile.height && players[playerID].character){
+
+                let skin = (players[playerID].skin == this.skin) ? this.character.spriteSheet.img : this.onlineSkins[players[playerID].skin]
+                      
+                /* Check if any player is still */
+                if(players[playerID].still && players[playerID].life > 0)
+                    quitePlayers = true
+
+
+                if(skin){
+                    let color = (playerID === this.playerID) ? this.colors.self : lifeColor
+                    this.drawLife(characterX, characterY -6, players[playerID].life, color)
+
+                    let character = {
+                        flip: (players[playerID].character.currentSprite.y === 0 || players[playerID].character.currentSprite.y === 2) ? 1 : players[playerID].character.currentSprite.flip,
+                        y: (players[playerID].shooting && players[playerID].life > 0) ? players[playerID].character.currentSprite.y + 6 : players[playerID].character.currentSprite.y,
+                        x: (players[playerID].still && players[playerID].life > 0) ? this.staticAnimation.x : players[playerID].character.currentSprite.x,
+                    }
+                    this.drawOnlineCharacter({posX: characterX, posY: characterY}, character , skin, players[playerID].playerName)
+                }
+            }
+        }
+
+        return quitePlayers
     }
 
     /* Draws online players from server's data */
@@ -373,7 +388,12 @@ export default class Online extends Engine{
     updateState(){
 
         /* Set player stats when packet's been interpolated */
-        let currentPlayerPos = this.state.players[this.playerID]
+        let currentPlayerPos
+
+        if(Array.isArray(this.state.players))
+            currentPlayerPos = this.state.players[0][this.playerID] || this.state.players[1][this.playerID]
+        else
+            currentPlayerPos = this.state.players[this.playerID]
 
         this.playerStats = currentPlayerPos
 

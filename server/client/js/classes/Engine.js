@@ -126,6 +126,17 @@ export default class Engine{
 
         /* Get the timings of the animation 0-4 */
         this.animationTiming = 1
+
+        /**
+         *  =========================
+         *          COLORS
+         *  =========================
+         */
+        this.colors = {
+            enemy: '#eb3d11',
+            self: ' #00b7ff',
+            ally: '#00ff00'
+        }
         
         window.addEventListener('resize', this.resizeCanvas)
         this.resizeCanvas()
@@ -371,7 +382,7 @@ export default class Engine{
     }
 
     /* Draw life of an entity */
-    drawLife(posX, posY, life){
+    drawLife(posX, posY, life, color){
 
         this.context.beginPath()
 
@@ -381,7 +392,7 @@ export default class Engine{
         this.context.beginPath()
 
         this.context.rect(posX, posY, this.tile.width*life/100, this.tile.height/10)
-        this.context.fillStyle = 'red'
+        this.context.fillStyle = color
         this.context.fill()
 
         this.context.closePath()

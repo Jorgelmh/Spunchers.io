@@ -24,6 +24,10 @@ app.get('/online', (req, res) => {
     res.sendFile(path.join(__dirname + '/public/Pages/online.html'))
 })
 
+app.get('/teams', (req, res) => {
+    res.sendFile(path.join(__dirname + '/public/Pages/teams.html'))
+})
+
 app.get('/offline', (req, res) => {
     res.sendFile(path.join(__dirname + '/public/Pages/offline.html'))
 })

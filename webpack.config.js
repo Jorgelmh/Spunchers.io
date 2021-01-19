@@ -6,16 +6,20 @@ const path = require('path');
  ===========================
 
  Note: Important to use npm packages of the server
- the compiled code will be in dist/main.js
+ the compiled code will be at dist/main.js
 
  Note2: Babel to write ES 6, as most of my classes are written in new JS
 
 */
 module.exports = {
-    entry: './server/client/js/online.js',
+    entry: {
+        online: './server/client/js/online.js',
+        teams: './server/client/js/teams.js',
+        loadcharacters: './server/client/js/loadcharacters.js'
+    },
     mode: 'development',
     output: {
-        filename: 'main.js',
+        filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'server/public/dist'),
     },
     module:{

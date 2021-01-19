@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
-    <link href="../assets/styles/styles.css" rel="stylesheet"/>
-    <link rel="manifest" href="/manifest.json" >
     <script>
         /** 
          *    ===========================
@@ -19,6 +16,9 @@
         let glide
 
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+    <link href="../assets/styles/styles.css" rel="stylesheet"/>
+    <link rel="manifest" href="/manifest.json" >
     <title>Document</title>
 </head>
 <body style="margin: 0; overflow:hidden;" class="background-connect-frame">
@@ -49,6 +49,15 @@
         </div>
     </div>
 
+    <div id="select-teams">
+        <div id="site-blue-team">
+            
+        </div>
+        <div id="site-red-team">
+
+        </div>
+    </div>
+
     <div id="site-game">
         <canvas id="game"></canvas>
         <div id="site-hud">
@@ -71,7 +80,7 @@
         </div>
     </div>
     
-    <script src="../dist/loadcharacters.bundle.js"></script>
-    <script src="../dist/online.bundle.js"></script>
+    <script src="../dist/loadcharacters.bundle.js" type="module"></script>
+    <script src="../dist/teams.bundle.js" type="module"></script>
 </body>
 </html>

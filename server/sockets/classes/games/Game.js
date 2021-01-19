@@ -1,13 +1,5 @@
 /* Import Chat Class */
-const OnlineChatServer = require('./OnlineChatServer')
-
-/* Import character classes */
-const Mikaela = require('./characters/Mikaela.js')
-const Blade = require('./characters/Blade.js')
-const Rider = require('./characters/Rider.js')
-const Lisa = require('./characters/Lisa.js')
-const Ezrael = require('./characters/Ezrael')
-const Sydnie = require('./characters/Sydnie')
+const OnlineChatServer = require('../OnlineChatServer')
 
 class Game {
     constructor(map, io){
@@ -15,9 +7,6 @@ class Game {
         /* Socket to use in case of specific state events */
         this.socketIO = io
         
-        /* Arrays for players and active bullets */
-        this.players = {}
-        this.bullets = []
         this.bulletSpeed = 200
 
         this.characterSpeed = 1.5
@@ -70,56 +59,31 @@ class Game {
         /* Manage updates */
         this.updateInterval = null
         this.sendState = false
-    }
-    /* Add Players */
 
-    addPlayers(data, socketID){
-
-        switch (data.skin) {
-            case 'blade':
-                this.players[socketID] = new Blade(600, 200, data.character, data.name)
-                break
-            case 'mikaela':
-                this.players[socketID] = new Mikaela(600, 200, data.character, data.name)
-                break
-            case 'rider':
-                this.players[socketID] = new Rider(600, 200, data.character, data.name)
-                break
-            case 'lisa':
-                this.players[socketID] = new Lisa(600, 200, data.character, data.name)
-                break
-            case 'ezrael':
-                this.players[socketID] = new Ezrael(600, 200, data.character, data.name)
-                break
-            case 'sydnie':
-                this.players[socketID] = new Sydnie(600, 200, data.character, data.name)
-                break
-        }
+        this.setUpdate()
     }
 
-    /* Remove Player ->  recieves the socket id as the parameter */
-
-    removePlayer = (id) => {
-        delete this.players[id]  
-    }
 
     /* change position of players when the movement events on the client are triggered */
-    onMovement = (socketID, data) => {
+    onMovement = (player, data, socketID) => {
+
+        if(!player)
+            this.socketIO.to(socketID).emit('banned')
 
         /* Only store user's state when they are alive */
-        if(this.players[socketID].life > 0){
-            if(this.players[socketID].lastUpdate === 0)
-                this.calculateMovement(socketID, data)
+        if(player.life > 0){
+            if(player.lastUpdate === 0)
+                this.calculateMovement(player, data)
             
-            this.players[socketID].buffer.push(data)
+            player.buffer.push(data)
         }
         
     }
 
     /* Trigger movement of players */
-    calculateMovement(socketID, data){
+    calculateMovement(player, data){
 
-        let currentPlayer = this.players[socketID]
+        let currentPlayer = player
 
         if(currentPlayer){
 
@@ -150,7 +114,6 @@ class Game {
     }
 
     /* Detect colission between players and objects on the server */
-
     detectCollisions(player){
 
         for(let i = 0; i < this.collisionMatrix.length; i++){
@@ -174,65 +137,34 @@ class Game {
      * ========================
      */
 
-    addBullet = (playerID, bullet, shootTime) => {
+    addBullet = (player, bullet, shootTime, playerID, bulletsArray = this.bullets) => {
 
-        if(shootTime > this.players[playerID].lastDeath && this.players[playerID].life > 0 
-            && this.players[playerID].ableToShoot && this.players[playerID].bulletsCharger > 0){
+        if(shootTime > player.lastDeath && player.life > 0 
+            && player.ableToShoot && player.bulletsCharger > 0){
 
-                let currentPlayer = this.players[playerID]
-                let bulletPosition = this.emitBullet(playerID)
+                let bulletPosition = this.emitBullet(player)
 
-            if(Date.now() - currentPlayer.lastShot > currentPlayer.shootingDelay){
+            if(Date.now() - player.lastShot > player.shootingDelay){
 
                 /* Set shooting state which is translated to a shooting animation on the client */
-                currentPlayer.shooting = true
-                currentPlayer.reduceAmmunition(this.emitReload, playerID)
+                player.shooting = true
+                player.reduceAmmunition(this.emitReload, playerID)
 
-                currentPlayer.lastShot = Date.now()
+                player.lastShot = Date.now()
 
                 setTimeout(() => {
-                    currentPlayer.shooting = false
+                    player.shooting = false
                 }, 90)
 
                 /* Create bullet based on the character -> Different characters different kind of bullets */
-                let characterBullet = currentPlayer.createBullet(playerID, bulletPosition, bullet)
+                let characterBullet = player.createBullet(playerID, bulletPosition, bullet)
 
                 /* Push bullet/s onto the array of bullets */
-                this.bullets.push(...characterBullet) 
+                bulletsArray.push(...characterBullet) 
             }
         }
     }
 
-    update(date){
-
-        let now = new Date()
-        this.lastRefresh = date || this.lastRefresh
-        let dt = (now - this.lastRefresh)/1000
-        this.lastRefresh = now
-
-        if(this.bullets.length > 0)
-            this.updateBulletsPosition(dt)        
-
-        /* return only the info the user needs to know about the players */
-        let clientPlayers = Object.fromEntries(Object.entries(this.players).map(([id, player]) => {
-
-            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
-                this.calculateMovement(id, player.dequeueState())
-
-            /* Death animation */
-            if(this.players[id].life === 0 && Date.now() - this.players[id].lastDeath >= 300 && this.players[id].character.currentSprite.x === 0)
-                this.players[id].character.currentSprite.x ++
-
-            return [id, player.playerState()]
-        }))
-
-        return {
-            players: clientPlayers,
-            bullets: this.bullets,
-            serverTime: Date.now()
-        }
-
-    }
 
     /** 
      * =================================
@@ -247,7 +179,7 @@ class Game {
             let state = this.update()
             
             if(this.sendState){
-                this.socketIO.sockets.emit('state', state)
+                this.socketIO.to(this.roomname).emit('state', state)
                 this.sendState = false
             }
             else
@@ -256,12 +188,13 @@ class Game {
         }, 1000 / 60)
     }
 
-    updateBulletsPosition(dt){
+    /* calculate collisions against a given hash table of players and bullets */
+    updateBulletsPosition(dt, players = this.players, bullets = this.bullets){
 
         /* Loop each bullet to see if they've hit any target while this update */
-        for(let i = 0; i < this.bullets.length; i++){
+        for(let i = 0; i < bullets.length; i++){
 
-            let bullet = this.bullets[i]
+            let bullet = bullets[i]
             let removeBullet = false
 
             /* Update current position of each bullet */
@@ -293,15 +226,15 @@ class Game {
                 && (!Array.isArray(this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix]) && this.collisionMatrix[bulletPosYMatrix][bulletPosXMatrix] !== 0))){
 
                     /* Check collisions with players */
-                    for(let playerID in this.players){
+                    for(let playerID in players){
 
-                        if(playerID != bullet.ownerID && this.players[playerID].life > 0 && (this.players[playerID].posX + (this.tile.width/2) < bullet.posX + this.bulletWidth && this.players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
-                            && (this.players[playerID].posY + (this.tile.width/2) < bullet.posY + this.bulletWidth && this.players[playerID].posY + this.tile.height > bullet.posY)){
+                        if(playerID != bullet.ownerID && players[playerID].life > 0 && (players[playerID].posX + (this.tile.width/2) < bullet.posX + this.bulletWidth && players[playerID].posX + (this.tile.width/4) + (this.tile.width/2) > bullet.posX) 
+                            && (players[playerID].posY + (this.tile.width/2) < bullet.posY + this.bulletWidth && players[playerID].posY + this.tile.height > bullet.posY)){
         
-                                this.players[playerID].life = (this.players[playerID].life - this.players[bullet.ownerID].impactDamage < 0) ? 0 : this.players[playerID].life - this.players[bullet.ownerID].impactDamage
+                                players[playerID].life = this.reduceLife(playerID, bullet.ownerID)
         
-                                if(this.players[playerID].life <= 0){
-                                    this.players[bullet.ownerID].score ++
+                                if(players[playerID].life <= 0){
+                                    this.setScore(bullet.ownerID)
                                     this.playerHasDied(playerID)
                                 }
                                 removeBullet = true
@@ -314,7 +247,7 @@ class Game {
             
 
             if(removeBullet){
-                this.bullets.splice(i, 1)
+                bullets.splice(i, 1)
                 i--
             }
             
@@ -333,57 +266,6 @@ class Game {
 
     emitReload = (playerID) => {
         this.socketIO.to(playerID).emit('Reload Weapon')
-    }
-
-
-    /** 
-     *  ==================================================
-     *      Functions to be called when a Player dies
-     *  ==================================================
-    */
-
-    playerHasDied(playerID){
-
-        /* Sync check time */
-        this.players[playerID].lastDeath = Date.now()
-
-        /* Reload user's weapon when died */
-        this.players[playerID].bulletsCharger = this.players[playerID].ammunition
-        this.emitReload(playerID)
-        
-        let currentPlayer = this.players[playerID]
-        let newPosition = this.respawnPlayerPosition()
-
-        this.bullets = this.bullets.filter((elem) => elem.ownerID !== playerID)
-
-        let tempFlip = currentPlayer.character.currentSprite.flip
-
-        /* Set death animations */
-        currentPlayer.character.currentSprite = {
-            x: 0,
-            y: 12,
-            flip: tempFlip
-        }
-
-        if(currentPlayer){
-
-            setTimeout(() => {
-                currentPlayer.life = 100
-                currentPlayer.posX = newPosition.x
-                currentPlayer.posY = newPosition.y
-
-                currentPlayer.character.currentSprite = {
-                    x: 0,
-                    y: 5,
-                    flip: tempFlip
-                }
-
-            }, 1000) 
-        }
-
-        /* Emit new leaderboard */
-        this.socketIO.sockets.emit('New leaderboard', this.sortScores(this.players))
-                
     }
 
     respawnPlayerPosition(){
@@ -407,6 +289,7 @@ class Game {
         let newArr = []
 
         let length = (arr.length < 3) ? arr.length : 3
+
         for(let i = 0; i < length ; i++){
             let greaterScore = i
 
@@ -457,8 +340,6 @@ class Game {
                 if(playerID){
                     delete this.players[playerID]
                     this.socketIO.to(playerID).emit('banned')
-                    if(this.bullets.length === 0)
-                        this.socketIO.sockets.emit('state', this.update())
                 }
             }
         }
@@ -472,26 +353,10 @@ class Game {
      *  ==================
      */
 
-    /* Return non-repeated values of skins */
-    getSkins(playerID){
-        let srcArray = []
-
-        for(let playerID in this.players){
-            if(srcArray.indexOf(this.players[playerID].skin))
-                srcArray.push(this.players[playerID].skin)
-        }   
-
-        return {
-            srcArray,
-            characterInfo: {
-                bullets: this.players[playerID].ammunition,
-                shootingDelay: this.players[playerID].shootingDelay
-            }
-        }
-    }
 
     /* Data that is needed to be loaded before the game can run */
     onLoadMap(id){
+
         return {
             lobby: {
                 map: this.map,
@@ -508,36 +373,36 @@ class Game {
     }
 
     /* Emit Bullet */
-    emitBullet(playerID){
+    emitBullet(player){
 
         /* Reference width to calculate offset*/
         let halfServerTileWidth = this.tile.width/2
         let halfServerTileHeight = this.tile.height/2
 
         let pos = {
-            x: this.players[playerID].posX + halfServerTileWidth,
-            y: this.players[playerID].posY
+            x: player.posX + halfServerTileWidth,
+            y: player.posY
         }
 
         /* Adding extra offset to bullets position*/
 
-        if(this.players[playerID].character.currentSprite.y === 0)
+        if(player.character.currentSprite.y === 0)
             pos.y += halfServerTileWidth*2
 
-        if(this.players[playerID].character.currentSprite.y === 2)
+        if(player.character.currentSprite.y === 2)
             pos.x += this.tile.width/6
 
-        if(this.players[playerID].character.currentSprite.y === 1 || this.players[playerID].character.currentSprite.y === 5)
-            pos.y += this.players[playerID].offsetYHorizontal(halfServerTileWidth) 
+        if(player.character.currentSprite.y === 1 || player.character.currentSprite.y === 5)
+            pos.y += player.offsetYHorizontal(halfServerTileWidth) 
 
-        if(this.players[playerID].character.currentSprite.y === 3){
-            pos.x += this.players[playerID].diagonalUpOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
-            pos.y += this.players[playerID].diagonalUpOffsetY(halfServerTileHeight)
+        if(player.character.currentSprite.y === 3){
+            pos.x += player.diagonalUpOffsetX(halfServerTileWidth, player.character.currentSprite.flip) 
+            pos.y += player.diagonalUpOffsetY(halfServerTileHeight)
         }
 
-        if(this.players[playerID].character.currentSprite.y === 4){
-            pos.x += this.players[playerID].diagonalDownOffsetX(halfServerTileWidth, this.players[playerID].character.currentSprite.flip) 
-            pos.y += this.players[playerID].diagonalDownOffsetY(halfServerTileHeight)
+        if(player.character.currentSprite.y === 4){
+            pos.x += player.diagonalDownOffsetX(halfServerTileWidth, player.character.currentSprite.flip) 
+            pos.y += player.diagonalDownOffsetY(halfServerTileHeight)
         }
 
         return pos
