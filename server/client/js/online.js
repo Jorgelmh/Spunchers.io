@@ -29,16 +29,5 @@ socket.on('loadMap', (data) => {
     game = data
 })
 
-/**
- *  ==============================
- *     Register Service Worker
- *  ==============================
- */
-
-if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./ServiceWorker.js').
-        then(() => console.log('Service Worker successfully registered'))
-}
-
 
  

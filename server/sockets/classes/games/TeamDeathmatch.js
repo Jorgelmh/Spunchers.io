@@ -1,14 +1,6 @@
 /* Import supper class for game modes -> abstract logic */
 const Game = require('./Game')
 
-/* Import character classes */
-const Mikaela = require('../characters/Mikaela.js')
-const Blade = require('../characters/Blade.js')
-const Rider = require('../characters/Rider.js')
-const Lisa = require('../characters/Lisa.js')
-const Ezrael = require('../characters/Ezrael')
-const Sydnie = require('../characters/Sydnie')
-
 /**
  *  =============================
  *          TEAM DEATHMATCH
@@ -51,69 +43,12 @@ class TeamDeathmatch extends Game{
             this.updateBulletsPosition(dt, this.team1, this.bulletsTeam2)
 
         /* return only the info the user needs to know about the players */
-        let clientPlayers = [this.getPlayers(this.team1), this.getPlayers(this.team2)]
+        let clientPlayers = [this.serializePlayers(this.team1), this.serializePlayers(this.team2)]
 
         return {
             players: clientPlayers,
             bullets: [...this.bulletsTeam1, ...this.bulletsTeam2],
             serverTime: Date.now()
-        }
-    }
-
-    getPlayers(players){
-        return Object.fromEntries(Object.entries(players).map(([id, player]) => {
-
-            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
-                this.calculateMovement(player, player.dequeueState())
-
-            /* Death animation */
-            if(players[id].life === 0 && Date.now() - players[id].lastDeath >= 300 && players[id].character.currentSprite.x === 0)
-                players[id].character.currentSprite.x ++
-
-            return [id, player.playerState()]
-        }))
-    }
-
-    /* Add players */
-    addPlayers(data, socketID, team){
-
-        switch (data.skin) {
-            case 'blade':
-                if(team)
-                    this.team1[socketID] = new Blade(600, 200, data.character, data.name)
-                else
-                    this.team2[socketID] = new Blade(600, 200, data.character, data.name)
-                break
-            case 'mikaela':
-                if(team)
-                    this.team1[socketID] = new Mikaela(600, 200, data.character, data.name)
-                else
-                    this.team2[socketID] = new Mikaela(600, 200, data.character, data.name)
-                break
-            case 'rider':
-                if(team)
-                    this.team1[socketID] = new Rider(600, 200, data.character, data.name)
-                else
-                    this.team2[socketID] = new Rider(600, 200, data.character, data.name)
-                break
-            case 'lisa':
-                if(team)
-                    this.team1[socketID] = new Lisa(600, 200, data.character, data.name)
-                else
-                    this.team2[socketID] = new Lisa(600, 200, data.character, data.name)
-                break
-            case 'ezrael':
-                if(team)
-                    this.team1[socketID] = new Ezrael(600, 200, data.character, data.name)
-                else
-                    this.team2[socketID] = new Ezrael(600, 200, data.character, data.name)
-                break
-            case 'sydnie':
-                if(team)
-                    this.team1[socketID] = new Sydnie(600, 200, data.character, data.name)
-                else
-                    this.team2[socketID] = new Sydnie(600, 200, data.character, data.name)
-                break
         }
     }
 
@@ -229,6 +164,24 @@ class TeamDeathmatch extends Game{
                 bullets: player.ammunition,
                 shootingDelay: player.shootingDelay
             }
+        }
+    }
+
+    /* return players for the pre-lobby screen */
+    getPlayers(){
+        return {
+            blues: Object.values(this.team1).map(player => {
+                return {
+                    name: player.playerName,
+                    skin: player.skin
+                }
+            }),
+            reds: Object.values(this.team2).map(player => {
+                return {
+                    name: player.playerName,
+                    skin: player.skin
+                }
+            })
         }
     }
 }

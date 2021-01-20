@@ -47,6 +47,7 @@ const socketListen = (app) => {
         else if(gamemode === 'teams'){
             socket.emit('loadMap', teamDeathmatch.onLoadMap(socket.id))
             socket.join(teamDeathmatch.roomname)
+            socket.emit('load team members', teamDeathmatch.getPlayers())
         }
 
         /* When a new player enters the lobby => Note: Validations on repetitions are in the client version of the game*/
@@ -72,16 +73,19 @@ const socketListen = (app) => {
 
             /* 1 -> Team deathmatch */
             else if(data.game.mode === 1){
-                teamDeathmatch.addPlayers(data, socket.id, data.game.team)
-                skins = teamDeathmatch.getSkins(socket.id)
 
+                if(data.game.team)
+                    teamDeathmatch.addPlayers(data, socket.id, teamDeathmatch.team2)
+                else
+                    teamDeathmatch.addPlayers(data, socket.id, teamDeathmatch.team1)
+        
+                skins = teamDeathmatch.getSkins(socket.id)
                 /* set roomname */
                 roomname = teamDeathmatch.roomname
-
                
             }
 
-            /* Other players load tnew player's skin */
+            /* Other players load new player's skin */
             socket.to(roomname).emit('Load New Skin', {src: data.skin})
 
             /* Send the score */
@@ -120,7 +124,10 @@ const socketListen = (app) => {
         })
 
         socket.on('reload weapon', (data) => {
-            freeforall.reloadPlayerWeapon(socket.id)
+            if(gamemode === 'online')
+                freeforall.reloadPlayerWeapon(freeforall.players[socket.id])
+            else if(gamemode === 'teams')
+                teamDeathmatch.reloadPlayerWeapon(teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id])
         })
 
         /* Listener of players shooting */

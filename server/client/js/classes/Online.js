@@ -102,10 +102,6 @@ export default class Online extends Engine{
             
         })
 
-        this.socketIO.on('Reload Weapon', (data) => {
-            this.reloading = false
-        })
-
         /* When the score changes */
 
         this.socketIO.on('New leaderboard', (data) => {
@@ -402,8 +398,9 @@ export default class Online extends Engine{
                 this.currentAmmo = this.playerStats.currentAmmo
                 this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
             }
+            /* Check if the player is reloading */
+            this.reloading = this.playerStats.reloading
         }
-
     }
 
     /* Emit bullet to server */

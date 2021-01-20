@@ -1,14 +1,6 @@
 /* Import supper class for game modes -> abstract logic */
 const Game = require('./Game')
 
-/* Import character classes */
-const Mikaela = require('../characters/Mikaela.js')
-const Blade = require('../characters/Blade.js')
-const Rider = require('../characters/Rider.js')
-const Lisa = require('../characters/Lisa.js')
-const Ezrael = require('../characters/Ezrael')
-const Sydnie = require('../characters/Sydnie')
-
 /**
  *  =============================
  *          FREE FOR ALL
@@ -44,17 +36,7 @@ class FreeforAll extends Game{
             this.updateBulletsPosition(dt)        
 
         /* return only the info the user needs to know about the players */
-        let clientPlayers = Object.fromEntries(Object.entries(this.players).map(([id, player]) => {
-
-            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
-                this.calculateMovement(id, player.dequeueState())
-
-            /* Death animation */
-            if(this.players[id].life === 0 && Date.now() - this.players[id].lastDeath >= 300 && this.players[id].character.currentSprite.x === 0)
-                this.players[id].character.currentSprite.x ++
-
-            return [id, player.playerState()]
-        }))
+        let clientPlayers = this.serializePlayers(this.players)
 
         return {
             players: clientPlayers,
@@ -62,32 +44,6 @@ class FreeforAll extends Game{
             serverTime: Date.now()
         }
 
-    }
-
-    /* Add Players */
-
-    addPlayers(data, socketID){
-
-        switch (data.skin) {
-            case 'blade':
-                this.players[socketID] = new Blade(600, 200, data.character, data.name)
-                break
-            case 'mikaela':
-                this.players[socketID] = new Mikaela(600, 200, data.character, data.name)
-                break
-            case 'rider':
-                this.players[socketID] = new Rider(600, 200, data.character, data.name)
-                break
-            case 'lisa':
-                this.players[socketID] = new Lisa(600, 200, data.character, data.name)
-                break
-            case 'ezrael':
-                this.players[socketID] = new Ezrael(600, 200, data.character, data.name)
-                break
-            case 'sydnie':
-                this.players[socketID] = new Sydnie(600, 200, data.character, data.name)
-                break
-        }
     }
 
     /* Remove Player ->  recieves the socket id as the parameter */
@@ -154,6 +110,43 @@ class FreeforAll extends Game{
     /* Reduce life of a hit player */
     reduceLife(hitID, shooterID){
         return (this.players[hitID].life - this.players[shooterID].impactDamage < 0) ? 0 : this.players[hitID].life - this.players[shooterID].impactDamage
+    }
+
+    /**
+     * =========================
+     *  Sending Updated Scores
+     * =========================
+     *
+    */
+
+    /* Insertion sort application to find the 3 highest scores -> returns 3 names and scores */
+    sortScores(hashMap){
+
+        let arr = Object.keys(hashMap)
+        let newArr = []
+
+        let length = (arr.length < 3) ? arr.length : 3
+
+        for(let i = 0; i < length ; i++){
+            let greaterScore = i
+
+            for(let j = i+1; j < arr.length; j++){
+                if(hashMap[arr[j]].score > hashMap[arr[greaterScore]].score)
+                    greaterScore = j
+                
+            }
+            let temp = arr[i]
+            arr[i] = arr[greaterScore]
+            arr[greaterScore] = temp
+
+            newArr.push({
+                id: arr[i],
+                name: hashMap[arr[i]].playerName,
+                score: hashMap[arr[i]].score
+            })
+        }
+
+        return newArr
     }
 
     /**

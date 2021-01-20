@@ -238,22 +238,46 @@ body{
     cursor: pointer;
 }
 
-#site-blue-team{
+.team{
+    display: flex;
+    justify-content: space-around;
     position: absolute;
     top: 0;
-    background-color: rgba(26, 101, 241, 0.75);
     z-index: 1;
     width: 100%;
     min-height: 50%;
+    transition: all .5s ease-in-out;
+
+}
+
+#site-blue-team{
+    background-color: rgba(26, 101, 241, 0.75);
+}
+
+#site-blue-team:hover{
+    background-color: rgba(26, 101, 241, 0.4);
 }
 
 #site-red-team{
-    position: absolute;
     top: 50%;
-    background-position: cover;
     background-color: rgba(245, 51, 51, 0.75);
-    z-index: 1;
-    width: 100%;
-    min-height: 50%;
 }
 
+#site-red-team:hover{
+    background-color: rgba(245, 51, 51, 0.4);
+}
+
+.lobby-player{
+    display: flex;
+    align-items: center;
+}
+
+.lobby-player img{
+    width: 90px;
+    height: 90px;
+}
+.lobby-player p{
+    font-weight: bold;
+    text-transform: capitalize;
+    font-size: 1.3rem;
+}

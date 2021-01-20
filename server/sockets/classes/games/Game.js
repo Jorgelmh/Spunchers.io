@@ -1,6 +1,14 @@
 /* Import Chat Class */
 const OnlineChatServer = require('../OnlineChatServer')
 
+/* Import character classes */
+const Mikaela = require('../characters/Mikaela.js')
+const Blade = require('../characters/Blade.js')
+const Rider = require('../characters/Rider.js')
+const Lisa = require('../characters/Lisa.js')
+const Ezrael = require('../characters/Ezrael')
+const Sydnie = require('../characters/Sydnie')
+
 class Game {
     constructor(map, io){
 
@@ -71,13 +79,39 @@ class Game {
             this.socketIO.to(socketID).emit('banned')
 
         /* Only store user's state when they are alive */
-        if(player.life > 0){
+        else if(player.life > 0){
             if(player.lastUpdate === 0)
                 this.calculateMovement(player, data)
             
             player.buffer.push(data)
         }
         
+    }
+
+    /* Add Players */
+
+    addPlayers(data, socketID, team = this.players){
+
+        switch (data.skin) {
+            case 'blade':
+                team[socketID] = new Blade(600, 200, data.character, data.name)
+                break
+            case 'mikaela':
+                team[socketID] = new Mikaela(600, 200, data.character, data.name)
+                break
+            case 'rider':
+                team[socketID] = new Rider(600, 200, data.character, data.name)
+                break
+            case 'lisa':
+                team[socketID] = new Lisa(600, 200, data.character, data.name)
+                break
+            case 'ezrael':
+                team[socketID] = new Ezrael(600, 200, data.character, data.name)
+                break
+            case 'sydnie':
+                team[socketID] = new Sydnie(600, 200, data.character, data.name)
+                break
+        }
     }
 
     /* Trigger movement of players */
@@ -260,8 +294,9 @@ class Game {
      * ========================
      */
 
-    reloadPlayerWeapon(playerID){
-        this.players[playerID].reloadWeapon(this.emitReload, playerID)
+    reloadPlayerWeapon(player){
+        player.reloading = true
+        player.lastReload = Date.now()
     }
 
     emitReload = (playerID) => {
@@ -276,40 +311,29 @@ class Game {
     }
 
     /**
-     * =========================
-     *  Sending Updated Scores
-     * =========================
-     *
-    */
+     *  ========================
+     *      Serialize Players
+     *  ========================
+     */
 
-    /* Insertion sort application to find the 3 highest scores -> returns 3 names and scores */
-    sortScores(hashMap){
+    serializePlayers(players){
+        return Object.fromEntries(Object.entries(players).map(([id, player]) => {
 
-        let arr = Object.keys(hashMap)
-        let newArr = []
+            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
+                this.calculateMovement(player, player.dequeueState())
 
-        let length = (arr.length < 3) ? arr.length : 3
+            /* Death animation */
+            if(players[id].life === 0 && Date.now() - players[id].lastDeath >= 300 && players[id].character.currentSprite.x === 0)
+                players[id].character.currentSprite.x ++
 
-        for(let i = 0; i < length ; i++){
-            let greaterScore = i
-
-            for(let j = i+1; j < arr.length; j++){
-                if(hashMap[arr[j]].score > hashMap[arr[greaterScore]].score)
-                    greaterScore = j
-                
+            /* Check if the player already finished reloading */
+            if(players[id].reloading && Date.now() - players[id].lastReload >= players[id].reloadTime){
+                players[id].bulletsCharger = players[id].ammunition
+                players[id].reloading = false
             }
-            let temp = arr[i]
-            arr[i] = arr[greaterScore]
-            arr[greaterScore] = temp
 
-            newArr.push({
-                id: arr[i],
-                name: hashMap[arr[i]].playerName,
-                score: hashMap[arr[i]].score
-            })
-        }
-
-        return newArr
+            return [id, player.playerState()]
+        }))
     }
 
     /**

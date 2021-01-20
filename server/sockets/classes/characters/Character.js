@@ -37,6 +37,10 @@ class Character {
 
         /* Interpolation */
         this.buffer = []
+
+        /* reloading */
+        this.reloading = false
+        this.lastReload = 0
     }
     
     /* dequeue interpolated state */
@@ -62,19 +66,13 @@ class Character {
         }]
     }
 
-    reduceAmmunition(emitReload, playerID){
+    reduceAmmunition(){
         this.bulletsCharger --
 
-        if(this.bulletsCharger === 0)
-            this.reloadWeapon(emitReload, playerID)
-        
-    }
-
-    reloadWeapon(emitReload, playerID){
-        setTimeout(() => {
-            this.bulletsCharger = this.ammunition
-            emitReload(playerID)
-        }, this.reloadTime)
+        if(this.bulletsCharger === 0){
+            this.reloading = true
+            this.lastReload = Date.now()
+        }        
     }
 
     /* Return what the client needs in order to draw the player */
@@ -91,7 +89,8 @@ class Character {
             ableToShoot: this.ableToShoot,
             currentAmmo: this.bulletsCharger,
             cartesianValueOfMovement: this.cartesianValueOfMovement,
-            still:  this.still
+            still:  this.still,
+            reloading: this.reloading
         }
     }
 }
