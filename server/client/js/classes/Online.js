@@ -153,7 +153,6 @@ export default class Online extends Engine{
         if(this.playerStats)
             this.calculateLocalMap()
         
-        this.controls.animate()
 
         this.calculateOffset()
         this.drawMap()
@@ -162,9 +161,8 @@ export default class Online extends Engine{
         this.drawBullets()
         this.drawOtherPlayers()
 
-        if(window.mobileCheck())
-            this.controls.drawJoystick()
-
+        this.controls.animate()
+        
         this.context.font = '16px cursive'
         this.context.fillStyle = 'black'
 

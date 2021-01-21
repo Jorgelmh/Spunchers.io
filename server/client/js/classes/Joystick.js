@@ -35,6 +35,9 @@ export default class Joystick{
         /* Color and Design */
         this.internalFillColor = internalFillColor || "rgba(255,255,255,0.8)"
 
+        /* Color when pressed */
+        this.internalPressedColor = "rgba(255,255,255,0.4)"
+
         /* Character sprite */
         this.character = character
 
@@ -82,12 +85,19 @@ export default class Joystick{
 
         /* Draw inner circle */
         this.context.beginPath()
+        if(this.dragging)
+            this.context.fillStyle = this.internalPressedColor
         this.context.arc(this.innerCircle.x, this.innerCircle.y, this.innerCircle.radius, 0, Math.PI * 2)
         this.context.fill()
         this.context.stroke()
 
+        /* Reset Filling style */
+        this.context.fillStyle = this.internalFillColor
+
         /* Draw shooting circle */
         this.context.beginPath()
+        if(this.shoot)
+            this.context.fillStyle = this.internalPressedColor
         this.context.arc(this.shootButton.x, this.shootButton.y, this.shootButton.radius, 0, Math.PI * 2)
         this.context.fill()
         this.context.stroke()
@@ -288,6 +298,8 @@ export default class Joystick{
 
             this.emitPosition(this.movement)
         }
+
+        this.drawJoystick()
 
         if(this.shoot)
             this.createBullet()
