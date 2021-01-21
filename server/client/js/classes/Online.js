@@ -127,8 +127,8 @@ export default class Online extends Engine{
 
         /* Scores from a team based lobby */
         this.socketIO.on('New teams leaderboard', (data)=>{
-            document.getElementById('usa-score').innerHTML = data.team1
-            document.getElementById('urss-score').innerHTML = data.team2
+            document.getElementById('fbi-score').innerHTML = data.team1
+            document.getElementById('gambinos-score').innerHTML = data.team2
         })
 
         this.socketIO.on('pong', (ms) => {
@@ -162,7 +162,7 @@ export default class Online extends Engine{
         this.drawOtherPlayers()
 
         this.controls.animate()
-        
+
         this.context.font = '16px cursive'
         this.context.fillStyle = 'black'
 

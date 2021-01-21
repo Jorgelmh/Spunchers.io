@@ -96,6 +96,7 @@ export default class Joystick{
 
         /* Draw shooting circle */
         this.context.beginPath()
+        
         if(this.shoot)
             this.context.fillStyle = this.internalPressedColor
         this.context.arc(this.shootButton.x, this.shootButton.y, this.shootButton.radius, 0, Math.PI * 2)
