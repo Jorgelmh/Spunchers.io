@@ -125,9 +125,18 @@ export default class Online extends Engine{
 
         })
 
+        /* Scores from a team based lobby */
+        this.socketIO.on('New teams leaderboard', (data)=>{
+            document.getElementById('usa-score').innerHTML = data.team1
+            document.getElementById('urss-score').innerHTML = data.team2
+        })
+
         this.socketIO.on('pong', (ms) => {
             this.latency= ms
         })
+
+        /* Still players animation */
+        this.lastStillUpdate = Date.now()
 
     }
 
@@ -158,6 +167,16 @@ export default class Online extends Engine{
 
         this.context.font = '16px cursive'
         this.context.fillStyle = 'black'
+
+        if(Date.now() - this.lastStillUpdate >= this.character.animationSpeed){
+
+            this.staticAnimation.x ++
+
+            if(this.staticAnimation.x === 3) 
+                this.staticAnimation.x = 0
+
+            this.lastStillUpdate = Date.now()
+        }
 
         //this.drawCharacter()
 
@@ -243,19 +262,13 @@ export default class Online extends Engine{
         if(Array.isArray(this.state.players)){
             let colors = (this.state.players[0][this.playerID]) ? [this.colors.ally, this.colors.enemy] : [this.colors.enemy, this.colors.ally]
 
-            let quitePlayers = false
-            
-            quitePlayers = this.drawPlayers(this.state.players[0], colors[0])
-            quitePlayers = this.drawPlayers(this.state.players[1], colors[1])
-
-            if(quitePlayers && !this.staticAnimation.interval)
-                this.setAnimationWhenStatic()
-            else if (!quitePlayers)
-                this.endAnimationWhenStatic()
+            this.drawPlayers(this.state.players[0], colors[0])
+            this.drawPlayers(this.state.players[1], colors[1])
 
         }else{
             this.drawPlayers(this.state.players)
         }
+
     }
 
     drawPlayers(players, lifeColor = this.colors.enemy){
@@ -276,7 +289,7 @@ export default class Online extends Engine{
                 if(players[playerID].still && players[playerID].life > 0)
                     quitePlayers = true
 
-
+            
                 if(skin){
                     let color = (playerID === this.playerID) ? this.colors.self : lifeColor
                     this.drawLife(characterX, characterY -6, players[playerID].life, color)

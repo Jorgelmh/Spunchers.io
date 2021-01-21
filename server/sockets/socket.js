@@ -56,7 +56,6 @@ const socketListen = (app) => {
             /* Skins needed to be loaded on the engine */
             let skins
             let roomname
-            let scores
 
             /* 0 -> Free for all */
             if(data.game.mode === 0){
@@ -66,8 +65,6 @@ const socketListen = (app) => {
                 /* set roomname */
                 roomname = freeforall.roomname
 
-                /* Return new scores */
-                scores = freeforall.sortScores(freeforall.players)
 
             }
 
@@ -90,7 +87,9 @@ const socketListen = (app) => {
 
             /* Send the score */
             if(gamemode === 'online')
-                io.to(roomname).emit('New leaderboard', scores)
+                io.to(roomname).emit('New leaderboard', freeforall.sortScores(freeforall.players))
+            else if(gamemode === 'teams')
+                io.to(roomname).emit('New teams leaderboard', teamDeathmatch.scores)
 
             /* load previous players' skins and send ammunition for the character selected */
             socket.emit('Load Skins and ammunition', skins)
@@ -113,14 +112,11 @@ const socketListen = (app) => {
             if(gamemode === 'online'){
                 freeforall.removePlayer(socket.id) 
                 if(Object.keys(freeforall.players).length === 0) freeforall.onlineChat.messages = []
-                io.sockets.emit('New leaderboard', freeforall.sortScores(freeforall.players))
+                io.to(freeforall.roomname).emit('New leaderboard', freeforall.sortScores(freeforall.players))
 
             }else if(gamemode === 'teams'){
                 teamDeathmatch.removePlayer(socket.id)
-            }
-            
- 
-              
+            } 
         })
 
         socket.on('reload weapon', (data) => {
@@ -149,10 +145,20 @@ const socketListen = (app) => {
         */
 
         socket.on('Chat Message', (data) => {
-            let name = freeforall.addChatMessage(data.text, socket, data.adminID)
 
-            if(name)
-                io.sockets.emit('new Chat Message', {name, text: data.text})
+            if(gamemode === 'online'){
+                let name = freeforall.addChatMessage(data.text, freeforall.players[socket.id], data.adminID)
+
+                if(name)
+                    io.to(freeforall.roomname).emit('new Chat Message', {name, text: data.text})
+            }else if(gamemode === 'teams'){
+                let name = teamDeathmatch.addChatMessage(data.text, teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id], data.adminID)
+
+                if(name)
+                    io.to(teamDeathmatch.roomname).emit('new Chat Message', {name, text: data.text})
+            }
+
+            
         })
 
     })

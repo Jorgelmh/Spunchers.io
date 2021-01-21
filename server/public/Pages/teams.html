@@ -54,10 +54,22 @@
 
     <div id="select-teams">
         <div class="team" id="site-blue-team">
-            
+            <div class="site-team-name">
+                <h1>USA special forces</h1>
+                <img src="../assets/resources/usa_flag.png">
+            </div>
+            <div id="blue-team-players">
+
+            </div>
         </div>
         <div class="team" id="site-red-team">
+            <div class="site-team-name">
+                <h1>USSR Spetnaz</h1>
+                <img src="../assets/resources//urss_flag.svg">
+            </div>
+            <div id="red-team-players">
 
+            </div>
         </div>
     </div>
 
@@ -66,15 +78,25 @@
         <div id="site-hud">
             <div class="site-chat">
                 <div class="chat-messages" id="chatMessages">
-                    <p>Chat with other players</p>
+                    <p>Chat to other players</p>
                 </div>
                 <div class="write-chat">
                     <input type="text" id="chat-message" placeholder="Leave a message">
                 </div>
             </div>
-            <div class="leaderboard">
-                <h1>leaderboard</h1>
-                <div class="scores" id="scores">
+            <div class="leaderboard" style="max-width: 250px;">
+                <div class="site-team-scores">
+                    <div class="team-score">
+                        <img class="score-flag" src="../assets/resources/usa_flag.png" style="max-height: 30px;">
+                        <h2 id="usa-score">0</h2>
+                    </div>
+                    <p style="color: white;
+                    font-size: 40px;
+                    margin: 0;">-</p>
+                    <div class="team-score">
+                        <img class="score-flag" src="../assets/resources//urss_flag.svg" style="max-height: 30px;">
+                        <h2 id="urss-score">0</h2>
+                    </div>
                 </div>
             </div>
             <div id="bullets">

@@ -72,8 +72,8 @@ play.onclick = () => {
     document.getElementById('background-frame').style.display = 'none'
 
     /* Show current players in lobby */
-    displayPlayers(players.blues, selectBlueTeam)
-    displayPlayers(players.reds, selectRedTeam)
+    displayPlayers(players.blues, document.getElementById('blue-team-players'))
+    displayPlayers(players.reds, document.getElementById('red-team-players'))
 }
 
 socket.on('loadMap', (data) => {
@@ -96,7 +96,7 @@ function displayPlayers(players, div){
         let playerName = document.createElement('p')
         playerName.innerHTML = player.name
 
-        divPlayer.append(images[characterSkins.indexOf(player.skin)].cloneNode())
+        divPlayer.append(images.find((image) => image.src.includes(player.skin)).cloneNode())
         divPlayer.append(playerName)
 
         div.append(divPlayer)

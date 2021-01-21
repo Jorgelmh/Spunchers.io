@@ -114,10 +114,16 @@ body{
 
 .chat-messages p{
     margin-bottom: 0;
+    color: white;
 }
 
 .chat-messages:first-child{
     margin-top: 0;
+}
+
+.single-comment span{
+    font-weight: bold;
+    color: #4042d4;
 }
 
 .site-chat{
@@ -239,8 +245,7 @@ body{
 }
 
 .team{
-    display: flex;
-    justify-content: space-around;
+
     position: absolute;
     top: 0;
     z-index: 1;
@@ -280,4 +285,46 @@ body{
     font-weight: bold;
     text-transform: capitalize;
     font-size: 1.3rem;
+}
+.site-team-name{
+    display: flex;
+    justify-content: center;
+    padding: 15px 0;
+}
+
+.site-team-name img, .score-flag{
+    height: 100%;
+    width: auto;
+    max-height: 70px;
+    box-shadow: 2px 4px 39px 3px rgba(0,0,0,0.75);
+    margin: 10px;
+}
+
+.team-score h2{
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+.site-team-name h1{
+    color: white;
+    text-shadow: 1px 1px 2px black;
+    border-bottom: 1px solid;
+}
+
+#blue-team-players, #red-team-players{
+    display: flex;
+    justify-content: space-around;
+}
+
+@media(min-width: 768px){
+    #blue-team-players, #red-team-players{
+        padding-top: 5%;
+    }
+}
+
+.site-team-scores{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }

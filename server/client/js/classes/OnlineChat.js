@@ -31,8 +31,8 @@ export default class OnlineChat{
         this.inputChat.onfocus = () => this.active = true
         this.inputChat.onblur =() => this.active = false
 
-        window.addEventListener('keydown', () => {
-            if(event.key.toLowerCase() == 'enter'){
+        window.addEventListener('keydown', (e) => {
+            if(e.key.toLowerCase() == 'enter'){
 
                 if(this.active){
                     this.inputChat.blur()
@@ -49,12 +49,9 @@ export default class OnlineChat{
 
             /* Create message HTML node */
             let message = document.createElement('p')
-            let name = document.createElement('span')
-            name.style.color = 'red'
+            message.className = 'single-comment'
 
-            console.log(data.text);
-
-            message.innerHTML = `<span style="color: red;"> ${data.name}</span>: ${data.text}`
+            message.innerHTML = `<span> ${data.name}</span>: ${data.text}`
             this.messages.append(message)
 
             /* Scroll to the new message */

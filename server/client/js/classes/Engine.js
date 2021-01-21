@@ -364,23 +364,6 @@ export default class Engine{
         return {posX, posY}
     }
 
-    /* Set animation when static */
-
-    setAnimationWhenStatic(){
-        this.staticAnimation.interval = setInterval(() =>{
-            this.staticAnimation.x ++
-
-            if(this.staticAnimation.x === 3) 
-                this.staticAnimation.x = 0
-
-        }, this.character.animationSpeed)
-    }
-
-    endAnimationWhenStatic(){
-        clearInterval(this.staticAnimation.interval)
-        this.staticAnimation.interval = null
-    }
-
     /* Draw life of an entity */
     drawLife(posX, posY, life, color){
 

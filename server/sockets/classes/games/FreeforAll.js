@@ -98,7 +98,7 @@ class FreeforAll extends Game{
         }
 
         /* Emit new leaderboard */
-        this.socketIO.sockets.emit('New leaderboard', this.sortScores(this.players))
+        this.socketIO.to(this.roomname).emit('New leaderboard', this.sortScores(this.players))
             
     }
 

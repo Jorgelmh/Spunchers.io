@@ -21,6 +21,12 @@ class TeamDeathmatch extends Game{
         /* Bullet arrays of every team */
         this.bulletsTeam1 = []
         this.bulletsTeam2 = []
+
+        /* Team scores */
+        this.scores = {
+            team1: 2,
+            team2: 0
+        }
     }
 
     /**
@@ -62,6 +68,9 @@ class TeamDeathmatch extends Game{
         else
             delete this.team2[playerID]
 
+        if(Object.keys(this.team1).length === 0 && Object.keys(this.team2).length === 0)
+            this.scores = {team1: 0, team2: 0}
+
     }
 
     /* Reduce life of a hit player */
@@ -77,6 +86,13 @@ class TeamDeathmatch extends Game{
     setScore(playerID){
         let player = this.team1[playerID] || this.team2[playerID]
         player.score ++
+
+        /* Increment team's score */
+        if(this.team1[playerID])
+            this.scores.team1 ++
+
+        else
+            this.scores.team2 ++
 
     }
 
@@ -131,7 +147,7 @@ class TeamDeathmatch extends Game{
         }
 
     /* Emit new leaderboard */
-    //this.socketIO.sockets.emit('New leaderboard', this.sortScores(this.players))
+    this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scores)
         
 }
 

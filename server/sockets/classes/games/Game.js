@@ -279,7 +279,6 @@ class Game {
             }else
                 removeBullet = true
             
-
             if(removeBullet){
                 bullets.splice(i, 1)
                 i--
@@ -342,19 +341,19 @@ class Game {
      * =======================
      */
 
-     addChatMessage(message, socket, adminID){
+     addChatMessage(message, player, adminID){
 
         /* Add the message if it's not a command and return true */
         let isAdmin = (adminID === process.env.AdminKey)
         let command = this.onlineChat.checkCommand(message, isAdmin)
 
         if(!command){
-            this.onlineChat.addMessage(this.players[socket.id].playerName, message)
+            this.onlineChat.addMessage(player.playerName, message)
 
             if(isAdmin)
-                return `${this.players[socket.id].playerName} [<i class="fas fa-user-check"></i>]`
+                return `${player.playerName} [<i class="fas fa-user-check"></i>]`
             else
-                return this.players[socket.id].playerName
+                return player.playerName
 
         }else{
 
