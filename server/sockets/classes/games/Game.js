@@ -24,7 +24,7 @@ class Game {
         this.shootingInterval = null
 
         /* Constant of interpolation */
-        this.interpolationDelay = (process.env.AdminKey == 200) ? 5 : 100
+        this.interpolationDelay = (process.env.AdminKey == 200) ? 5 : 50
 
         /* 
              ====================
