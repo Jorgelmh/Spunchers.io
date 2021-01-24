@@ -3,6 +3,8 @@ require('./config/config')
 
 const socket = require('./sockets/socket')
 const express = require('express')
+const hbs = require('hbs')
+
 const app = express()
 const path = require('path')
 const server = require('http').createServer(app);
@@ -12,24 +14,28 @@ socket.listen(server)
 
 /* Middlewares */
 app.use(express.static(__dirname+'/public'))
+hbs.registerPartials(__dirname + '/public/views/partials')
+
+app.set('view engine', 'hbs')
 
 app.set('port', process.env.PORT)
+app.set('views', __dirname + '/public/views')
 
-//Routes that will ne moved to a different folder soon
+//Routes of server-side application
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/Pages/index.html'))
+    res.sendFile(path.join(__dirname + '/public/views/index.html'))
 })
 
 app.get('/online', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/Pages/online.html'))
+    res.render('online')
 })
 
 app.get('/teams', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/Pages/teams.html'))
+    res.render('teams')
 })
 
 app.get('/offline', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/Pages/offline.html'))
+    res.sendFile(path.join(__dirname + 'public/views/offline.html'))
 })
 
 server.listen(process.env.PORT ,() => {
