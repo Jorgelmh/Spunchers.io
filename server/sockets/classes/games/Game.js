@@ -86,6 +86,9 @@ class Game {
             }
             player.lastPacket = Date.now()
             player.buffer.push(data)
+
+            if(player.buffer.length > 5)
+                player.buffer.splice(0,3)
         }
         
     }
