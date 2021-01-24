@@ -84,7 +84,7 @@ class Game {
                 this.calculateMovement(player, data)
                 player.lastUpdate = Date.now()
             }
-            console.log(Date.now() - player.lastPacket);
+            console.log(Date.now() - player.lastPacket)
             player.lastPacket = Date.now()
             player.buffer.push(data)
         }
@@ -324,7 +324,6 @@ class Game {
         return Object.fromEntries(Object.entries(players).map(([id, player]) => {
 
             if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0){
-                console.log(Date.now() - player.lastUpdate);
                 this.calculateMovement(player, player.dequeueState())
             }
             
