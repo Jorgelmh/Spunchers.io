@@ -48,33 +48,22 @@ export default class Online extends Engine{
             y: false
         }
 
-        /* INTERPOLATION */
+        /* Buffer for interpolated state */
         this.buffer = []
+        this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
         this.interpolationDelay = 20
-
+        
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
 
-            if(this.buffer.length == 0){
+            if(this.lastInterpolation === 0){
                 this.state = data
                 this.updateState()
             }
 
             this.buffer.push(data)
-
-            /* Add interpolation */
-            setTimeout(() => {
-
-                /* Dequeue from buffer */
-                this.state = this.buffer[0]
-                this.buffer.splice(0, 1)
-                
-                this.updateState()
-
-            }, this.interpolationDelay)
-            
 
             this.serverDelay = Date.now() - data.serverTime
         })
@@ -165,10 +154,11 @@ export default class Online extends Engine{
     render = (timeSinceLastFrame) => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
 
+        this.interpolate()
+
         if(this.playerStats)
             this.calculateLocalMap()
         
-
         this.calculateOffset()
         this.drawMap()
         this.drawShadows()
@@ -213,6 +203,28 @@ export default class Online extends Engine{
             this.lastFrameTime = now
             this.FPS = Math.floor(1/(timeSinceLastFrame/1000)) 
         })
+    }
+
+    /** 
+    *  ============================
+    *       INTERPOLATE STATE
+    *  ============================
+    */
+
+    interpolate(){
+        console.log(this.buffer.length);
+
+        if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
+            this.lastInterpolation = Date.now()
+            /* Dequeue from buffer */
+            this.state = this.buffer[0]
+            this.buffer.splice(0, 1)
+            
+            this.updateState()
+        }
+
+        if(this.buffer.length > 5)
+            this.buffer.splice(0, 3)
     }
 
     /* Send data back to the server */

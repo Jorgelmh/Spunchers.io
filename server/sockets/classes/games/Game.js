@@ -24,7 +24,7 @@ class Game {
         this.shootingInterval = null
 
         /* Constant of interpolation */
-        this.interpolationDelay = (process.env.AdminKey == 200) ? 15 : 10
+        this.interpolationDelay = 15
 
         /* 
              ====================
@@ -84,7 +84,6 @@ class Game {
                 this.calculateMovement(player, data)
                 player.lastUpdate = Date.now()
             }
-            console.log(Date.now() - player.lastPacket)
             player.lastPacket = Date.now()
             player.buffer.push(data)
         }
@@ -326,7 +325,6 @@ class Game {
             if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0){
                 this.calculateMovement(player, player.dequeueState())
             }
-            
             /* Death animation */
             if(players[id].life === 0 && Date.now() - players[id].lastDeath >= 300 && players[id].character.currentSprite.x === 0)
                 players[id].character.currentSprite.x ++
