@@ -153,6 +153,10 @@ export default class Engine{
         this.soundWaveRadius = 600
         
         window.addEventListener('resize', this.resizeCanvas)
+        
+        if(window.mobileCheck())
+            window.addEventListener('deviceorientatio', this.resizeCanvas)
+
         this.resizeCanvas()
         this.load()
     }

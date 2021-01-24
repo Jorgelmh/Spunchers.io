@@ -240,12 +240,12 @@ export default class Joystick{
             let angle = 22.5
 
             if((this.angleInDegrees <= angle || this.angleInDegrees > 337.5) && this.character.currentSprite.y != 1){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingRight()
             }
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 3){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingForwardRight()
             }
 
@@ -253,7 +253,7 @@ export default class Joystick{
             angle += 45
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 2){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingForward()
             }
 
@@ -261,7 +261,7 @@ export default class Joystick{
             angle += 45
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 3){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingForwardLeft()
             }
 
@@ -269,7 +269,7 @@ export default class Joystick{
             angle += 45
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 1){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingLeft()
             }
 
@@ -277,7 +277,7 @@ export default class Joystick{
             angle += 45
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 4){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingBackwardsLeft()
             }
 
@@ -285,7 +285,7 @@ export default class Joystick{
             angle += 45
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 0){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingBackwards()
             }
 
@@ -293,7 +293,7 @@ export default class Joystick{
             angle += 45
 
             if(this.angleInDegrees > angle && this.angleInDegrees <= angle + 45 && this.character.currentSprite.y != 4){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingBackwardsRight()
             }
 

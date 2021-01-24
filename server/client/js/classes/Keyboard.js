@@ -70,25 +70,25 @@ export default class Keyboard {
 
             switch (e.key.toLowerCase()){
                 case 'arrowup':
-                    this.character.onMovingStop()
+                    this.character.stopMoving()
                     this.controls.goUp = false
                     this.cartesianValueOfMovement.y = (this.controls.goDown) ? -1 : 0
                     break
 
                 case 'arrowdown':
-                    this.character.onMovingStop()
+                    this.character.stopMoving()
                     this.controls.goDown = false
                     this.cartesianValueOfMovement.y = (this.controls.goUp) ? 1 : 0
                     break
 
                 case 'arrowleft':
-                    this.character.onMovingStop()
+                    this.character.stopMoving()
                     this.controls.goLeft = false
                     this.cartesianValueOfMovement.x = (this.controls.goRight) ? 1 : 0
                     break
 
                 case 'arrowright':
-                    this.character.onMovingStop()
+                    this.character.stopMoving()
                     this.controls.goRight = false
                     this.cartesianValueOfMovement.x = (this.controls.goLeft) ? -1 : 0
                     break
@@ -115,7 +115,7 @@ export default class Keyboard {
             movement.x = - Math.sin(Math.PI / 4)
             movement.y = - Math.sin(Math.PI / 4)
             if(this.character.currentSprite.y != 3){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingForwardLeft()
             } 
         }
@@ -124,7 +124,7 @@ export default class Keyboard {
             movement.x = Math.sin(Math.PI / 4)
             movement.y = - Math.sin(Math.PI / 4)
             if(this.character.currentSprite.y != 3){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingForwardRight()
             } 
         }
@@ -133,7 +133,7 @@ export default class Keyboard {
             movement.x = Math.sin(Math.PI / 4)
             movement.y = Math.sin(Math.PI / 4)
             if(this.character.currentSprite.y != 4){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingBackwardsRight()
             } 
         }
@@ -143,7 +143,7 @@ export default class Keyboard {
             movement.y = Math.sin(Math.PI / 4)
 
             if(this.character.currentSprite.y != 4){
-                this.character.onMovingStop()
+                this.character.stopMoving()
                 this.character.onMovingBackwardsLeft()
             } 
         }
@@ -183,6 +183,10 @@ export default class Keyboard {
             
         if(movement.x !== 0 || movement.y !== 0)
             this.emitPosition(movement)
+        else if(this.character.currentSprite.y !== 5){
+            this.character.onMovingStop()
+            this.emitPosition(movement)
+        }
     }
 
     createBullet(){

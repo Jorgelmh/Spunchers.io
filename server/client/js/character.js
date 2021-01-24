@@ -45,18 +45,24 @@ const character = {
 
     /* Change the image when moving forward */
     onMovingForward: function() {
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 2
 
         this.createInterval()
     },
 
     onMovingBackwards: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 0
 
         this.createInterval()
     },
 
     onMovingLeft: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 1
         this.currentSprite.flip = -1
 
@@ -64,6 +70,8 @@ const character = {
     },
 
     onMovingRight: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 1
         this.currentSprite.flip = 1
 
@@ -71,6 +79,8 @@ const character = {
     },
 
     onMovingForwardLeft: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 3
         this.currentSprite.flip = -1
 
@@ -78,6 +88,8 @@ const character = {
     },
 
     onMovingForwardRight: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 3
         this.currentSprite.flip = 1
 
@@ -85,6 +97,8 @@ const character = {
     },
 
     onMovingBackwardsRight: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 4
         this.currentSprite.flip = 1
 
@@ -92,6 +106,8 @@ const character = {
     },
 
     onMovingBackwardsLeft: function(){
+        if(this.currentSprite.y === 0)
+            this.currentSprite.x = 0
         this.currentSprite.y = 4
         this.currentSprite.flip = -1
 
@@ -109,8 +125,11 @@ const character = {
 
     /* Delete  */
     onMovingStop: function(){
-        clearInterval(this.moveInterval)
         this.currentSprite.y = 5
+    },
+
+    stopMoving: function(){
+        clearInterval(this.moveInterval)
         this.moveInterval = null
     }
 
