@@ -18,6 +18,9 @@ class Lisa extends Character{
 
         this.reloadTime = 1000
 
+        /* Gunshot sound effect */
+        this.gunshotSound = 'silencer'
+
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */

@@ -135,6 +135,22 @@ export default class Online extends Engine{
             this.latency= ms
         })
 
+        /* Play sound effect */
+        this.socketIO.on('Bullet sound', ({bullet, sound}) => {
+
+            let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
+            console.log(distanceFromGunshot);
+
+            if(distanceFromGunshot <= this.soundWaveRadius){
+                if(!this.sounds[sound].paused)
+                    this.sounds[sound].currentTime = 0
+            
+                this.sounds[sound].volume = 1 - distanceFromGunshot/this.soundWaveRadius
+                this.sounds[sound].play()
+            }
+            
+        })
+
         /* Still players animation */
         this.lastStillUpdate = Date.now()
 
@@ -394,15 +410,8 @@ export default class Online extends Engine{
     /** Update state */
     updateState(){
 
-        /* Set player stats when packet's been interpolated */
-        let currentPlayerPos
-
-        if(Array.isArray(this.state.players))
-            currentPlayerPos = this.state.players[0][this.playerID] || this.state.players[1][this.playerID]
-        else
-            currentPlayerPos = this.state.players[this.playerID]
-
-        this.playerStats = currentPlayerPos
+        this.playerStats = (Array.isArray(this.state.players)) ? this.state.players[0][this.playerID] || this.state.players[1][this.playerID] 
+                            : this.state.players[this.playerID]
 
         if(this.playerStats){
             if(this.currentAmmo !== this.playerStats.bulletsCharger){
@@ -429,7 +438,7 @@ export default class Online extends Engine{
 
     emitReload = () => {
 
-        if(this.currentAmmo !== this.playerAmmunition){
+        if(this.currentAmmo !== this.playerAmmunition && !this.reloading){
             this.reloading = true
             this.socketIO.emit('reload weapon')
         }

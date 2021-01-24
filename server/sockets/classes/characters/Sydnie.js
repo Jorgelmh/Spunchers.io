@@ -17,6 +17,9 @@ class Sydnie extends Character{
         this.bulletsCharger = this.ammunition
 
         this.reloadTime = 3000
+
+        /* Gunshot sound effect */
+        this.gunshotSound = 'silencer'
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */

@@ -21,6 +21,9 @@ class Mikaela extends Character{
 
         this.reloadTime = 1000
 
+        /* Gunshot sound effect */
+        this.gunshotSound = 'shotgun'
+
     }
 
     /* Create a set of bullets shotgun style */

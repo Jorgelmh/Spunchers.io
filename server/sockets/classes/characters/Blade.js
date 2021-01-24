@@ -17,6 +17,9 @@ class Blade extends Character{
         this.bulletsCharger = 30
 
         this.reloadTime = 1200
+
+        /* Gunshot sound effect */
+        this.gunshotSound = 'silencer'
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */

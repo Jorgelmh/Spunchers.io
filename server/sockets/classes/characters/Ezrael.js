@@ -18,6 +18,9 @@ class Ezrael extends Character{
 
         this.reloadTime = 1200
 
+        /* Gunshot sound effect */
+        this.gunshotSound = 'sniper'
+
     }
 
     /* offsetYHorizontal when player is in horizontal movement => y:1 and y:2 */

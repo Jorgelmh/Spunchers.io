@@ -176,9 +176,11 @@ class Game {
         if(shootTime > player.lastDeath && player.life > 0 
             && player.ableToShoot && player.bulletsCharger > 0){
 
-                let bulletPosition = this.emitBullet(player)
+            let bulletPosition = this.emitBullet(player)
 
             if(Date.now() - player.lastShot > player.shootingDelay){
+
+                this.socketIO.to(this.roomname).emit('Bullet sound', {bullet: {x: bulletPosition.x, y: bulletPosition.y}, sound: player.gunshotSound})
 
                 /* Set shooting state which is translated to a shooting animation on the client */
                 player.shooting = true

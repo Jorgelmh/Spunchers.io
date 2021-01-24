@@ -100,7 +100,7 @@ export default class Engine{
 
         this.shooting = false
 
-        /* Animation? */
+        /* Animation */
         this.animatedSprites = false
 
         /* Camera smoothness */
@@ -137,6 +137,18 @@ export default class Engine{
             self: ' #00b7ff',
             ally: '#00ff00'
         }
+
+        /* Sounds */
+        this.sounds = {
+            empty: new Audio('../assets/sounds/empty.mp3'),
+            silencer: new Audio('../assets/sounds/gunshot.mp3'),
+            shotgun: new Audio('../assets/sounds/Shotgun.mp3'),
+            laser: new Audio('../assets/sounds/laser.mp3'),
+            sniper: new Audio('../assets/sounds/sniper.mp3')
+        }
+
+        /* gunshot sound radius -> in pixels */
+        this.soundWaveRadius = 600
         
         window.addEventListener('resize', this.resizeCanvas)
         this.resizeCanvas()
@@ -394,7 +406,12 @@ export default class Engine{
 
         // Testing variables for shooting
         //console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
-        
+        if(this.reloading){
+            if(!this.sounds.empty.paused)
+                this.sounds.empty.currentTime = 0
+            this.sounds.empty.play()
+        }
+
         if(this.ableToShoot && this.controls.shoot && !this.chat.active && this.currentAmmo && !this.reloading){
             this.ableToShoot = false
 
