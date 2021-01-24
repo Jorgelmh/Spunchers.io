@@ -24,7 +24,7 @@ class Game {
         this.shootingInterval = null
 
         /* Constant of interpolation */
-        this.interpolationDelay = (process.env.AdminKey === 200) ? 5 : 100
+        this.interpolationDelay = (process.env.AdminKey == 200) ? 5 : 100
 
         /* 
              ====================
@@ -80,8 +80,10 @@ class Game {
 
         /* Only store user's state when they are alive */
         else if(player.life > 0){
-            if(player.lastUpdate === 0)
+            if(player.lastUpdate === 0){
                 this.calculateMovement(player, data)
+                player.lastUpdate = Date.now()
+            }
             
             player.buffer.push(data)
         }
@@ -119,7 +121,7 @@ class Game {
 
         let currentPlayer = player
 
-        if(currentPlayer){
+        if(currentPlayer && data){
 
             currentPlayer.character = data.character
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
@@ -322,7 +324,7 @@ class Game {
 
             if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0)
                 this.calculateMovement(player, player.dequeueState())
-
+            
             /* Death animation */
             if(players[id].life === 0 && Date.now() - players[id].lastDeath >= 300 && players[id].character.currentSprite.x === 0)
                 players[id].character.currentSprite.x ++

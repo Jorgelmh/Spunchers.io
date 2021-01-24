@@ -144,8 +144,10 @@ export default class Engine{
             silencer: new Audio('../assets/sounds/gunshot.mp3'),
             shotgun: new Audio('../assets/sounds/Shotgun.mp3'),
             laser: new Audio('../assets/sounds/laser.mp3'),
-            sniper: new Audio('../assets/sounds/sniper.mp3')
+            sniper: new Audio('../assets/sounds/sniper.mp3'),
+            footstep: new Audio('../assets/sounds/footstep.mp3')
         }
+        this.sounds.footstep.volume = .4
 
         /* gunshot sound radius -> in pixels */
         this.soundWaveRadius = 600

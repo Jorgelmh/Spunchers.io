@@ -139,7 +139,6 @@ export default class Online extends Engine{
         this.socketIO.on('Bullet sound', ({bullet, sound}) => {
 
             let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
-            console.log(distanceFromGunshot);
 
             if(distanceFromGunshot <= this.soundWaveRadius){
                 if(!this.sounds[sound].paused)
@@ -302,8 +301,10 @@ export default class Online extends Engine{
                 /* Check if any player is still */
                 if(players[playerID].still && players[playerID].life > 0)
                     quitePlayers = true
+                
+                if(players[playerID].character.currentSprite.x % 2 ==1 && !players[playerID].still)
+                    this.sounds.footstep.play()
 
-            
                 if(skin){
                     let color = (playerID === this.playerID) ? this.colors.self : lifeColor
                     this.drawLife(characterX, characterY -6, players[playerID].life, color)

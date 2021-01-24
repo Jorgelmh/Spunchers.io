@@ -41,11 +41,16 @@ class Character {
         /* reloading */
         this.reloading = false
         this.lastReload = 0
+
+        /* Steps-sound effect */
+        this.stepping = false
+
     }
     
     /* dequeue interpolated state */
     dequeueState(){
-        let state = this.buffer[0]
+
+        let state = this.buffer[0] 
         this.buffer.splice(0,1)
 
         this.lastUpdate = Date.now()
@@ -90,7 +95,8 @@ class Character {
             currentAmmo: this.bulletsCharger,
             cartesianValueOfMovement: this.cartesianValueOfMovement,
             still:  this.still,
-            reloading: this.reloading
+            reloading: this.reloading,
+            stepping: this.stepping
         }
     }
 }

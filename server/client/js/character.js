@@ -99,7 +99,6 @@ const character = {
     },
     
     createInterval : function(){
-        this.currentSprite.x = 0
         this.moveInterval = setInterval(() =>{
             this.currentSprite.x ++
             if(this.currentSprite.x > 3) 
@@ -111,7 +110,6 @@ const character = {
     /* Delete  */
     onMovingStop: function(){
         clearInterval(this.moveInterval)
-        this.currentSprite.x = 0
         this.currentSprite.y = 5
         this.moveInterval = null
     }

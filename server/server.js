@@ -39,7 +39,7 @@ app.get('/offline', (req, res) => {
 })
 
 server.listen(process.env.PORT ,() => {
-    console.log(`Listening port: ${process.env.PORT}`);
+    console.log(`Listening port: ${process.env.PORT} AND adminKey: ${process.env.AdminKey}`);
 })
 
 
