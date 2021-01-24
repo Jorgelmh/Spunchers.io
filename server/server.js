@@ -35,7 +35,7 @@ app.get('/teams', (req, res) => {
 })
 
 app.get('/offline', (req, res) => {
-    res.sendFile(path.join(__dirname + 'public/views/offline.html'))
+    res.sendFile(path.join(__dirname + '/public/views/offline.html'))
 })
 
 server.listen(process.env.PORT ,() => {
