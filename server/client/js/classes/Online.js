@@ -53,7 +53,7 @@ export default class Online extends Engine{
         this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = 15
+        this.interpolationDelay = 25
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
