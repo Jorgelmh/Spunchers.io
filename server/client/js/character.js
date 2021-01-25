@@ -45,7 +45,7 @@ const character = {
 
     /* Change the image when moving forward */
     onMovingForward: function() {
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 2
 
@@ -53,7 +53,7 @@ const character = {
     },
 
     onMovingBackwards: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 0
 
@@ -61,7 +61,7 @@ const character = {
     },
 
     onMovingLeft: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 1
         this.currentSprite.flip = -1
@@ -70,7 +70,7 @@ const character = {
     },
 
     onMovingRight: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 1
         this.currentSprite.flip = 1
@@ -79,7 +79,7 @@ const character = {
     },
 
     onMovingForwardLeft: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 3
         this.currentSprite.flip = -1
@@ -88,7 +88,7 @@ const character = {
     },
 
     onMovingForwardRight: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 3
         this.currentSprite.flip = 1
@@ -97,7 +97,7 @@ const character = {
     },
 
     onMovingBackwardsRight: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 4
         this.currentSprite.flip = 1
@@ -106,7 +106,7 @@ const character = {
     },
 
     onMovingBackwardsLeft: function(){
-        if(this.currentSprite.y === 0)
+        if(this.currentSprite.y === 5)
             this.currentSprite.x = 0
         this.currentSprite.y = 4
         this.currentSprite.flip = -1

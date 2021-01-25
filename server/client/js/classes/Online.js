@@ -212,7 +212,6 @@ export default class Online extends Engine{
     */
 
     interpolate(){
-        console.log(this.buffer.length);
 
         if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
             this.lastInterpolation = Date.now()
@@ -224,7 +223,7 @@ export default class Online extends Engine{
         }
 
         if(this.buffer.length > 5)
-            this.buffer.splice(0, 3)
+            this.buffer.splice(0, this.buffer.length - 2)
     }
 
     /* Send data back to the server */
