@@ -129,7 +129,7 @@ export default class Online extends Engine{
 
             let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
 
-            if(distanceFromGunshot <= this.soundWaveRadius){
+            if(distanceFromGunshot <= this.soundWaveRadius && !window.mobileCheck()){
                 if(!this.sounds[sound].paused)
                     this.sounds[sound].currentTime = 0
             
@@ -313,7 +313,7 @@ export default class Online extends Engine{
                 if(players[playerID].still && players[playerID].life > 0)
                     quitePlayers = true
                 
-                if(players[playerID].character.currentSprite.x % 2 ==1 && !players[playerID].still)
+                if(players[playerID].character.currentSprite.x % 2 ==1 && !players[playerID].still && !window.mobileCheck())
                     this.sounds.footstep.play()
 
                 if(skin){
