@@ -53,7 +53,10 @@ export default class Online extends Engine{
         this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = 18
+        this.interpolationDelay = 19
+
+        /* Auto-regulate the interpolationDelay based on users connection */
+        this.canRegulateDelay = false
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
@@ -142,6 +145,8 @@ export default class Online extends Engine{
         /* Still players animation */
         this.lastStillUpdate = Date.now()
 
+        setTimeout(()=> this.canRegulateDelay = true, 1000)
+
     }
 
     /**
@@ -222,10 +227,18 @@ export default class Online extends Engine{
             this.updateState()
         }
 
-        console.log(this.buffer.length);
+        console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
 
-        if(this.buffer.length > 5)
-            this.buffer.splice(0, this.buffer.length - 4)
+        if(this.canRegulateDelay){
+            if(this.buffer.length === 0)
+            this.interpolationDelay ++
+
+            if(this.buffer.length >= 5){
+                this.buffer.splice(0, this.buffer.length - 3)
+                this.interpolationDelay -= 4
+            }
+        }
+        
     }
 
     /* Send data back to the server */
