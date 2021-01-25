@@ -124,7 +124,7 @@ class Game {
 
         let currentPlayer = player
 
-        if(currentPlayer && data){
+        if(currentPlayer && data && currentPlayer.life > 0){
 
             currentPlayer.character = data.character
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
