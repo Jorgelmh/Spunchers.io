@@ -88,7 +88,7 @@ class Game {
             player.buffer.push(data)
 
             if(player.buffer.length > 5)
-                player.buffer.splice(0,player.buffer.length-2)
+                player.buffer.splice(0,player.buffer.length-3)
         }
         
     }

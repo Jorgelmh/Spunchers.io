@@ -53,7 +53,7 @@ export default class Online extends Engine{
         this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = 20
+        this.interpolationDelay = 15
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
@@ -222,8 +222,10 @@ export default class Online extends Engine{
             this.updateState()
         }
 
+        console.log(this.buffer.length);
+
         if(this.buffer.length > 5)
-            this.buffer.splice(0, this.buffer.length - 2)
+            this.buffer.splice(0, this.buffer.length - 4)
     }
 
     /* Send data back to the server */

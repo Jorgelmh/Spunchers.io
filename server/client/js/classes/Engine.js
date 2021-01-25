@@ -412,7 +412,7 @@ export default class Engine{
 
         // Testing variables for shooting
         //console.log(`able to shoot: ${this.ableToShoot} ; controls shoot: ${this.controls.shoot} ; chat inactive: ${this.chat.active} ; ammo : ${this.currentAmmo} ; reloading: ${this.reloading}`)
-        if(this.reloading){
+        if(this.reloading && !window.mobileCheck()){
             if(!this.sounds.empty.paused)
                 this.sounds.empty.currentTime = 0
             this.sounds.empty.play()
