@@ -56,6 +56,7 @@ const socketListen = (app) => {
             /* Skins needed to be loaded on the engine */
             let skins
             let roomname
+            let ids
 
             /* 0 -> Free for all */
             if(data.game.mode === 0){
@@ -65,7 +66,11 @@ const socketListen = (app) => {
                 /* set roomname */
                 roomname = freeforall.roomname
 
+                /* Set ids of players currently in the room */
+                ids = freeforall.getIds()
 
+                /* Send scores */
+                io.to(roomname).emit('New leaderboard', freeforall.sortScores(freeforall.players))
             }
 
             /* 1 -> Team deathmatch */
@@ -79,20 +84,20 @@ const socketListen = (app) => {
                 skins = teamDeathmatch.getSkins(socket.id)
                 /* set roomname */
                 roomname = teamDeathmatch.roomname
+
+                /* set ids of players currently in the room*/
+                ids= teamDeathmatch.getIds()
+
+                /* Send scores */
+                socket.emit('New teams leaderboard', teamDeathmatch.scores)
                
             }
 
             /* Other players load new player's skin */
-            socket.to(roomname).emit('Load New Skin', {src: data.skin})
-
-            /* Send the score */
-            if(gamemode === 'online')
-                io.to(roomname).emit('New leaderboard', freeforall.sortScores(freeforall.players))
-            else if(gamemode === 'teams')
-                io.to(roomname).emit('New teams leaderboard', teamDeathmatch.scores)
+            socket.to(roomname).emit('Load New Skin', {src: data.skin, id: socket.id})
 
             /* load previous players' skins and send ammunition for the character selected */
-            socket.emit('Load Skins and ammunition', skins)
+            socket.emit('Load Skins, ammunition and sounds', {skins, ids})
 
         })
 
@@ -109,14 +114,19 @@ const socketListen = (app) => {
         })
 
         socket.on('disconnect', (data) => {
+
             if(gamemode === 'online'){
                 freeforall.removePlayer(socket.id) 
                 if(Object.keys(freeforall.players).length === 0) freeforall.onlineChat.messages = []
                 io.to(freeforall.roomname).emit('New leaderboard', freeforall.sortScores(freeforall.players))
+                socket.to(freeforall.roomname).emit('Player Disconnected', socket.id)
 
             }else if(gamemode === 'teams'){
                 teamDeathmatch.removePlayer(socket.id)
-            } 
+                if(Object.keys(teamDeathmatch.team1).length + Object.keys(teamDeathmatch.team2).length === 0) teamDeathmatch.onlineChat.messages = []
+                socket.to(teamDeathmatch.roomname).emit('Player Disconnected', socket.id)
+
+            }
         })
 
         socket.on('reload weapon', (data) => {

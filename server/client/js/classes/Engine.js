@@ -145,12 +145,14 @@ export default class Engine{
             shotgun: new Audio('../assets/sounds/Shotgun.mp3'),
             laser: new Audio('../assets/sounds/laser.mp3'),
             sniper: new Audio('../assets/sounds/sniper.mp3'),
-            footstep: new Audio('../assets/sounds/footstep.mp3')
+            footsteps: {}
         }
-        this.sounds.footstep.volume = .4
 
         /* gunshot sound radius -> in pixels */
-        this.soundWaveRadius = 600
+        this.soundWaves = {
+            bullets: 600,
+            footsteps: 200
+        }
         
         window.addEventListener('resize', this.resizeCanvas)
         

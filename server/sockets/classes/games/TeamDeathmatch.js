@@ -200,6 +200,11 @@ class TeamDeathmatch extends Game{
             })
         }
     }
+
+    /* return every socket's id in the room */
+    getIds(){
+        return [...Object.keys(this.team1), ...Object.keys(this.team2)]
+    }
 }
 
 module.exports = TeamDeathmatch

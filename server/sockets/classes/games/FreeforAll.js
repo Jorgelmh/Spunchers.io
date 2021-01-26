@@ -173,6 +173,11 @@ class FreeforAll extends Game{
         }
     }
 
+     /* return every socket's id in the room */
+     getIds(){
+        return Object.keys(this.players)
+    }
+
 }
 
 module.exports = FreeforAll

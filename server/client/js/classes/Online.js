@@ -16,10 +16,10 @@ export default class Online extends Engine{
         this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload, this.playerStats)
 
         this.name = name
-        this.serverDelay = null
-
         /* Online attributes recevied from the sever */
         this.playerID = playerID
+        this.serverDelay = null
+
         this.socketIO = socket
 
         /* Create a chat room */
@@ -72,30 +72,51 @@ export default class Online extends Engine{
         })
 
         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
-        this.socketIO.on('Load Skins and ammunition', (data) => {
-            data.srcArray.forEach((value) => {
+        this.socketIO.on('Load Skins, ammunition and sounds', ({skins, ids}) => {
+            skins.srcArray.forEach((value) => {
                 if(value != this.skin){
                     this.loadServerSkin(value)
                 }
             })
 
-            this.playerAmmunition = data.characterInfo.bullets
+            this.playerAmmunition = skins.characterInfo.bullets
             this.currentAmmo = this.playerAmmunition
-            this.shootingDelay = data.characterInfo.shootingDelay
+            this.shootingDelay = skins.characterInfo.shootingDelay
 
             this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+
+            /* Load a footstep audio for every player already in the room */
+            ids.map((id) => {
+                this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
+            })
         })
 
-        /* when a new player enters, other people must load his skin */
-        this.socketIO.on('Load New Skin', (data) =>{
-            let element = this.onlineSkins[data.src]
-            if(!element && data.src != this.skin)
-                this.loadServerSkin(data.src)
+        /* when a new player enters, other people must load their skin */
+        this.socketIO.on('Load New Skin', ({src, id}) =>{
+            let element = this.onlineSkins[src]
+            if(!element && src != this.skin)
+                this.loadServerSkin(src)
+
+            let availableSlot = Object.keys(this.sounds.footsteps).find((idPlayer) => this.sounds.footsteps[idPlayer].free)
+
+            if(availableSlot){
+                this.sounds.footsteps[id] = {sound: this.sounds.footsteps[availableSlot].sound}
+                delete this.sounds.footsteps[availableSlot]
+            }else
+                this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
+
+            console.log(this.sounds.footsteps);
+        })
+
+        /* When a player's been disconnected set its footstep variable as free, so that new players can used it, without needing to load the audio again */
+        this.socketIO.on('Player Disconnected', (id) => {
+            if(this.sounds.footsteps[id])
+                this.sounds.footsteps[id].free = true
             
+            console.log(id, this.sounds.footsteps);
         })
 
         /* When the score changes */
-
         this.socketIO.on('New leaderboard', (data) => {
 
             let positions = ['trophy', 'medal', 'award']
@@ -132,14 +153,13 @@ export default class Online extends Engine{
 
             let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
 
-            if(distanceFromGunshot <= this.soundWaveRadius && !window.mobileCheck()){
+            if(distanceFromGunshot <= this.soundWaves.bullets && !window.mobileCheck()){
                 if(!this.sounds[sound].paused)
                     this.sounds[sound].currentTime = 0
             
-                this.sounds[sound].volume = 1 - distanceFromGunshot/this.soundWaveRadius
+                this.sounds[sound].volume = 1 - distanceFromGunshot/this.soundWaves.bullets
                 this.sounds[sound].play()
             }
-            
         })
 
         /* Still players animation */
@@ -227,7 +247,7 @@ export default class Online extends Engine{
             this.updateState()
         }
 
-        console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
+        //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
 
         if(this.canRegulateDelay){
             if(this.buffer.length === 0)
@@ -328,8 +348,14 @@ export default class Online extends Engine{
                 if(players[playerID].still && players[playerID].life > 0)
                     quitePlayers = true
                 
-                if(players[playerID].character.currentSprite.x % 2 ==1 && !players[playerID].still && !window.mobileCheck())
-                    this.sounds.footstep.play()
+                if(players[playerID].character.currentSprite.x % 2 ==1 && !players[playerID].still && !window.mobileCheck()){
+                    let distanceFromFootstep = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - players[playerID].posX,2) + (Math.pow(this.playerStats.posY - players[playerID].posY,2))))
+                    if(distanceFromFootstep <= this.soundWaves.footsteps && !window.mobileCheck()){
+                    
+                        this.sounds.footsteps[playerID].sound.volume = (1 - distanceFromFootstep/this.soundWaves.footsteps)/10
+                        this.sounds.footsteps[playerID].sound.play()
+                    }
+                }
 
                 if(skin){
                     let color = (playerID === this.playerID) ? this.colors.self : lifeColor
