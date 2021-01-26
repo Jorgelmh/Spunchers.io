@@ -25,6 +25,17 @@ let name
 /* Players in the lobby */
 let players
 
+const createEngine = (team) => {
+    /* show background when a team has been selected */
+    document.getElementById('background-frame').style.display = 'block'
+
+    document.getElementById('site-ajax-loader').style.display = 'block'
+    body.removeChild(selectTeam)
+    const engine = new Online(game.lobby.map, game.lobby.collisionMatrix, game.lobby.shadowMap ,game.lobby.tileSet, 
+                    document.getElementById('game'), socket, game.playerID, game.lobby.server, characterSkins[glide.index], name, {mode: 1, team})
+
+}
+
 /**
  *  =================================
  *      ADD SELECT TEAMS LISTENERS
@@ -34,25 +45,16 @@ let players
  const selectRedTeam = document.getElementById('site-red-team')
  const selectBlueTeam = document.getElementById('site-blue-team')
 
-/* listeners callback */
-const callback = (e) => {
-    let team = (e.target.id === 'site-blue-team') ? 0 : 1 
-
-    /* show background when a team has been selected */
-    document.getElementById('background-frame').style.display = 'block'
-
-    document.getElementById('site-ajax-loader').style.display = 'block'
-    body.removeChild(selectTeam)
-    const engine = new Online(game.lobby.map, game.lobby.collisionMatrix, game.lobby.shadowMap ,game.lobby.tileSet, 
-                    document.getElementById('game'), socket, game.playerID, game.lobby.server, characterSkins[glide.index], name, {mode: 1, team})
-}
-
 
 /* Enter red team */
-selectRedTeam.onclick = callback
+selectRedTeam.onclick = (e) => {
+    createEngine(1)
+}
 
 /* Enter blue team */
-selectBlueTeam.onclick = callback
+selectBlueTeam.onclick = (e) => {
+    createEngine(0)
+}
 
 /**
  *  =======================================
