@@ -22,8 +22,7 @@ characterSkins.map((skin) => {
     imgHTML.src = `../assets/selectCharacters/${skin}.png`
     imgHTML.onload = () => {
 
-        if(images)
-            images.push(imgHTML)
+        images.push(imgHTML)
         /* When the last image is loaded, then the glide object can be created => Important */
         if(++loadedImg >= characterSkins.length){
             glide = new Glide('.glide', {
