@@ -22,6 +22,9 @@ export default class Online extends Engine{
 
         this.socketIO = socket
 
+        /* online team */
+        this.team = (game.mode) ? game.team : undefined
+
         /* Create a chat room */
         this.chat = new OnlineChat(this.socketIO)
 
@@ -164,6 +167,12 @@ export default class Online extends Engine{
 
         /* Still players animation */
         this.lastStillUpdate = Date.now()
+
+        /* Add color to score */
+        if(this.team === 0)
+            document.getElementById('fbi-score').style.color = 'rgb(240, 86, 94)'
+        else if(this.team === 1)
+            document.getElementById('gambinos-score').style.color = 'rgb(240, 86, 94)'
 
         setTimeout(()=> this.canRegulateDelay = true, 1000)
 

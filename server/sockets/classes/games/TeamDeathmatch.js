@@ -90,7 +90,6 @@ class TeamDeathmatch extends Game{
         /* Increment team's score */
         if(this.team1[playerID])
             this.scores.team1 ++
-
         else
             this.scores.team2 ++
 
