@@ -1,5 +1,6 @@
 /* Import Chat Class */
 const OnlineChatServer = require('../OnlineChatServer')
+const BonusKit = require('../BonusKits')
 
 /* Import character classes */
 const Mikaela = require('../characters/Mikaela.js')
@@ -68,6 +69,12 @@ class Game {
         this.updateInterval = null
         this.sendState = false
 
+        /* Declare BonusKit respawner */
+        this.bonusKitRespawner = new BonusKit(this.tile, this.collisionMatrix)
+
+        /* renew life after 10 seconds */
+        this.renewLife = 10000
+
         this.setUpdate()
     }
 
@@ -81,7 +88,7 @@ class Game {
         /* Only store user's state when they are alive */
         else if(player.life > 0){
             if(player.lastUpdate === 0){
-                this.calculateMovement(player, data)
+                this.calculateMovement(player, data, socketID)
                 player.lastUpdate = Date.now()
             }
             player.lastPacket = Date.now()
@@ -120,7 +127,7 @@ class Game {
     }
 
     /* Trigger movement of players */
-    calculateMovement(player, data){
+    calculateMovement(player, data, socketID){
 
         let currentPlayer = player
 
@@ -138,14 +145,14 @@ class Game {
                 let oldPositionX = currentPlayer.posX
                 currentPlayer.posX += data.movement.x
 
-                if(this.detectCollisions(currentPlayer))
+                if(this.detectCollisions(currentPlayer, socketID))
                     currentPlayer.posX = oldPositionX
 
                 /* Movement on Y */
                 let oldPositionY = currentPlayer.posY
                 currentPlayer.posY += data.movement.y
 
-                if(this.detectCollisions(currentPlayer))
+                if(this.detectCollisions(currentPlayer, socketID))
                     currentPlayer.posY = oldPositionY
             }
         }
@@ -153,20 +160,48 @@ class Game {
     }
 
     /* Detect colission between players and objects on the server */
-    detectCollisions(player){
+    detectCollisions(player, socketID){
 
-        for(let i = 0; i < this.collisionMatrix.length; i++){
-            for(let j = 0; j < this.collisionMatrix[0].length; j++){
+        /* Optimize collision detection */
+        let positionTile = {
+            x: Math.floor(player.posX / this.tile.width),
+            y: Math.floor(player.posY/this.tile.height)
+        }
+        
+        /* Analyze collision with objects */
+        for(let i = positionTile.y - 3; i < positionTile.y + 3; i++){
+            for(let j = positionTile.x - 3; j < positionTile.x + 3; j++){
                 if(this.collisionMatrix[i][j] !== 0){
     
                     /* Check if exists a collision => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
                     if((j*this.tile.width < player.posX + (this.tile.width/4) + (this.tile.width/2) && j*this.tile.width + this.tile.width > player.posX + (this.tile.width/4)) 
-                        && (i*this.tile.height< player.posY + this.tile.height && i*this.tile.height + this.tile.height > player.posY + 3*(this.tile.width/4))){
+                        && (i*this.tile.height < player.posY + 6*(this.tile.width/7) && i*this.tile.height + this.tile.height > player.posY + 3*(this.tile.width/4))){
                         return true
                     }
                 }
             }
         }
+
+        let bulletKit = this.bonusKitRespawner.bulletKit
+        let medicalKit = this.bonusKitRespawner.medicalKit
+
+        /*  Analyze collision with bonus kit */
+        if(bulletKit.position && (bulletKit.position.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && bulletKit.position.x + this.tile.width/3 > player.posX + (this.tile.width/4))
+            && (bulletKit.position.y < player.posY + 6*(this.tile.width/7) && bulletKit.position.y + this.tile.height/2 > player.posY + (this.tile.width/4))){
+                bulletKit.position = null
+                player.bulletsCharger = player.ammunition
+                bulletKit.lastPicked = Date.now()
+                this.socketIO.to(socketID).emit('Capture bulletKit')
+        }
+
+        if(medicalKit.position && (medicalKit.position.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && medicalKit.position.x + this.tile.width/3 > player.posX + (this.tile.width/4))
+            && (medicalKit.position.y < player.posY + 6*(this.tile.width/7) && medicalKit.position.y + this.tile.height/2 > player.posY + (this.tile.width/4))){
+                medicalKit.position = null
+                player.life = 100
+                medicalKit.lastPicked = Date.now()
+                this.socketIO.to(socketID).emit('Capture medicalKit')
+        }        
+
         return false
     }
 
@@ -317,6 +352,33 @@ class Game {
     }
 
     /**
+     *  =============================
+     *      Check Bonus kits state
+     *  =============================
+     */
+
+     checkBonusKits(){
+        let bulletKit = this.bonusKitRespawner.bulletKit
+        let medicalKit = this.bonusKitRespawner.medicalKit
+
+         /* Check whether a bullet kit needs to be respawned */
+        if(!bulletKit.position && Date.now() - bulletKit.lastPicked >= bulletKit.respawningTime)
+            this.bonusKitRespawner.respawnBulletKit()
+        
+
+        if(!medicalKit.position && Date.now() - medicalKit.lastPicked >= medicalKit.respawningTime)
+            this.bonusKitRespawner.respawnMedicalKit()
+
+        
+        /* return each bonus position */
+        return {
+            bulletKit: bulletKit.position,
+            medicalKit: medicalKit.position
+        }
+         
+     }
+
+    /**
      *  ========================
      *      Serialize Players
      *  ========================
@@ -325,12 +387,16 @@ class Game {
     serializePlayers(players){
         return Object.fromEntries(Object.entries(players).map(([id, player]) => {
 
-            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0){
-                this.calculateMovement(player, player.dequeueState())
+            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0 && player.buffer.length > 0){
+                this.calculateMovement(player, player.dequeueState(), id)
             }
             /* Death animation */
             if(players[id].life === 0 && Date.now() - players[id].lastDeath >= 300 && players[id].character.currentSprite.x === 0)
                 players[id].character.currentSprite.x ++
+
+            /* Renew life when off combat */
+            if(players[id].life < 100 && Date.now() - players[id].lastHit >= this.renewLife)
+                players[id].life ++
 
             /* Check if the player already finished reloading */
             if(players[id].reloading && Date.now() - players[id].lastReload >= players[id].reloadTime){

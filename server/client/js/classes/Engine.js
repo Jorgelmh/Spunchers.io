@@ -145,8 +145,17 @@ export default class Engine{
             shotgun: new Audio('../assets/sounds/Shotgun.mp3'),
             laser: new Audio('../assets/sounds/laser.mp3'),
             sniper: new Audio('../assets/sounds/sniper.mp3'),
+            reload: new Audio('../assets/sounds/reload.mp3'),
+            healing: new Audio('../assets/sounds/healing.mp3'),
             footsteps: {}
         }
+
+        /* Set default volumes */
+        this.sounds.healing.volume = .2
+        this.sounds.reload.volume = .2
+
+        /* Bonus kits that will be around the map */
+        this.kits = {}
 
         /* gunshot sound radius -> in pixels */
         this.soundWaves = {
@@ -227,14 +236,37 @@ export default class Engine{
             if(this.animatedSprites)
                 this.setAnimationTiming()
 
-            this.closeLoadingScreen()
-            requestAnimationFrame(this.render)
+            this.loadBonusKits()
         })
+    }
+
+    /* Load bonus kits */
+    loadBonusKits(){
+
+        let loaded = 0
+        const onload = () => {
+            if(++loaded >= 2){
+                this.closeLoadingScreen()
+                requestAnimationFrame(this.render)
+            }
+        }
+
+        /* Load medical kit image */
+        this.kits.medical = new Image()
+        this.kits.medical.onload = onload
+        this.kits.medical.src = '../assets/resources/medical-kit.png'
+
+        /* Load bullets kit image */
+        this.kits.bullets = new Image()
+        this.kits.bullets.onload = onload
+        this.kits.bullets.src = '../assets/resources/bullets-kit.png'
+
     }
 
     /* Shut loading screen once every element's been downloaded */
 
     closeLoadingScreen(){
+        console.log(this.kits);
         /* Show game */
         let body =document.getElementsByTagName('body')[0]
         body.classList.remove('background-connect-frame')
@@ -274,6 +306,10 @@ export default class Engine{
         /* Bullet's size */
         this.bulletSprite.width = this.canvas.width * .02
         this.bulletSprite.height = this.canvas.width * .02
+
+        /* bonusKit sizes */
+        this.kits.width = this.tile.width/2
+        this.kits.height = this.tile.height/2
 
         /* Set player's position */
         this.playerRelativePosition = this.getPlayerRelativePosition()

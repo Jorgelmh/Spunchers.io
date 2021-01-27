@@ -22,6 +22,13 @@ let game
 /* Player name */
 let name
 
+/* Has the user pressed the play button? */
+let pressedPlay = false
+
+/* Team members of each team */
+let teammembersBlue = document.getElementById('blue-team-players')
+let teammembersRed = document.getElementById('red-team-players')
+
 /* Players in the lobby */
 let players
 
@@ -63,6 +70,7 @@ selectBlueTeam.onclick = (e) => {
  */
 play.onclick = () => {
 
+    pressedPlay = true
     name = document.getElementById('playerName').value || 'unnamed'
     /* remove select characters frame */
     body.removeChild(document.getElementById('login-frame'))
@@ -74,8 +82,8 @@ play.onclick = () => {
     document.getElementById('background-frame').style.display = 'none'
 
     /* Show current players in lobby */
-    displayPlayers(players.blues, document.getElementById('blue-team-players'))
-    displayPlayers(players.reds, document.getElementById('red-team-players'))
+    displayPlayers(players.blues, teammembersBlue)
+    displayPlayers(players.reds, teammembersRed)
 }
 
 socket.on('loadMap', (data) => {
@@ -83,7 +91,19 @@ socket.on('loadMap', (data) => {
 })
 
 socket.on('load team members', (data) => {
+    console.log(data);
     players = data
+
+    /* If we've already clicked play and are at the selecte team screen refresh team-members */
+    if(pressedPlay && document.getElementById('select-teams')){
+        /* Clear team members */
+        teammembersBlue.innerHTML = ""
+        teammembersRed.innerHTML = ""
+
+        /* Refresh members of each team */
+        displayPlayers(players.blues, teammembersBlue)
+        displayPlayers(players.reds, teammembersRed)
+    }
 })
 
 /* Display players on the lobby */

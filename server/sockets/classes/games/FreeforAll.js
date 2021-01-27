@@ -38,10 +38,14 @@ class FreeforAll extends Game{
         /* return only the info the user needs to know about the players */
         let clientPlayers = this.serializePlayers(this.players)
 
+        /* Check bonus position */
+        let bonusKits = this.checkBonusKits()
+
         return {
             players: clientPlayers,
             bullets: this.bullets,
-            serverTime: Date.now()
+            serverTime: Date.now(),
+            bonusKits
         }
 
     }
@@ -109,6 +113,7 @@ class FreeforAll extends Game{
 
     /* Reduce life of a hit player */
     reduceLife(hitID, shooterID){
+        this.players[hitID].lastHit = Date.now()
         return (this.players[hitID].life - this.players[shooterID].impactDamage < 0) ? 0 : this.players[hitID].life - this.players[shooterID].impactDamage
     }
 

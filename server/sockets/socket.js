@@ -90,6 +90,7 @@ const socketListen = (app) => {
 
                 /* Send scores */
                 socket.emit('New teams leaderboard', teamDeathmatch.scores)
+                io.to(teamDeathmatch.roomname).emit('load team members', teamDeathmatch.getPlayers())
                
             }
 
@@ -107,6 +108,7 @@ const socketListen = (app) => {
             /* Change position */
             if(gamemode === 'online')
                 freeforall.onMovement(freeforall.players[socket.id], data, socket.id)
+            
 
             else if(gamemode === 'teams')
                 teamDeathmatch.onMovement(teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id], data, socket.id)
@@ -125,7 +127,7 @@ const socketListen = (app) => {
                 teamDeathmatch.removePlayer(socket.id)
                 if(Object.keys(teamDeathmatch.team1).length + Object.keys(teamDeathmatch.team2).length === 0) teamDeathmatch.onlineChat.messages = []
                 socket.to(teamDeathmatch.roomname).emit('Player Disconnected', socket.id)
-
+                io.to(teamDeathmatch.roomname).emit('load team members', teamDeathmatch.getPlayers())
             }
         })
 

@@ -42,8 +42,8 @@ class Character {
         this.reloading = false
         this.lastReload = 0
 
-        /* Steps-sound effect */
-        this.stepping = false
+        /* Increase life when player is out of combat */
+        this.lastHit = 0
 
     }
     

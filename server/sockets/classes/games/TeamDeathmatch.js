@@ -24,7 +24,7 @@ class TeamDeathmatch extends Game{
 
         /* Team scores */
         this.scores = {
-            team1: 2,
+            team1: 0,
             team2: 0
         }
     }
@@ -51,10 +51,14 @@ class TeamDeathmatch extends Game{
         /* return only the info the user needs to know about the players */
         let clientPlayers = [this.serializePlayers(this.team1), this.serializePlayers(this.team2)]
 
+        /* Check bonus position */
+        let bonusKits = this.checkBonusKits()
+
         return {
             players: clientPlayers,
             bullets: [...this.bulletsTeam1, ...this.bulletsTeam2],
-            serverTime: Date.now()
+            serverTime: Date.now(),
+            bonusKits
         }
     }
 
@@ -77,6 +81,8 @@ class TeamDeathmatch extends Game{
     reduceLife(hitID, shooterID){
         let hitPlayer = this.team1[hitID] || this.team2[hitID]
         let shooterPlayer = this.team1[shooterID] || this.team2[shooterID]
+
+        hitPlayer.lastHit = Date.now()
 
         return (hitPlayer.life - shooterPlayer.impactDamage < 0) ? 0 : hitPlayer.life - shooterPlayer.impactDamage
 

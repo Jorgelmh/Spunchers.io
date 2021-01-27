@@ -160,10 +160,23 @@ export default class Online extends Engine{
                 if(!this.sounds[sound].paused)
                     this.sounds[sound].currentTime = 0
             
-                this.sounds[sound].volume = 1 - distanceFromGunshot/this.soundWaves.bullets
+                this.sounds[sound].volume = (1 - distanceFromGunshot/this.soundWaves.bullets)/2
                 this.sounds[sound].play()
             }
         })
+
+        /** 
+         *  ===========================================
+         *      SOUND EFFECTS WHEN PICKING A BONUS
+         *  ===========================================
+        */
+       this.socketIO.on('Capture medicalKit', () => {
+            this.sounds.healing.play()
+       })
+
+       this.socketIO.on('Capture bulletKit', () => {
+            this.sounds.reload.play()
+       })
 
         /* Still players animation */
         this.lastStillUpdate = Date.now()
@@ -197,6 +210,7 @@ export default class Online extends Engine{
         this.drawMap()
         this.drawShadows()
         this.drawObjects()
+        this.drawBonusKits()
         this.drawBullets()
         this.drawOtherPlayers()
 
@@ -325,6 +339,11 @@ export default class Online extends Engine{
 
     }
 
+    /**
+     *  ==========================
+     *      DRAW ONLINE PLAYERS 
+     *  ==========================
+     */
     /* Loops server players and calls the drawOnlineCharacter to draw each player with the data from the socket */
     drawOtherPlayers(){
         if(Array.isArray(this.state.players)){
@@ -467,6 +486,44 @@ export default class Online extends Engine{
                 }
             })
         }
+    }
+
+    /**
+     *  =========================
+     *        DRAW BONUS KITS
+     *  =========================
+     */
+
+    drawBonusKits(){
+        const drawKit = (img, location) => {
+            this.context.drawImage(img, location.x, location.y, this.kits.width, this.kits.height)
+        }
+
+        let bulletKitPos
+        let medicalKitPos
+
+        /* calculate local position of bulletKit */
+        if(this.state.bonusKits.bulletKit){
+            bulletKitPos = {
+                x:  this.transformServerMagnitudesX(this.state.bonusKits.bulletKit.x) + this.tileMap.startX,
+                y: this.transformServerMagnitudesY(this.state.bonusKits.bulletKit.y) + this.tileMap.startY
+            }
+        }
+
+        /* calculate local position of medicalKit */
+        if(this.state.bonusKits.medicalKit){
+            medicalKitPos = {
+                x:  this.transformServerMagnitudesX(this.state.bonusKits.medicalKit.x) + this.tileMap.startX,
+                y: this.transformServerMagnitudesY(this.state.bonusKits.medicalKit.y) + this.tileMap.startY
+            }
+        }
+         
+
+        if(bulletKitPos && bulletKitPos.x >= 0 && bulletKitPos.x < this.screenTiles.x * this.tile.width && bulletKitPos.y >= 0 && bulletKitPos.y < this.screenTiles.y * this.tile.height)
+            drawKit(this.kits.bullets, bulletKitPos)
+
+        if(medicalKitPos && medicalKitPos.x >= 0 && medicalKitPos.x < this.screenTiles.x * this.tile.width && medicalKitPos.y >= 0 && medicalKitPos.y < this.screenTiles.y * this.tile.height)
+            drawKit(this.kits.medical, medicalKitPos)
     }
 
     /** Update state */
