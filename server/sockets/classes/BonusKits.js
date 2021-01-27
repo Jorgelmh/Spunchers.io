@@ -49,8 +49,8 @@ class BonusKits {
 
         do{
             /* respawn a tile position which is within the area players can move -> avoid surrounding areas of the map */
-            tileX = Math.floor(Math.random() * (this.collisionMatrix[0].length - this.notRespawnable)) + this.notRespawnable
-            tileY = Math.floor(Math.random() * (this.collisionMatrix.length - this.notRespawnable)) + this.notRespawnable
+            tileX = Math.floor(Math.random() * ((this.collisionMatrix[0].length - this.notRespawnable) - this.notRespawnable) + this.notRespawnable)
+            tileY = Math.floor(Math.random() * ((this.collisionMatrix.length - this.notRespawnable) - this.notRespawnable) + this.notRespawnable) 
 
             /* Calculate actual position to check it's not the sames as the other bonus */
             x = (tileX * this.tile.width) + (this.tile.width - this.width)/2,

@@ -502,6 +502,8 @@ export default class Online extends Engine{
         let bulletKitPos
         let medicalKitPos
 
+        if(this.playerStats)
+            console.log(this.playerStats.posX, this.playerStats.posY);
         /* calculate local position of bulletKit */
         if(this.state.bonusKits.bulletKit){
             bulletKitPos = {
