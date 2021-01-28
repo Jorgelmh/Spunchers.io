@@ -276,7 +276,7 @@ export default class Online extends Engine{
             this.updateState()
         }
 
-        //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
+        console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
 
         if(this.canRegulateDelay){
             if(this.buffer.length === 0)
@@ -590,9 +590,6 @@ export default class Online extends Engine{
             /* Check if the player is reloading */
             this.reloading = this.playerStats.reloading
         }
-
-        if(this.state.bonusKits.bulletKit && this.playerStats)
-            console.log(this.playerStats.posX - this.state.flags[0].pos.x , this.playerStats.posY - this.state.flags[0].pos.y);
     }
 
     /* Emit bullet to server */
