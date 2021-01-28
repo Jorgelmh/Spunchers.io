@@ -34,6 +34,10 @@ app.get('/teams', (req, res) => {
     res.render('teams')
 })
 
+app.get('/ctf', (req, res) => {
+    res.render('teams')
+})
+
 app.get('/offline', (req, res) => {
     res.sendFile(path.join(__dirname + '/public/views/offline.html'))
 })

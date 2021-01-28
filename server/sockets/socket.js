@@ -7,9 +7,11 @@
 const socketIO = require('socket.io')
 const FreeforAll = require('./classes/games/FreeforAll')
 const TeamDeathmatch = require('./classes/games/TeamDeathmatch')
+const CaptureTheFlag = require('./classes/games/CaptureTheFlag')
+
 const map = require('./maps/castle.json')
 
-/* Scoket listener */
+/* Socket listener */
 const socketListen = (app) => {
 
     const io = socketIO(app, {pingInterval: 1000})
@@ -19,6 +21,9 @@ const socketListen = (app) => {
     
     /* Lobby for team deathmatch game */
     const teamDeathmatch = new TeamDeathmatch(map, io)
+
+    /* Lobby for team capture the flag game */
+    const captureTheFlag = new CaptureTheFlag(map, io)
     
     /**
      * ====================================
@@ -48,6 +53,11 @@ const socketListen = (app) => {
             socket.emit('loadMap', teamDeathmatch.onLoadMap(socket.id))
             socket.join(teamDeathmatch.roomname)
             socket.emit('load team members', teamDeathmatch.getPlayers())
+
+        }else if(gamemode === 'ctf'){
+            socket.emit('loadMap', captureTheFlag.onLoadMap(socket.id))
+            socket.join(captureTheFlag.roomname)
+            socket.emit('load team members', captureTheFlag.getPlayers())
         }
 
         /* When a new player enters the lobby => Note: Validations on repetitions are in the client version of the game*/
@@ -59,7 +69,7 @@ const socketListen = (app) => {
             let ids
 
             /* 0 -> Free for all */
-            if(data.game.mode === 0){
+            if(data.game.mode === freeforall.gameCode){
                 freeforall.addPlayers(data, socket.id)
                 skins = freeforall.getSkins(socket.id)
 
@@ -74,24 +84,36 @@ const socketListen = (app) => {
             }
 
             /* 1 -> Team deathmatch */
-            else if(data.game.mode === 1){
+            else if(data.game.mode === teamDeathmatch.gameCode){
 
-                if(data.game.team)
-                    teamDeathmatch.addPlayers(data, socket.id, teamDeathmatch.team2)
-                else
-                    teamDeathmatch.addPlayers(data, socket.id, teamDeathmatch.team1)
+               teamDeathmatch.selectTeam(data, socket.id)
         
-                skins = teamDeathmatch.getSkins(socket.id)
-                /* set roomname */
-                roomname = teamDeathmatch.roomname
+               let [skinteams, idTeams] = teamDeathmatch.prepareNewPlayer(socket.id)
 
-                /* set ids of players currently in the room*/
-                ids= teamDeathmatch.getIds()
+                skins = skinteams
+                ids = idTeams
+
+                roomname = teamDeathmatch.roomname
 
                 /* Send scores */
                 socket.emit('New teams leaderboard', teamDeathmatch.scores)
-                io.to(teamDeathmatch.roomname).emit('load team members', teamDeathmatch.getPlayers())
                
+            }
+
+            /* 2 -> Capture the flag */
+            else if(data.game.mode === captureTheFlag.gameCode){
+                captureTheFlag.selectTeam(data, socket.id)
+
+                let [skinteams, idTeams] = captureTheFlag.prepareNewPlayer(socket.id)
+
+                skins = skinteams
+                ids = idTeams
+
+                roomname = captureTheFlag.roomname
+                
+                /* Send scores */
+                socket.emit('New teams leaderboard', captureTheFlag.scores)
+
             }
 
             /* Other players load new player's skin */
@@ -111,31 +133,43 @@ const socketListen = (app) => {
             
 
             else if(gamemode === 'teams')
-                teamDeathmatch.onMovement(teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id], data, socket.id)
+                teamDeathmatch.onMovement(teamDeathmatch.blueTeam[socket.id] || teamDeathmatch.redTeam[socket.id], data, socket.id)
+            
+            else if(gamemode === 'ctf')
+                captureTheFlag.onMovement(captureTheFlag.blueTeam[socket.id] || captureTheFlag.redTeam[socket.id], data, socket.id)
             
         })
 
         socket.on('disconnect', (data) => {
 
             if(gamemode === 'online'){
+
                 freeforall.removePlayer(socket.id) 
-                if(Object.keys(freeforall.players).length === 0) freeforall.onlineChat.messages = []
-                io.to(freeforall.roomname).emit('New leaderboard', freeforall.sortScores(freeforall.players))
                 socket.to(freeforall.roomname).emit('Player Disconnected', socket.id)
 
             }else if(gamemode === 'teams'){
+
                 teamDeathmatch.removePlayer(socket.id)
-                if(Object.keys(teamDeathmatch.team1).length + Object.keys(teamDeathmatch.team2).length === 0) teamDeathmatch.onlineChat.messages = []
                 socket.to(teamDeathmatch.roomname).emit('Player Disconnected', socket.id)
-                io.to(teamDeathmatch.roomname).emit('load team members', teamDeathmatch.getPlayers())
+
+            }else if(gamemode === 'ctf'){
+
+                captureTheFlag.removePlayer(socket.id)
+                socket.to(captureTheFlag.roomname).emit('Player Disconnected', socket.id)
+
             }
         })
 
         socket.on('reload weapon', (data) => {
+
             if(gamemode === 'online')
                 freeforall.reloadPlayerWeapon(freeforall.players[socket.id])
+
             else if(gamemode === 'teams')
-                teamDeathmatch.reloadPlayerWeapon(teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id])
+                teamDeathmatch.reloadPlayerWeapon(teamDeathmatch.blueTeam[socket.id] || teamDeathmatch.redTeam[socket.id])
+            
+            else if(gamemode === 'ctf')
+                captureTheFlag.reloadPlayerWeapon(captureTheFlag.blueTeam[socket.id] || captureTheFlag.redTeam[socket.id])
         })
 
         /* Listener of players shooting */
@@ -145,8 +179,13 @@ const socketListen = (app) => {
             if(gamemode === 'online')
                 freeforall.addBullet(freeforall.players[socket.id], data.bullet, data.shootTime, socket.id)
             else if(gamemode === 'teams'){
-                let teamBullet = (teamDeathmatch.team1[socket.id]) ? {player: teamDeathmatch.team1[socket.id], bullets: teamDeathmatch.bulletsTeam1} : {player: teamDeathmatch.team2[socket.id], bullets: teamDeathmatch.bulletsTeam2}
+                let teamBullet = (teamDeathmatch.blueTeam[socket.id]) ? {player: teamDeathmatch.blueTeam[socket.id], bullets: teamDeathmatch.bulletsBlueTeam} : {player: teamDeathmatch.redTeam[socket.id], bullets: teamDeathmatch.bulletsRedTeam}
                 teamDeathmatch.addBullet(teamBullet.player, data.bullet, data.shootTime, socket.id, teamBullet.bullets)
+            }
+
+            else if(gamemode === 'ctf'){
+                let teamBullet = (captureTheFlag.blueTeam[socket.id]) ? {player: captureTheFlag.blueTeam[socket.id], bullets: captureTheFlag.bulletsBlueTeam} : {player: captureTheFlag.redTeam[socket.id], bullets: captureTheFlag.bulletsRedTeam}
+                captureTheFlag.addBullet(teamBullet.player, data.bullet, data.shootTime, socket.id, teamBullet.bullets)
             }
         })
 
@@ -164,10 +203,16 @@ const socketListen = (app) => {
                 if(name)
                     io.to(freeforall.roomname).emit('new Chat Message', {name, text: data.text})
             }else if(gamemode === 'teams'){
-                let name = teamDeathmatch.addChatMessage(data.text, teamDeathmatch.team1[socket.id] || teamDeathmatch.team2[socket.id], data.adminID)
+                let name = teamDeathmatch.addChatMessage(data.text, teamDeathmatch.blueTeam[socket.id] || teamDeathmatch.redTeam[socket.id], data.adminID)
 
                 if(name)
                     io.to(teamDeathmatch.roomname).emit('new Chat Message', {name, text: data.text})
+
+            }else if(gamemode === 'ctf'){
+                let name = captureTheFlag.addChatMessage(data.text, captureTheFlag.blueTeam[socket.id] || captureTheFlag.redTeam[socket.id], data.adminID)
+
+                if(name)
+                    io.to(captureTheFlag.roomname).emit('new Chat Message', {name, text: data.text})
             }
 
             

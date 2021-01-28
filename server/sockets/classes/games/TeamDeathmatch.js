@@ -15,18 +15,21 @@ class TeamDeathmatch extends Game{
         this.roomname = 'teamdeathmatch'
 
         /* Hash map of players of every team */
-        this.team1 = {}
-        this.team2 = {}
+        this.blueTeam = {}
+        this.redTeam = {}
 
         /* Bullet arrays of every team */
-        this.bulletsTeam1 = []
-        this.bulletsTeam2 = []
+        this.bulletsBlueTeam = []
+        this.bulletsRedTeam = []
 
         /* Team scores */
         this.scores = {
-            team1: 0,
-            team2: 0
+            blueTeam: 0,
+            redTeam: 0
         }
+
+        /* Gamemode-code */
+        this.gameCode = 1
     }
 
     /**
@@ -42,21 +45,21 @@ class TeamDeathmatch extends Game{
         let dt = (now - this.lastRefresh)/1000
         this.lastRefresh = now
 
-        if(this.bulletsTeam1.length > 0)
-            this.updateBulletsPosition(dt, this.team2, this.bulletsTeam1)  
+        if(this.bulletsBlueTeam.length > 0)
+            this.updateBulletsPosition(dt, this.redTeam, this.bulletsBlueTeam)  
         
-        if(this.bulletsTeam2.length > 0)
-            this.updateBulletsPosition(dt, this.team1, this.bulletsTeam2)
+        if(this.bulletsRedTeam.length > 0)
+            this.updateBulletsPosition(dt, this.blueTeam, this.bulletsRedTeam)
 
         /* return only the info the user needs to know about the players */
-        let clientPlayers = [this.serializePlayers(this.team1), this.serializePlayers(this.team2)]
+        let clientPlayers = [this.serializePlayers(this.blueTeam), this.serializePlayers(this.redTeam)]
 
         /* Check bonus position */
         let bonusKits = this.checkBonusKits()
 
         return {
             players: clientPlayers,
-            bullets: [...this.bulletsTeam1, ...this.bulletsTeam2],
+            bullets: [...this.bulletsBlueTeam, ...this.bulletsRedTeam],
             serverTime: Date.now(),
             bonusKits
         }
@@ -66,21 +69,52 @@ class TeamDeathmatch extends Game{
     removePlayer(playerID){
 
         /* Delete depending on their team */
-        if(this.team1[playerID])
-            delete this.team1[playerID]
+        if(this.blueTeam[playerID])
+            delete this.blueTeam[playerID]
         
         else
-            delete this.team2[playerID]
+            delete this.redTeam[playerID]
 
-        if(Object.keys(this.team1).length === 0 && Object.keys(this.team2).length === 0)
-            this.scores = {team1: 0, team2: 0}
+        if(Object.keys(this.blueTeam).length === 0 && Object.keys(this.redTeam).length === 0)
+            this.scores = {blueTeam: 0, redTeam: 0}
 
+        /* If the room is empty flush the chat */
+        if(Object.keys(this.blueTeam).length + Object.keys(this.redTeam).length === 0) this.onlineChat.messages = []
+
+        /* notify the rest of the players that someone has abandoned the lobby */
+        this.socketIO.to(this.roomname).emit('load team members', this.getPlayers())
+
+    }
+
+
+    /* Decide team for new player */
+    selectTeam(data, socketID){
+        if(data.game.team)
+            this.addPlayers(data, socketID, this.redTeam)
+        else
+            this.addPlayers(data, socketID, this.blueTeam)
+    }
+
+    /* Prepare new player -> set data and socket to other players */
+    prepareNewPlayer(socketID){
+        let skins, ids
+
+        skins = this.getSkins(socketID)
+
+        /* set ids of players currently in the room*/
+        ids = this.getIds()
+
+        this.socketIO.to(this.roomname).emit('load team members', this.getPlayers())
+
+        return [skins,
+            ids]
+            
     }
 
     /* Reduce life of a hit player */
     reduceLife(hitID, shooterID){
-        let hitPlayer = this.team1[hitID] || this.team2[hitID]
-        let shooterPlayer = this.team1[shooterID] || this.team2[shooterID]
+        let hitPlayer = this.blueTeam[hitID] || this.redTeam[hitID]
+        let shooterPlayer = this.blueTeam[shooterID] || this.redTeam[shooterID]
 
         hitPlayer.lastHit = Date.now()
 
@@ -90,14 +124,14 @@ class TeamDeathmatch extends Game{
 
     /* Set score, increase the teams score */
     setScore(playerID){
-        let player = this.team1[playerID] || this.team2[playerID]
+        let player = this.blueTeam[playerID] || this.redTeam[playerID]
         player.score ++
 
         /* Increment team's score */
-        if(this.team1[playerID])
-            this.scores.team1 ++
+        if(this.blueTeam[playerID])
+            this.scores.blueTeam ++
         else
-            this.scores.team2 ++
+            this.scores.redTeam ++
 
     }
 
@@ -109,7 +143,7 @@ class TeamDeathmatch extends Game{
 
    playerHasDied(playerID){
 
-        let currentPlayer = this.team1[playerID] || this.team2[playerID]
+        let currentPlayer = this.blueTeam[playerID] || this.redTeam[playerID]
         /* Sync check time */
         currentPlayer.lastDeath = Date.now()
 
@@ -120,10 +154,10 @@ class TeamDeathmatch extends Game{
         let newPosition = this.respawnPlayerPosition()
 
         /* Remove bullets when a player dies */
-        if(this.team1[playerID])
-            this.bulletsTeam1 = this.bulletsTeam1.filter((elem) => elem.ownerID !== playerID)
+        if(this.blueTeam[playerID])
+            this.bulletsBlueTeam = this.bulletsBlueTeam.filter((elem) => elem.ownerID !== playerID)
         else
-            this.bulletsTeam2 = this.bulletsTeam2.filter((elem) => elem.ownerID !== playerID)
+            this.bulletsRedTeam = this.bulletsRedTeam.filter((elem) => elem.ownerID !== playerID)
 
 
         let tempFlip = currentPlayer.character.currentSprite.flip
@@ -152,7 +186,8 @@ class TeamDeathmatch extends Game{
         }
 
     /* Emit new leaderboard */
-    this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scores)
+    if(this.gameCode === 1)
+        this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scores)
         
 }
 
@@ -166,18 +201,18 @@ class TeamDeathmatch extends Game{
     getSkins(playerID){
         let srcArray = []
 
-        for(let playerID in this.team1){
-            if(srcArray.indexOf(this.team1[playerID].skin))
-                srcArray.push(this.team1[playerID].skin)
+        for(let playerID in this.blueTeam){
+            if(srcArray.indexOf(this.blueTeam[playerID].skin))
+                srcArray.push(this.blueTeam[playerID].skin)
         }
 
-        for(let playerID in this.team2){
-            if(srcArray.indexOf(this.team2[playerID].skin))
-                srcArray.push(this.team2[playerID].skin)
+        for(let playerID in this.redTeam){
+            if(srcArray.indexOf(this.redTeam[playerID].skin))
+                srcArray.push(this.redTeam[playerID].skin)
         }
 
         /* Player object */
-        let player = this.team1[playerID] || this.team2[playerID]
+        let player = this.blueTeam[playerID] || this.redTeam[playerID]
 
         return {
             srcArray,
@@ -191,13 +226,13 @@ class TeamDeathmatch extends Game{
     /* return players for the pre-lobby screen */
     getPlayers(){
         return {
-            blues: Object.values(this.team1).map(player => {
+            blues: Object.values(this.blueTeam).map(player => {
                 return {
                     name: player.playerName,
                     skin: player.skin
                 }
             }),
-            reds: Object.values(this.team2).map(player => {
+            reds: Object.values(this.redTeam).map(player => {
                 return {
                     name: player.playerName,
                     skin: player.skin
@@ -208,7 +243,7 @@ class TeamDeathmatch extends Game{
 
     /* return every socket's id in the room */
     getIds(){
-        return [...Object.keys(this.team1), ...Object.keys(this.team2)]
+        return [...Object.keys(this.blueTeam), ...Object.keys(this.redTeam)]
     }
 }
 

@@ -157,6 +157,9 @@ export default class Engine{
         /* Bonus kits that will be around the map */
         this.kits = {}
 
+        /* Flag sprites in case they have to be loaded */
+        this.flags = {}
+
         /* gunshot sound radius -> in pixels */
         this.soundWaves = {
             bullets: 600,
@@ -246,8 +249,7 @@ export default class Engine{
         let loaded = 0
         const onload = () => {
             if(++loaded >= 2){
-                this.closeLoadingScreen()
-                requestAnimationFrame(this.render)
+                this.loadFlags()
             }
         }
 
@@ -261,6 +263,37 @@ export default class Engine{
         this.kits.bullets.onload = onload
         this.kits.bullets.src = '../assets/resources/bullets-kit.png'
 
+        console.log(this.mode);
+
+    }
+
+    loadFlags(){
+
+        /* if the game mode is not capture the flag then we're done loading assets */
+        if(this.mode !== 2){
+            this.closeLoadingScreen()
+            requestAnimationFrame(this.render)
+
+            return
+        }
+
+        /* if the game mode is capture the flag then load the flag sprites */
+        let loaded = 0
+        let callback = () => {
+            if(++loaded >= 2){
+                this.closeLoadingScreen()
+                requestAnimationFrame(this.render)
+            }
+        }
+
+        this.flags.blue = new Image()
+        this.flags.blue.onload = callback
+        this.flags.blue.src = '../assets/resources/blue-flag.png'
+
+        this.flags.red = new Image()
+        this.flags.red.onload = callback
+        this.flags.red.src = '../assets/resources/red-flag.png'
+        
     }
 
     /* Shut loading screen once every element's been downloaded */

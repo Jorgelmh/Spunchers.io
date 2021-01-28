@@ -96,7 +96,6 @@ class Character {
             cartesianValueOfMovement: this.cartesianValueOfMovement,
             still:  this.still,
             reloading: this.reloading,
-            stepping: this.stepping
         }
     }
 }

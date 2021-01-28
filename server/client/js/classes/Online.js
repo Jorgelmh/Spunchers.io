@@ -25,6 +25,9 @@ export default class Online extends Engine{
         /* online team */
         this.team = (game.mode) ? game.team : undefined
 
+        /* game mode */
+        this.mode = game.mode
+
         /* Create a chat room */
         this.chat = new OnlineChat(this.socketIO)
 
@@ -108,7 +111,6 @@ export default class Online extends Engine{
             }else
                 this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
 
-            console.log(this.sounds.footsteps);
         })
 
         /* When a player's been disconnected set its footstep variable as free, so that new players can used it, without needing to load the audio again */
@@ -116,7 +118,7 @@ export default class Online extends Engine{
             if(this.sounds.footsteps[id])
                 this.sounds.footsteps[id].free = true
             
-            console.log(id, this.sounds.footsteps);
+            console.log(`Someone disconnected from the lobby`);
         })
 
         /* When the score changes */
@@ -143,8 +145,8 @@ export default class Online extends Engine{
 
         /* Scores from a team based lobby */
         this.socketIO.on('New teams leaderboard', (data)=>{
-            document.getElementById('fbi-score').innerHTML = data.team1
-            document.getElementById('gambinos-score').innerHTML = data.team2
+            document.getElementById('fbi-score').innerHTML = data.blueTeam
+            document.getElementById('gambinos-score').innerHTML = data.redTeam
         })
 
         this.socketIO.on('pong', (ms) => {
@@ -211,6 +213,10 @@ export default class Online extends Engine{
         this.drawShadows()
         this.drawObjects()
         this.drawBonusKits()
+
+        if(this.state.flags)
+            this.drawFlags()
+
         this.drawBullets()
         this.drawOtherPlayers()
 
@@ -453,7 +459,7 @@ export default class Online extends Engine{
                 let bulletX = this.transformServerMagnitudesX(element.posX)+this.tileMap.startX
                 let bulletY = this.transformServerMagnitudesY(element.posY)+this.tileMap.startY
 
-                if(bulletX >= 0 && bulletX < this.screenTiles.x * this.tile.width && bulletY >= 0 && bulletY < this.screenTiles.y * this.tile.height){
+                if(bulletX >= 0 && bulletX < this.screenTiles.x * this.tile.width && bulletY + this.bulletSprite.width >= 0 && bulletY < this.screenTiles.y * this.tile.height){
                     this.context.save()
                     this.context.scale(element.flip, 1)
     
@@ -502,8 +508,6 @@ export default class Online extends Engine{
         let bulletKitPos
         let medicalKitPos
 
-        if(this.playerStats)
-            console.log(this.playerStats.posX, this.playerStats.posY);
         /* calculate local position of bulletKit */
         if(this.state.bonusKits.bulletKit){
             bulletKitPos = {
@@ -521,11 +525,55 @@ export default class Online extends Engine{
         }
          
 
-        if(bulletKitPos && bulletKitPos.x >= 0 && bulletKitPos.x < this.screenTiles.x * this.tile.width && bulletKitPos.y >= 0 && bulletKitPos.y < this.screenTiles.y * this.tile.height)
+        if(bulletKitPos && bulletKitPos.x + this.tile.width >= 0 && bulletKitPos.x < this.screenTiles.x * this.tile.width && bulletKitPos.y + this.tile.height >= 0 && bulletKitPos.y < this.screenTiles.y * this.tile.height)
             drawKit(this.kits.bullets, bulletKitPos)
 
-        if(medicalKitPos && medicalKitPos.x >= 0 && medicalKitPos.x < this.screenTiles.x * this.tile.width && medicalKitPos.y >= 0 && medicalKitPos.y < this.screenTiles.y * this.tile.height)
+        if(medicalKitPos && medicalKitPos.x + this.tile.width >= 0 && medicalKitPos.x < this.screenTiles.x * this.tile.width && medicalKitPos.y + this.tile.height >= 0 && medicalKitPos.y < this.screenTiles.y * this.tile.height)
             drawKit(this.kits.medical, medicalKitPos)
+    }
+
+    /**
+     *  ============================
+     *      DRAW FLAGS ON CANVAS
+     *  ============================
+     */
+    drawFlags(){
+        /* Pick flag color depending on the team */
+        let flags = (this.state.players[0][this.playerID]) ? [this.flags.blue, this.flags.red] : [this.flags.red, this.flags.blue]
+
+        /* Server blue flag */
+        let serverBlueFlag = {
+            x: this.transformServerMagnitudesX(this.state.flags[0].pos.x)+this.tileMap.startX,
+            y: this.transformServerMagnitudesY(this.state.flags[0].pos.y)+this.tileMap.startY
+        }
+
+        let serverRedFlag = {
+            x: this.transformServerMagnitudesX(this.state.flags[1].pos.x)+this.tileMap.startX,
+            y: this.transformServerMagnitudesY(this.state.flags[1].pos.y)+this.tileMap.startY
+        }
+
+        let carrierBlue = (this.state.flags[0].carrier) ? this.state.players[1][this.state.flags[0].carrier] : false
+        let carrierRed = (this.state.flags[1].carrier) ? this.state.players[0][this.state.flags[1].carrier] : false
+
+        /* render the flags onto the canvas */
+        this.renderFlag(flags[0], serverBlueFlag, carrierBlue)
+        this.renderFlag(flags[1], serverRedFlag, carrierRed)
+
+    }
+
+    renderFlag(img, pos, carrier){
+
+        let flip = (carrier) ? carrier.character.currentSprite.flip * (-1) : 1
+
+        let posX = (flip === 1) ?  pos.x : pos.x * flip - this.tile.width
+
+        this.context.save()
+        this.context.scale(flip, 1)
+
+        if(pos && pos.x + this.tile.width >= 0 && pos.x < this.screenTiles.x * this.tile.width && pos.y + this.tile.height >= 0 && pos.y < this.screenTiles.y * this.tile.height)
+            this.context.drawImage(img, this.staticAnimation.x * this.character.spriteSheet.width, 0, this.character.spriteSheet.width, this.character.spriteSheet.height, posX, pos.y, this.tile.width, this.tile.height)
+
+        this.context.restore()
     }
 
     /** Update state */
@@ -542,6 +590,9 @@ export default class Online extends Engine{
             /* Check if the player is reloading */
             this.reloading = this.playerStats.reloading
         }
+
+        if(this.state.bonusKits.bulletKit && this.playerStats)
+            console.log(this.playerStats.posX - this.state.flags[0].pos.x , this.playerStats.posY - this.state.flags[0].pos.y);
     }
 
     /* Emit bullet to server */

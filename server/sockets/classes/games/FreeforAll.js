@@ -17,6 +17,9 @@ class FreeforAll extends Game{
         /* Arrays for players and active bullets */
         this.players = {}
         this.bullets = []
+
+        /* Gamemode-code */
+        this.gameCode = 0
     }
 
     /**
@@ -53,7 +56,10 @@ class FreeforAll extends Game{
     /* Remove Player ->  recieves the socket id as the parameter */
 
     removePlayer = (id) => {
-        delete this.players[id]  
+        delete this.players[id] 
+
+        if(Object.keys(this.players).length === 0) this.onlineChat.messages = []
+        this.socketIO.to(this.roomname).emit('New leaderboard', this.sortScores(this.players))
     }
 
     /** 

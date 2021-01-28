@@ -38,8 +38,16 @@ const createEngine = (team) => {
 
     document.getElementById('site-ajax-loader').style.display = 'block'
     body.removeChild(selectTeam)
+
+    let mode
+    if(location.pathname === '/teams')
+        mode = 1
+
+    else if (location.pathname === '/ctf')
+        mode = 2
+
     const engine = new Online(game.lobby.map, game.lobby.collisionMatrix, game.lobby.shadowMap ,game.lobby.tileSet, 
-                    document.getElementById('game'), socket, game.playerID, game.lobby.server, characterSkins[glide.index], name, {mode: 1, team})
+                    document.getElementById('game'), socket, game.playerID, game.lobby.server, characterSkins[glide.index], name, {mode, team})
 
 }
 
@@ -91,7 +99,6 @@ socket.on('loadMap', (data) => {
 })
 
 socket.on('load team members', (data) => {
-    console.log(data);
     players = data
 
     /* If we've already clicked play and are at the selecte team screen refresh team-members */

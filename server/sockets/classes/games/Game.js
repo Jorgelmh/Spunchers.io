@@ -186,23 +186,44 @@ class Game {
         let medicalKit = this.bonusKitRespawner.medicalKit
 
         /*  Analyze collision with bonus kit */
-        if(bulletKit.position && (bulletKit.position.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && bulletKit.position.x + this.tile.width/3 > player.posX + (this.tile.width/4))
-            && (bulletKit.position.y < player.posY + 6*(this.tile.width/7) && bulletKit.position.y + this.tile.height/2 > player.posY + (this.tile.width/4))){
+        if(bulletKit.position && this.getCollision(bulletKit.position, player)){
                 bulletKit.position = null
                 player.bulletsCharger = player.ammunition
                 bulletKit.lastPicked = Date.now()
                 this.socketIO.to(socketID).emit('Capture bulletKit')
         }
 
-        if(medicalKit.position && (medicalKit.position.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && medicalKit.position.x + this.tile.width/3 > player.posX + (this.tile.width/4))
-            && (medicalKit.position.y < player.posY + 6*(this.tile.width/7) && medicalKit.position.y + this.tile.height/2 > player.posY + (this.tile.width/4))){
+        if(medicalKit.position && this.getCollision(medicalKit.position, player)){
                 medicalKit.position = null
                 player.life = 100
                 medicalKit.lastPicked = Date.now()
                 this.socketIO.to(socketID).emit('Capture medicalKit')
-        }        
+        }
+        
+        /* When running a capture the flag game check also collisions with the flags */
+        if(this.gameCode === 2){
+            this.checkFlagCollision(socketID)
+        }
 
         return false
+    }
+
+    /**
+     *  =======================
+     *      COLLIDE LOGIC
+     *  =======================
+     */
+
+    getCollision(object1, player){
+
+        if((object1.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && object1.x + this.tile.width/3 > player.posX + (this.tile.width/4))
+            && (object1.y < player.posY + 6*(this.tile.width/7) && object1.y + this.tile.height/2 > player.posY + (this.tile.width/4)))
+                return true
+            
+                
+        
+        return false
+            
     }
 
     /**
@@ -387,6 +408,7 @@ class Game {
     serializePlayers(players){
         return Object.fromEntries(Object.entries(players).map(([id, player]) => {
 
+            /* Interpolate player's packet buffer */
             if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0 && player.buffer.length > 0){
                 this.calculateMovement(player, player.dequeueState(), id)
             }
