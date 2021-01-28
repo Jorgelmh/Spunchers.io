@@ -112,8 +112,6 @@ export default class Keyboard {
         let movement = {x: 0, y: 0}
 
         if(this.controls.goUp && this.controls.goLeft){
-            movement.x = - Math.sin(Math.PI / 4)
-            movement.y = - Math.sin(Math.PI / 4)
             if(this.character.currentSprite.y != 3){
                 this.character.stopMoving()
                 this.character.onMovingForwardLeft()
@@ -121,8 +119,6 @@ export default class Keyboard {
         }
 
         if(this.controls.goUp && this.controls.goRight){
-            movement.x = Math.sin(Math.PI / 4)
-            movement.y = - Math.sin(Math.PI / 4)
             if(this.character.currentSprite.y != 3){
                 this.character.stopMoving()
                 this.character.onMovingForwardRight()
@@ -130,8 +126,6 @@ export default class Keyboard {
         }
 
         if(this.controls.goDown && this.controls.goRight){
-            movement.x = Math.sin(Math.PI / 4)
-            movement.y = Math.sin(Math.PI / 4)
             if(this.character.currentSprite.y != 4){
                 this.character.stopMoving()
                 this.character.onMovingBackwardsRight()
@@ -139,9 +133,6 @@ export default class Keyboard {
         }
 
         if(this.controls.goDown && this.controls.goLeft){
-            movement.x = -Math.sin(Math.PI / 4)
-            movement.y = Math.sin(Math.PI / 4)
-
             if(this.character.currentSprite.y != 4){
                 this.character.stopMoving()
                 this.character.onMovingBackwardsLeft()
@@ -180,6 +171,8 @@ export default class Keyboard {
 
         if(this.shoot)
             this.createBullet()
+
+        console.log(movement);
             
         if(movement.x !== 0 || movement.y !== 0)
             this.emitPosition(movement)

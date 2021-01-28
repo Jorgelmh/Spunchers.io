@@ -8,10 +8,10 @@ class Sydnie extends Character{
         /* Specific data about this character */
         this.skin = 'sydnie'
         this.shootingDelay = 90
-        this.impactDamage = 20
+        this.impactDamage = 15
 
         /* Full charger bullets */
-        this.ammunition = 60
+        this.ammunition = 50
 
         /* Current state of the charger */
         this.bulletsCharger = this.ammunition

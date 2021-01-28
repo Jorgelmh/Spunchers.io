@@ -276,13 +276,13 @@ export default class Online extends Engine{
             this.updateState()
         }
 
-        console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
+        //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
 
         if(this.canRegulateDelay){
             if(this.buffer.length === 0)
             this.interpolationDelay ++
 
-            if(this.buffer.length >= 5){
+            if(this.buffer.length >= 7){
                 this.buffer.splice(0, this.buffer.length - 3)
                 this.interpolationDelay -= 4
             }
