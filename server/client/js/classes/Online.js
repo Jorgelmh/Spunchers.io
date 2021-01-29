@@ -282,6 +282,7 @@ export default class Online extends Engine{
 
         //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
 
+        /*
         if(this.canRegulateDelay){
             if(this.buffer.length === 0)
             this.interpolationDelay ++
@@ -291,6 +292,7 @@ export default class Online extends Engine{
                 this.interpolationDelay -= 4
             }
         }
+        */
         
     }
 
