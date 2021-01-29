@@ -59,7 +59,7 @@ export default class Online extends Engine{
         this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = 19
+        this.interpolationDelay = 100
 
         /* Auto-regulate the interpolationDelay based on users connection */
         this.canRegulateDelay = false
