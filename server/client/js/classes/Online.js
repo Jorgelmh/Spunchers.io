@@ -59,7 +59,7 @@ export default class Online extends Engine{
         this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = 100
+        this.interpolationDelay = 18
 
         /* Auto-regulate the interpolationDelay based on users connection */
         this.canRegulateDelay = false
@@ -267,15 +267,12 @@ export default class Online extends Engine{
 
     interpolate(){
 
-        if(this.buffer[0].players[this.playerID] && Date.now() - this.buffer[0].players[this.playerID].timeStamp >= this.interpolationDelay && this.buffer.length){
-            console.log(Date.now() - this.buffer[0].players[this.playerID].timeStamp, this.buffer.length);
-
+        if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
+            console.log(Date.now() - this.lastInterpolation, this.buffer.length);
             this.lastInterpolation = Date.now()
             /* Dequeue from buffer */
             this.state = this.buffer[0]
-
-            if(this.buffer.length > 1)
-                this.buffer.splice(0, 1)
+            this.buffer.splice(0, 1)
             
             this.updateState()
         }
@@ -287,12 +284,12 @@ export default class Online extends Engine{
             if(this.buffer.length === 0)
             this.interpolationDelay ++
 
-            if(this.buffer.length >= 7){
-                this.buffer.splice(0, this.buffer.length - 3)
-                this.interpolationDelay -= 4
-            }
+            
+        }*/
+
+        if(this.buffer.length >= 6){
+            this.buffer.splice(0, this.buffer.length - 5)
         }
-        */
         
     }
 
@@ -303,8 +300,7 @@ export default class Online extends Engine{
             cartisianMovement: this.controls.cartesianValueOfMovement,
             character: {
                 currentSprite: this.character.currentSprite
-            },
-            timeStamp: Date.now()
+            }
         })
     }
 
