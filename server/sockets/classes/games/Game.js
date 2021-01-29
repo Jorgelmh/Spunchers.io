@@ -74,8 +74,6 @@ class Game {
 
         /* renew life after 10 seconds */
         this.renewLife = 10000
-
-        this.setUpdate()
     }
 
 
@@ -217,11 +215,9 @@ class Game {
     getCollision(object1, player){
 
         if((object1.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && object1.x + this.tile.width/3 > player.posX + (this.tile.width/4))
-            && (object1.y < player.posY + 6*(this.tile.width/7) && object1.y + this.tile.height/2 > player.posY + (this.tile.width/4)))
+            && (object1.y < player.posY + 6*(this.tile.width/7) && object1.y + this.tile.height > player.posY + (this.tile.width/4)))
                 return true
             
-                
-        
         return false
             
     }

@@ -268,6 +268,7 @@ export default class Online extends Engine{
     interpolate(){
 
         if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
+            console.log(`${Date.now() - this.lastInterpolation}`, this.buffer.length);
             this.lastInterpolation = Date.now()
             /* Dequeue from buffer */
             this.state = this.buffer[0]
@@ -277,17 +278,10 @@ export default class Online extends Engine{
         }
 
         //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
-
-        if(this.canRegulateDelay){
-            if(this.buffer.length === 0)
-            this.interpolationDelay ++
-
-            if(this.buffer.length >= 7){
-                this.buffer.splice(0, this.buffer.length - 3)
-                this.interpolationDelay -= 4
-            }
+        if(this.buffer.length >= 6){
+            this.buffer.splice(0, this.buffer.length - 5)
+            //this.interpolationDelay -= 4
         }
-        
     }
 
     /* Send data back to the server */
@@ -539,7 +533,7 @@ export default class Online extends Engine{
      */
     drawFlags(){
         /* Pick flag color depending on the team */
-        let flags = (this.state.players[0][this.playerID]) ? [this.flags.blue, this.flags.red] : [this.flags.red, this.flags.blue]
+        let flags = (this.state.players[0][this.playerID]) ? [this.flags.blue, this.flags.red, this.pointers.blue, this.pointers.red] : [this.flags.red, this.flags.blue, this.pointers.red, this.pointers.blue]
 
         /* Server blue flag */
         let serverBlueFlag = {
@@ -556,12 +550,12 @@ export default class Online extends Engine{
         let carrierRed = (this.state.flags[1].carrier) ? this.state.players[0][this.state.flags[1].carrier] : false
 
         /* render the flags onto the canvas */
-        this.renderFlag(flags[0], serverBlueFlag, carrierBlue)
-        this.renderFlag(flags[1], serverRedFlag, carrierRed)
+        this.renderFlag(flags[0], serverBlueFlag, carrierBlue, flags[2])
+        this.renderFlag(flags[1], serverRedFlag, carrierRed, flags[3])
 
     }
 
-    renderFlag(img, pos, carrier){
+    renderFlag(img, pos, carrier, pointer){
 
         let flip = (carrier) ? carrier.character.currentSprite.flip * (-1) : 1
 
@@ -570,8 +564,27 @@ export default class Online extends Engine{
         this.context.save()
         this.context.scale(flip, 1)
 
+        /* Draw flag if on screen */
         if(pos && pos.x + this.tile.width >= 0 && pos.x < this.screenTiles.x * this.tile.width && pos.y + this.tile.height >= 0 && pos.y < this.screenTiles.y * this.tile.height)
             this.context.drawImage(img, this.staticAnimation.x * this.character.spriteSheet.width, 0, this.character.spriteSheet.width, this.character.spriteSheet.height, posX, pos.y, this.tile.width, this.tile.height)
+        else{
+
+            /* Draw indicator of flag's position */
+            let posX = pos.x
+            let posY = pos.y
+
+            if(pos.x <= 0)
+                posX = 0
+            else if (pos.x >= this.screenTiles.x * this.tile.width)
+                posX = this.screenTiles.x * this.tile.width - this.tile.width/2
+
+            if(pos.y <= 0)
+                posY = 0
+            else if(pos.y >= this.screenTiles.y * this.tile.height)
+                posY = this.screenTiles.y * this.tile.height - (this.tile.height/2)
+            
+            this.context.drawImage(pointer, posX, posY, this.tile.width/2, this.tile.height/2)
+        }
 
         this.context.restore()
     }
@@ -590,6 +603,7 @@ export default class Online extends Engine{
             /* Check if the player is reloading */
             this.reloading = this.playerStats.reloading
         }
+
     }
 
     /* Emit bullet to server */

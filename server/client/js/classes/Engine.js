@@ -159,6 +159,7 @@ export default class Engine{
 
         /* Flag sprites in case they have to be loaded */
         this.flags = {}
+        this.pointers = {}
 
         /* gunshot sound radius -> in pixels */
         this.soundWaves = {
@@ -263,8 +264,6 @@ export default class Engine{
         this.kits.bullets.onload = onload
         this.kits.bullets.src = '../assets/resources/bullets-kit.png'
 
-        console.log(this.mode);
-
     }
 
     loadFlags(){
@@ -280,7 +279,7 @@ export default class Engine{
         /* if the game mode is capture the flag then load the flag sprites */
         let loaded = 0
         let callback = () => {
-            if(++loaded >= 2){
+            if(++loaded >= 4){
                 this.closeLoadingScreen()
                 requestAnimationFrame(this.render)
             }
@@ -293,6 +292,15 @@ export default class Engine{
         this.flags.red = new Image()
         this.flags.red.onload = callback
         this.flags.red.src = '../assets/resources/red-flag.png'
+
+        /* Load flag pointers too */
+        this.pointers.blue = new Image()
+        this.pointers.blue.onload = callback
+        this.pointers.blue.src = '../assets/resources/blue-flag-pointer.png'
+
+        this.pointers.red = new Image()
+        this.pointers.red.onload = callback
+        this.pointers.red.src = '../assets/resources/red-flag-pointer.png'
         
     }
 
@@ -317,16 +325,16 @@ export default class Engine{
 
         /* Dimension of the general canvas */
         this.canvas.width = window.innerWidth
+        this.canvas.height = (this.canvas.width * this.frameRatio < window.innerHeight) ? this.canvas.width * this.frameRatio : window.innerHeight
 
         /* Tile width and height responsive */
         this.tile.width = this.canvas.width/ this.screenTiles.x
-        this.tile.height = this.canvas.width * this.frameRatio / this.screenTiles.y
+        this.tile.height = this.canvas.height / this.screenTiles.y
 
         /* Dimensions of the tile map */
         this.tileMap.width = this.tileMap.tiles[0].length * this.tile.width
         this.tileMap.height = this.tileMap.tiles.length * this.tile.height
 
-        this.canvas.height = (this.canvas.width * this.frameRatio < window.innerHeight) ? this.canvas.width * this.frameRatio : window.innerHeight
 
         /* Start points responsive -> rule of 3*/
         this.tileMap.startX = (this.tileMap.startX * this.tileMap.width) / tempWidth

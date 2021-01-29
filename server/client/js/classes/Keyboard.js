@@ -171,8 +171,6 @@ export default class Keyboard {
 
         if(this.shoot)
             this.createBullet()
-
-        console.log(movement);
             
         if(movement.x !== 0 || movement.y !== 0)
             this.emitPosition(movement)

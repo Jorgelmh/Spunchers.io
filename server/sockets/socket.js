@@ -16,14 +16,17 @@ const socketListen = (app) => {
 
     const io = socketIO(app, {pingInterval: 1000})
 
-    //Lobby for freeforall game
+    //Lobby for freeforall game and start game loop
     const freeforall = new FreeforAll(map, io)
+    freeforall.setUpdate()
     
-    /* Lobby for team deathmatch game */
+    /* Lobby for team deathmatch game and start game loop */
     const teamDeathmatch = new TeamDeathmatch(map, io)
+    teamDeathmatch.setUpdate()
 
-    /* Lobby for team capture the flag game */
+    /* Lobby for team capture the flag game and start game loop */
     const captureTheFlag = new CaptureTheFlag(map, io)
+    captureTheFlag.setUpdate()
     
     /**
      * ====================================
