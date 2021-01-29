@@ -267,11 +267,15 @@ export default class Online extends Engine{
 
     interpolate(){
 
-        if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
+        if(this.buffer[0].players[this.playerID] && Date.now() - this.buffer[0].players[this.playerID].timeStamp >= this.interpolationDelay && this.buffer.length){
+            console.log(Date.now() - this.buffer[0].players[this.playerID].timeStamp);
+
             this.lastInterpolation = Date.now()
             /* Dequeue from buffer */
             this.state = this.buffer[0]
-            this.buffer.splice(0, 1)
+
+            if(this.buffer.length > 1)
+                this.buffer.splice(0, 1)
             
             this.updateState()
         }
@@ -297,7 +301,8 @@ export default class Online extends Engine{
             cartisianMovement: this.controls.cartesianValueOfMovement,
             character: {
                 currentSprite: this.character.currentSprite
-            }
+            },
+            timeStamp: Date.now()
         })
     }
 

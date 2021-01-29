@@ -45,6 +45,8 @@ class Character {
         /* Increase life when player is out of combat */
         this.lastHit = 0
 
+        /* LAST PACKET TIMESTAMP */
+        this.lastPacketTimeStamp = 0
     }
     
     /* dequeue interpolated state */
@@ -96,6 +98,7 @@ class Character {
             cartesianValueOfMovement: this.cartesianValueOfMovement,
             still:  this.still,
             reloading: this.reloading,
+            timeStamp: this.lastPacketTimeStamp
         }
     }
 }

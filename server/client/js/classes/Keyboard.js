@@ -172,9 +172,9 @@ export default class Keyboard {
         if(this.shoot)
             this.createBullet()
             
-        if(movement.x !== 0 || movement.y !== 0)
-            this.emitPosition(movement)
-        else if(this.character.currentSprite.y !== 5){
+        this.emitPosition(movement)
+        
+         if(this.character.currentSprite.y !== 5){
             this.character.onMovingStop()
             this.emitPosition(movement)
         }

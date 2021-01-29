@@ -134,6 +134,7 @@ class Game {
             currentPlayer.character = data.character
             currentPlayer.cartesianValueOfMovement = data.cartisianMovement
             currentPlayer.still = true
+            currentPlayer.lastPacketTimeStamp = data.timeStamp
 
             if(currentPlayer.life > 0 && (data.movement.x !== 0 || data.movement.y !== 0)){
 
