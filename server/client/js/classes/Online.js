@@ -59,7 +59,7 @@ export default class Online extends Engine{
         this.lastInterpolation = 0
 
         /* Constant of interpolation delay */
-        this.interpolationDelay = 15
+        this.interpolationDelay = 19
 
         /* Auto-regulate the interpolationDelay based on users connection */
         this.canRegulateDelay = false
@@ -268,7 +268,6 @@ export default class Online extends Engine{
     interpolate(){
 
         if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
-            console.log(`${Date.now() - this.lastInterpolation}`, this.buffer.length);
             this.lastInterpolation = Date.now()
             /* Dequeue from buffer */
             this.state = this.buffer[0]
@@ -278,10 +277,17 @@ export default class Online extends Engine{
         }
 
         //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
-        if(this.buffer.length >= 6){
-            this.buffer.splice(0, this.buffer.length - 5)
-            //this.interpolationDelay -= 4
+
+        if(this.canRegulateDelay){
+            if(this.buffer.length === 0)
+            this.interpolationDelay ++
+
+            if(this.buffer.length >= 7){
+                this.buffer.splice(0, this.buffer.length - 3)
+                this.interpolationDelay -= 4
+            }
         }
+        
     }
 
     /* Send data back to the server */
