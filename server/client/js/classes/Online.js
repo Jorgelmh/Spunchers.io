@@ -268,7 +268,7 @@ export default class Online extends Engine{
     interpolate(){
 
         if(this.buffer[0].players[this.playerID] && Date.now() - this.buffer[0].players[this.playerID].timeStamp >= this.interpolationDelay && this.buffer.length){
-            console.log(Date.now() - this.buffer[0].players[this.playerID].timeStamp);
+            console.log(Date.now() - this.buffer[0].players[this.playerID].timeStamp, this.buffer.length);
 
             this.lastInterpolation = Date.now()
             /* Dequeue from buffer */
