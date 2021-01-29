@@ -2,6 +2,7 @@ import Engine from './Engine.js'
 import OnlineChat from './OnlineChat.js'
 import Joystick from './Joystick.js'
 import Keyboard from './Keyboard.js'
+import State from './State.js'
 
 /**
  * ================================
@@ -54,27 +55,18 @@ export default class Online extends Engine{
             y: false
         }
 
-        /* Buffer for interpolated state */
-        this.buffer = []
-        this.lastInterpolation = 0
+        /**
+         *  =============================
+         *        INTERPOLATE STATE
+         *  =============================
+         */
 
-        /* Constant of interpolation delay */
-        this.interpolationDelay = 18
-
-        /* Auto-regulate the interpolationDelay based on users connection */
-        this.canRegulateDelay = false
+        this.gameUpdates = new State()
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
 
-            if(this.lastInterpolation === 0){
-                this.state = data
-                this.updateState()
-            }
-
-            this.buffer.push(data)
-
-            this.serverDelay = Date.now() - data.serverTime
+            this.gameUpdates.processGameUpdate(data)
         })
 
         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
@@ -267,29 +259,8 @@ export default class Online extends Engine{
 
     interpolate(){
 
-        if(Date.now() - this.lastInterpolation >= this.interpolationDelay && this.buffer.length){
-            console.log(Date.now() - this.lastInterpolation, this.buffer.length);
-            this.lastInterpolation = Date.now()
-            /* Dequeue from buffer */
-            this.state = this.buffer[0]
-            this.buffer.splice(0, 1)
-            
-            this.updateState()
-        }
-
-        //console.log(`${this.buffer.length} , ${this.interpolationDelay}`);
-
-        /*
-        if(this.canRegulateDelay){
-            if(this.buffer.length === 0)
-            this.interpolationDelay ++
-
-            
-        }*/
-
-        if(this.buffer.length >= 6){
-            this.buffer.splice(0, this.buffer.length - 5)
-        }
+        this.state = this.gameUpdates.getCurrentState()
+        this.updateState()
         
     }
 
