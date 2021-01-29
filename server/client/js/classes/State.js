@@ -8,7 +8,7 @@ class State {
     constructor(){
 
         /* Delay behind server time */
-        this.RENDER_DELAY = 100
+        this.RENDER_DELAY = 80
 
         /* buffer to push new packet states */
         this.buffer = []

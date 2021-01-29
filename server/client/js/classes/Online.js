@@ -181,8 +181,6 @@ export default class Online extends Engine{
         else if(this.team === 1)
             document.getElementById('gambinos-score').style.color = 'rgb(240, 86, 94)'
 
-        setTimeout(()=> this.canRegulateDelay = true, 1000)
-
     }
 
     /**
