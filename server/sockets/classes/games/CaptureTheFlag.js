@@ -57,8 +57,8 @@ class CaptureTheFlag extends TeamDeathMatch{
 
         /* Score */
         this.scores = {
-            blueTeam: 0,
-            redTeam: 0
+            blue: 0,
+            red: 0
         }
 
     }
@@ -131,7 +131,7 @@ class CaptureTheFlag extends TeamDeathMatch{
 
             /* If player is holding the flag and reaches the enemy flag then add point */
             if(currentPlayer && socketID === this.blueFlag.carrier && !this.redFlag.state && Date.now() - this.lastScored.red >= this.delayFlag && this.getCollision(this.redFlag.pos, currentPlayer)){
-                this.scores.redTeam ++
+                this.scores.red ++
                 this.blueFlag.carrier = null
                 this.lastScored.red = Date.now()
                 this.blueFlag.pos = {
@@ -164,7 +164,7 @@ class CaptureTheFlag extends TeamDeathMatch{
             /* If player is holding the flag and reaches the enemy flag then add point */
             if(currentPlayer && socketID === this.redFlag.carrier && !this.blueFlag.state && Date.now() - this.lastScored.blue >= this.delayFlag  && this.getCollision(this.blueFlag.pos, currentPlayer)){
                 
-                this.scores.blueTeam ++
+                this.scores.blue ++
                 this.redFlag.carrier = null
                 this.lastScored.blue = Date.now()
                 this.redFlag.pos = {
