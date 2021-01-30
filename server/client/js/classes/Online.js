@@ -148,14 +148,16 @@ export default class Online extends Engine{
         /* Play sound effect */
         this.socketIO.on('Bullet sound', ({bullet, sound}) => {
 
-            let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
+            if(this.playerStats){
+                let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
 
-            if(distanceFromGunshot <= this.soundWaves.bullets && !window.mobileCheck()){
-                if(!this.sounds[sound].paused)
-                    this.sounds[sound].currentTime = 0
-            
-                this.sounds[sound].volume = (1 - distanceFromGunshot/this.soundWaves.bullets)/2
-                this.sounds[sound].play()
+                if(distanceFromGunshot <= this.soundWaves.bullets && !window.mobileCheck()){
+                    if(!this.sounds[sound].paused)
+                        this.sounds[sound].currentTime = 0
+                
+                    this.sounds[sound].volume = (1 - distanceFromGunshot/this.soundWaves.bullets)/2
+                    this.sounds[sound].play()
+                }
             }
         })
 

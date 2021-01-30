@@ -59,7 +59,6 @@ export default class Keyboard {
 
                 case 'a':
                     this.shoot = true
-                    console.log('Pressing A');                 
                     break
                 case 'r':
                     this.emitReload()
