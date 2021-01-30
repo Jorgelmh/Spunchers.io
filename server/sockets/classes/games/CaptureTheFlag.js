@@ -56,9 +56,9 @@ class CaptureTheFlag extends TeamDeathMatch{
         this.gameCode = 2
 
         /* Score */
-        this.scores = {
-            blue: 0,
-            red: 0
+        this.scoresFlag = {
+            blueTeam: 0,
+            redTeam: 0
         }
 
     }
@@ -173,7 +173,7 @@ class CaptureTheFlag extends TeamDeathMatch{
                 }
                 this.redFlag.state = true
                 /* Emit new leaderboard */
-                this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scores)
+                this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scoresFlag)
             }
             
         }
