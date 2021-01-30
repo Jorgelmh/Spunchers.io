@@ -535,17 +535,16 @@ export default class Online extends Engine{
 
     renderFlag(img, pos, carrier, pointer){
 
-        let flip = (carrier) ? carrier.character.currentSprite.flip * (-1) : 1
-
-        let posX = (flip === 1) ?  pos.x : pos.x * flip - this.tile.width
-
-        this.context.save()
-        this.context.scale(flip, 1)
-
         /* Draw flag if on screen */
-        if(pos && pos.x + this.tile.width >= 0 && pos.x < this.screenTiles.x * this.tile.width && pos.y + this.tile.height >= 0 && pos.y < this.screenTiles.y * this.tile.height)
+        if(pos && pos.x + this.tile.width >= 0 && pos.x < this.screenTiles.x * this.tile.width && pos.y + this.tile.height >= 0 && pos.y < this.screenTiles.y * this.tile.height){
+            let flip = (carrier) ? carrier.character.currentSprite.flip * (-1) : 1
+
+            let posX = (flip === 1) ?  pos.x : pos.x * flip - this.tile.width
+
+            this.context.save()
+            this.context.scale(flip, 1)
             this.context.drawImage(img, this.staticAnimation.x * this.character.spriteSheet.width, 0, this.character.spriteSheet.width, this.character.spriteSheet.height, posX, pos.y, this.tile.width, this.tile.height)
-        else{
+        }else{
 
             /* Draw indicator of flag's position */
             let posX = pos.x
@@ -553,14 +552,15 @@ export default class Online extends Engine{
 
             if(pos.x <= 0)
                 posX = 0
-            else if (pos.x >= this.screenTiles.x * this.tile.width)
+            else if (pos.x >= this.screenTiles.x * this.tile.width - this.tile.width/2)
                 posX = this.screenTiles.x * this.tile.width - this.tile.width/2
 
             if(pos.y <= 0)
                 posY = 0
-            else if(pos.y >= this.screenTiles.y * this.tile.height)
+            else if(pos.y >= this.screenTiles.y * this.tile.height - this.tile.height/2)
                 posY = this.screenTiles.y * this.tile.height - (this.tile.height/2)
             
+            console.log(`${posX}, ${posY}`);    
             this.context.drawImage(pointer, posX, posY, this.tile.width/2, this.tile.height/2)
         }
 
