@@ -115,7 +115,7 @@ const socketListen = (app) => {
                 roomname = captureTheFlag.roomname
                 
                 /* Send scores */
-                socket.emit('New teams leaderboard', captureTheFlag.scores)
+                socket.emit('New teams leaderboard', captureTheFlag.scoresFlag)
 
             }
 

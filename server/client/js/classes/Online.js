@@ -560,7 +560,7 @@ export default class Online extends Engine{
             else if(pos.y >= this.screenTiles.y * this.tile.height - this.tile.height/2)
                 posY = this.screenTiles.y * this.tile.height - (this.tile.height/2)
             
-            console.log(`${posX}, ${posY}`);    
+            //console.log(`${posX}, ${posY}`);    
             this.context.drawImage(pointer, posX, posY, this.tile.width/2, this.tile.height/2)
         }
 
