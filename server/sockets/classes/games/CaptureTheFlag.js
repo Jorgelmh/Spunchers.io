@@ -138,6 +138,8 @@ class CaptureTheFlag extends TeamDeathMatch{
                     x: this.flagPositions.blue.x,
                     y: this.flagPositions.blue.y
                 }
+
+                this.redFlag.state = true
                 /* Emit new leaderboard */
                 this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scores)
             }
@@ -169,6 +171,7 @@ class CaptureTheFlag extends TeamDeathMatch{
                     x: this.flagPositions.red.x,
                     y: this.flagPositions.red.y
                 }
+                this.redFlag.state = true
                 /* Emit new leaderboard */
                 this.socketIO.to(this.roomname).emit('New teams leaderboard', this.scores)
             }
