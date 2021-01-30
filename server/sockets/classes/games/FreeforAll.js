@@ -72,6 +72,7 @@ class FreeforAll extends Game{
 
         /* Sync check time */
         this.players[playerID].lastDeath = Date.now()
+        this.players[playerID].deaths ++
 
         /* Reload user's weapon when died */
         this.players[playerID].bulletsCharger = this.players[playerID].ammunition
@@ -114,7 +115,7 @@ class FreeforAll extends Game{
 
     /* Change score of a player */
     setScore(playerID){
-        this.players[playerID].score ++
+        this.players[playerID].kills ++
     }
 
     /* Reduce life of a hit player */
@@ -142,7 +143,7 @@ class FreeforAll extends Game{
             let greaterScore = i
 
             for(let j = i+1; j < arr.length; j++){
-                if(hashMap[arr[j]].score > hashMap[arr[greaterScore]].score)
+                if(hashMap[arr[j]].score > hashMap[arr[greaterScore]].kills)
                     greaterScore = j
                 
             }
@@ -153,7 +154,7 @@ class FreeforAll extends Game{
             newArr.push({
                 id: arr[i],
                 name: hashMap[arr[i]].playerName,
-                score: hashMap[arr[i]].score
+                score: hashMap[arr[i]].kills
             })
         }
 

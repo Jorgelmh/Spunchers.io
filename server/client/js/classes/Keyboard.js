@@ -30,12 +30,16 @@ export default class Keyboard {
         this.emitBullet = emitBullet
         this.emitReload = emitReload
 
+        /* Show scores */
+        this.showScores = false
+
         this.addListeners()
     }
     
     /* Add keyboard listeners */
     addListeners(){
         window.addEventListener('keydown', (e) => {
+            e.preventDefault()
             switch (e.key.toLowerCase()){
                 case 'arrowup':
                     this.controls.goUp = true
@@ -60,6 +64,9 @@ export default class Keyboard {
                 case 'a':
                     this.shoot = true
                     break
+                case'tab':
+                    this.showScores = true
+                    break
                 case 'r':
                     this.emitReload()
                     break
@@ -68,6 +75,7 @@ export default class Keyboard {
 
         window.addEventListener('keyup', (e) => {
 
+            e.preventDefault()
             switch (e.key.toLowerCase()){
                 case 'arrowup':
                     this.character.stopMoving()
@@ -95,7 +103,10 @@ export default class Keyboard {
                 case 'a':
                     this.shoot = false
                     break
-
+                case 'tab':
+                    this.showScores = false
+                    document.getElementById('site-individual-scores').style.display = 'none'
+                    break
             }
             this.emitPosition({x: 0, y: 0})
         })

@@ -104,6 +104,12 @@ body{
     min-height: 100%;
 }
 
+/*
+    =============================
+              SITE HUD
+    =============================
+*/
+
 /* SITE-CHAT */
 
 .chat-messages{
@@ -229,6 +235,64 @@ body{
     padding: 10px;
 }
 
+/* individual scores state */
+#site-individual-scores{
+    position: fixed;
+    top: 7rem;
+    left: 50%;
+    transform: translate(-50%, 10%);
+    width: 60%;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 5px;
+    min-height: 10%;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 1.6rem;
+    display: none;
+}
+
+.table-row .entry{
+    width: 33.3%;
+    float: left;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.current-player .entry p{
+    color: #f0565e!important;
+}
+
+.site-score-titles{
+    border-bottom: 1px solid black;
+}
+.entry h3, .entry p{
+    text-align: center;
+    margin: 2px;
+    color: white;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+#scores-team-blue .entry p{
+    color: #0077ff;
+}
+
+#scores-team-red .entry p{
+    color: #ff3300;
+}
+
+#scores-team-red{
+    border-top: 1px solid black;
+}
+
+div#scores-team-red:empty {
+    border-top: none;
+}
+
 
 /* 
     ===================================
@@ -328,7 +392,7 @@ body{
     }
 
     .score-flag{
-        max-height: 60px;
+        max-height: 50px;
         margin: 6px;
     }
 

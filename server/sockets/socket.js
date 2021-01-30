@@ -178,7 +178,6 @@ const socketListen = (app) => {
         /* Listener of players shooting */
         socket.on('shoot',(data) => {
 
-            console.log(data);
             /* Call functions and send bullet's details and id of the player */
             if(gamemode === 'online')
                 freeforall.addBullet(freeforall.players[socket.id], data.bullet, data.shootTime, socket.id)

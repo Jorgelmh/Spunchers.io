@@ -125,7 +125,7 @@ class TeamDeathmatch extends Game{
     /* Set score, increase the teams score */
     setScore(playerID){
         let player = this.blueTeam[playerID] || this.redTeam[playerID]
-        player.score ++
+        player.kills ++
 
         /* Increment team's score */
         if(this.blueTeam[playerID])
@@ -146,6 +146,7 @@ class TeamDeathmatch extends Game{
         let currentPlayer = this.blueTeam[playerID] || this.redTeam[playerID]
         /* Sync check time */
         currentPlayer.lastDeath = Date.now()
+        currentPlayer.deaths ++
 
         /* Reload user's weapon when died */
         currentPlayer.bulletsCharger = currentPlayer.ammunition

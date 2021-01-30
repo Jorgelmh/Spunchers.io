@@ -17,7 +17,6 @@ class Character {
             currentSprite: sprite
         }
 
-        this.score = 0
         this.life = 100
         this.shooting = null
 
@@ -47,6 +46,12 @@ class Character {
 
         /* LAST PACKET TIMESTAMP */
         this.lastPacketTimeStamp = 0
+
+        /* Kills count */
+        this.kills = 0
+
+        /* Deaths count */
+        this.deaths = 0
     }
     
     /* dequeue interpolated state */
@@ -98,7 +103,9 @@ class Character {
             cartesianValueOfMovement: this.cartesianValueOfMovement,
             still:  this.still,
             reloading: this.reloading,
-            timeStamp: this.lastPacketTimeStamp
+            timeStamp: this.lastPacketTimeStamp,
+            kills: this.kills,
+            deaths: this.deaths
         }
     }
 }

@@ -65,7 +65,6 @@ export default class Online extends Engine{
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
-
             this.gameUpdates.processGameUpdate(data)
         })
 
@@ -211,6 +210,7 @@ export default class Online extends Engine{
 
         this.drawBullets()
         this.drawOtherPlayers()
+        this.showScoresTable()
 
         this.controls.animate()
 
@@ -533,6 +533,98 @@ export default class Online extends Engine{
         this.renderFlag(flags[0], serverBlueFlag, carrierBlue, flags[2])
         this.renderFlag(flags[1], serverRedFlag, carrierRed, flags[3])
 
+    }
+
+    /* Show scores table */
+    showScoresTable(){
+        if(this.controls.showScores && this.state){
+            if(!this.mode){
+                let sortedPlayers = this.bubbleSort()
+                this.displayScoreRows(sortedPlayers, document.getElementById('site-scores-data'))
+            }else{
+                /* decide team colors and diplay */
+                let sortedBlueTeam = this.bubbleSort(this.state.players[0])
+                let sortedRedTeam = this.bubbleSort(this.state.players[1])
+                
+                let teams = (this.state.players[0][this.playerID]) ? [sortedBlueTeam, sortedRedTeam] : [sortedRedTeam, sortedBlueTeam]
+
+                this.displayScoreRows(teams[0], document.getElementById('scores-team-blue'))
+                this.displayScoreRows(teams[1], document.getElementById('scores-team-red'))
+            }
+        }
+    }
+
+    /* Display every row on the score table */
+    displayScoreRows(players, table){
+
+        /* Html element previously set to show this table */
+        table.innerHTML = ""
+
+        let scoreTable = document.getElementById('site-individual-scores')
+
+        players.map((player) => {
+            /* Parent div */
+            let div = document.createElement('div')
+            let classes = 'table-row clearfix'
+
+            if(player.id === this.playerID)
+                classes+= " current-player"
+
+            div.classList = classes
+
+            /* Create HTML element to display username */
+            let usernameDiv = document.createElement('div')
+            usernameDiv.classList = "entry"
+            let username = document.createElement('p')
+            username.innerHTML = player.name
+            usernameDiv.append(username)
+
+            /*  HTML Element to display number of kills */
+            let killsDiv = document.createElement('div')
+            killsDiv.classList = "entry"
+            let kills = document.createElement('p')
+            kills.innerHTML = player.kills
+            killsDiv.append(kills)
+
+            /* HTML element to display number of deaths */
+            let deathsDiv = document.createElement('div')
+            deathsDiv.classList = "entry"
+            let deaths = document.createElement('p')
+            deaths.innerHTML = player.deaths
+            deathsDiv.append(deaths)
+
+            div.append(usernameDiv)
+            div.append(killsDiv)
+            div.append(deathsDiv)
+
+            table.append(div)
+
+        })
+
+        if(scoreTable.style.display === 'none' || !scoreTable.style.display){
+            scoreTable.style.display = 'block'
+        }
+        
+    }
+
+    /* Bubble sort for sorting score's table */
+    bubbleSort = (players = this.state.players) => {
+        let playersArr = Object.values(Object.fromEntries(Object.entries(players).map(([id, player]) => [id, {kills: player.kills, deaths: player.deaths, name: player.playerName, id}])))
+        let swapped
+
+        do {
+            swapped = false;
+            for (let i = 0; i < playersArr.length - 1; i++) {
+                if (playersArr[i].kills < playersArr[i + 1].kills) {
+                    let tmp = playersArr[i]
+                    playersArr[i] = playersArr[i + 1]
+                    playersArr[i + 1] = tmp
+                    swapped = true
+                }
+            }
+        } while (swapped)
+
+        return playersArr
     }
 
     renderFlag(img, pos, carrier, pointer){
