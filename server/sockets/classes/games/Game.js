@@ -231,6 +231,8 @@ class Game {
 
     addBullet = (player, bullet, shootTime, playerID, bulletsArray = this.bullets) => {
 
+        console.log(shootTime > player.lastDeath, Date.now() - player.lastShot > player.shootingDelay, shootTime > player.lastDeath, shootTime - Date.now());
+
         if(shootTime > player.lastDeath && player.life > 0 
             && player.ableToShoot && player.bulletsCharger > 0){
 
