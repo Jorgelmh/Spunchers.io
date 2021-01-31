@@ -46,7 +46,7 @@ class State {
 
     getBaseUpdate() {
         const serverTime = this.currentServerTime();
-        this.callback(Date.now() - serverTime)
+        this.callback(serverTime)
         for (let i = this.buffer.length - 1; i >= 0; i--) {
           if (this.buffer[i].serverTime <= serverTime) {
             return i
