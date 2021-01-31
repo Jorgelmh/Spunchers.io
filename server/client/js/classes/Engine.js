@@ -8,14 +8,11 @@ import character from '../character.js'
 
 export default class Engine{
 
-    constructor(map, collisionMatrix, shadowMatrix, tileset, canvas, skin, socket){
+    constructor(map, collisionMatrix, shadowMatrix, tileset, canvas, skin){
 
         /* General variables */
         this.canvas = canvas
         this.context  = this.canvas.getContext("2d")
-
-        /* socketIO object */
-        this.socketIO = socket
         
         /* List with single tiles -> no-repeated img -> Use to load only one image for each value */
         this.tileList = []
@@ -169,12 +166,7 @@ export default class Engine{
             bullets: 600,
             footsteps: 200
         }
-    
-        this.socketIO.on('state', (data) =>{
-            this.gameUpdates.processGameUpdate(data)
-            this.serverDelay = Date.now() - data.serverTime
-        })
-
+        
         window.addEventListener('resize', this.resizeCanvas)
         
         if(window.mobileCheck())
