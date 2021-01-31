@@ -42,10 +42,11 @@ class State {
     }
 
     getBaseUpdate() {
-        const serverTime = this.currentServerTime()
+        let serverTime = this.currentServerTime()
 
         /* if the game is ahead of time then increase the client's time */
         const delay = Date.now() - serverTime
+        console.log(delay);
 
         if(delay > 0)
             serverTime += delay
