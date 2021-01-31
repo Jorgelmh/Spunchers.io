@@ -44,13 +44,6 @@ class State {
     getBaseUpdate() {
         let serverTime = this.currentServerTime()
 
-        /* if the game is ahead of time then increase the client's time */
-        const delay = Date.now() - serverTime
-        console.log(delay);
-
-        if(delay > 0)
-            serverTime += delay
-
         for (let i = this.buffer.length - 1; i >= 0; i--) {
           if (this.buffer[i].serverTime <= serverTime) {
             return i
@@ -61,7 +54,18 @@ class State {
 
     /* get current time of the state in the server */
     currentServerTime() {
-        return this.firstServerTimestamp + (Date.now() - this.gameStart) - this.RENDER_DELAY;
+
+        const now = Date.now()
+        let serverTime = this.firstServerTimestamp + (now - this.gameStart)
+
+        /* If the client goes ahead of the server, then reduce some delay and add a controlled amount */
+        let delay = now - serverTime
+        if(delay > 0)
+            serverTime += delay
+
+        serverTime-=this.RENDER_DELAY*3
+
+        return  serverTime
     }
 
     getCurrentState() {
