@@ -12,7 +12,7 @@ import State from './State.js'
 export default class Online extends Engine{
 
     constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name, game){
-        super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
+        super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin, socket)
 
         this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload, this.playerStats)
 
@@ -20,8 +20,6 @@ export default class Online extends Engine{
         /* Online attributes recevied from the sever */
         this.playerID = playerID
         this.serverDelay = null
-
-        this.socketIO = socket
 
         /* online team */
         this.team = (game.mode) ? game.team : undefined
@@ -63,12 +61,8 @@ export default class Online extends Engine{
 
         this.renderDelay = 0
         this.gameUpdates = new State((delay) => this.renderDelay = delay)
-        
+
         /* SOCKET LISTENERS */
-        this.socketIO.on('state', (data) =>{
-            this.gameUpdates.processGameUpdate(data)
-            this.serverDelay = Date.now() - data.serverTime
-        })
 
         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
         this.socketIO.on('Load Skins, ammunition and sounds', ({skins, ids}) => {

@@ -462,7 +462,6 @@ export default class Joystick{
 
         for(let i = 0; i < e.changedTouches.length; i++){
             
-            console.log(this.indexJoystick);
             if(this.touchingFingers[this.indexJoystick] === e.changedTouches[i].identifier){
 
                 this.dragging = false
