@@ -515,9 +515,7 @@ export default class Joystick{
 
 
             }
-    
             this.emitPosition(this.movement)
-
         }
         
     }

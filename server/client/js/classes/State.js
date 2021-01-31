@@ -8,7 +8,7 @@ class State {
     constructor(){
 
         /* Delay behind server time */
-        this.RENDER_DELAY = 50
+        this.RENDER_DELAY = 60
 
         /* buffer to push new packet states */
         this.buffer = []
@@ -29,26 +29,27 @@ class State {
 
     processGameUpdate(update) {
         if (!this.firstServerTimestamp) {
-            this.firstServerTimestamp = update.serverTime;
-            this.gameStart = Date.now();
+            this.firstServerTimestamp = update.serverTime
+            this.gameStart = Date.now()
         }
         this.buffer.push(update);
             
         // Keep only one game update before the current server time
-        const base = this.getBaseUpdate();
+        const base = this.getBaseUpdate()
         if (base > 0) {
-            this.buffer.splice(0, base);
+            this.buffer.splice(0, base)
         }
     }
 
     getBaseUpdate() {
         const serverTime = this.currentServerTime();
+        console.log(Date.now() - serverTime);
         for (let i = this.buffer.length - 1; i >= 0; i--) {
           if (this.buffer[i].serverTime <= serverTime) {
-            return i;
+            return i
           }
         }
-        return -1;
+        return -1
     }
 
     /* get current time of the state in the server */
