@@ -215,6 +215,7 @@ class Game {
 
     getCollision(object1, player){
 
+        /* Check if exists a collision => x_overlaps = (a.left < b.right) && (a.right > b.left) AND y_overlaps = (a.top < b.bottom) && (a.bottom > b.top) */
         if((object1.x < player.posX + (this.tile.width/4) + (this.tile.width/2) && object1.x + this.tile.width/3 > player.posX + (this.tile.width/4))
             && (object1.y < player.posY + 6*(this.tile.width/7) && object1.y + this.tile.height > player.posY + (this.tile.width/4)))
                 return true
