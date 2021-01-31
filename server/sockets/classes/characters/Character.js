@@ -74,7 +74,8 @@ class Character {
                 dirX: bullet.dir.x,
                 dirY: bullet.dir.y,
                 flip: this.character.currentSprite.flip,
-                spriteY: bullet.spriteY
+                spriteY: bullet.spriteY,
+                timeStamp: Date.now()
         }]
     }
 

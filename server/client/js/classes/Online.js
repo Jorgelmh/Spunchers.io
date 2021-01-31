@@ -66,6 +66,7 @@ export default class Online extends Engine{
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
             this.gameUpdates.processGameUpdate(data)
+            this.serverDelay = Date.now() - data.serverTime
         })
 
         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
@@ -428,6 +429,7 @@ export default class Online extends Engine{
     drawBullets(){
 
         if(this.state.bullets.length > 0){
+
             this.state.bullets.map((element) => {
 
                 let bulletX = this.transformServerMagnitudesX(element.posX)+this.tileMap.startX
