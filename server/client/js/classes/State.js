@@ -5,7 +5,7 @@
  */
 
 class State {
-    constructor(){
+    constructor(callback){
 
         /* Delay behind server time */
         this.RENDER_DELAY = 60
@@ -18,6 +18,9 @@ class State {
 
         /* First server time stamp */
         this.firstServerTimestamp = 0
+
+        /* Testing callback */
+        this.callback = callback
 
     }
 
@@ -43,7 +46,7 @@ class State {
 
     getBaseUpdate() {
         const serverTime = this.currentServerTime();
-        console.log(Date.now() - serverTime);
+        this.callback(Date.now() - serverTime)
         for (let i = this.buffer.length - 1; i >= 0; i--) {
           if (this.buffer[i].serverTime <= serverTime) {
             return i
