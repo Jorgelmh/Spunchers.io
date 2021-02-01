@@ -416,3 +416,103 @@ div#scores-team-red:empty {
     justify-content: space-around;
     align-items: center;
 }
+
+/*
+    =========================
+            INDEX PAGE
+    =========================
+*/
+
+.site-game-title{
+    font-family: 'Londrina Solid', cursive;
+    text-align: center;
+    font-size: 15vw;
+    margin: 40px;
+    color: white;
+    text-shadow: 1px 7px 2px #0c8f0c;
+}
+
+.site-header{
+    z-index: 2;
+    position: relative;
+}
+
+
+.site-gamemode-links a{
+    text-transform: capitalize;
+    display: block;
+    padding: 20px;
+    font-size: 1.2rem;
+    background-color: #00ff00;
+    border-radius: 10px;
+    text-decoration: none;
+    color: black;
+    max-width: 200px;
+    margin: 20px auto;
+    text-align: center;
+    transition: all .5s ease-in-out;
+    font-weight: bold;
+}
+
+.site-gamemode-links a:hover{
+    background-color: #3ed311;
+
+}
+
+.content{
+    position: relative;
+    z-index: 2;
+}
+
+.container{
+    max-width: 1200px;
+    margin: auto;
+}
+
+.site-footer{
+    position: fixed;
+    bottom: 0;
+    background: linear-gradient(0deg, rgba(22,112,35,1) 0%, rgba(43,255,92,1) 100%);
+    box-shadow: 2px 4px 39px 3px rgb(174 255 197 / 75%);
+    width: 100%;
+    padding-bottom: 10px;
+}
+
+.site-footer h2{
+    font-size: 1.5rem;
+    margin: 5px;
+}
+
+.site-programmer, .site-designer{
+    text-align: center;
+    padding: 10px;
+}
+
+.contact-details{
+    font-size: 1rem;
+}
+.contact-details p{
+    margin: 5px;
+}
+
+@media(min-width: 768px){
+    .site-programmer, .site-designer{
+        width: 50%;
+        float: left;
+        box-sizing: border-box;
+    }
+}
+
+.credits{
+    text-align: center;
+    
+}
+
+.credits a{
+    color: chartreuse;
+    text-decoration: none;
+}
+
+.credits a:hover{
+    text-decoration: underline;
+}

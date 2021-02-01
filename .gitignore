@@ -3,3 +3,5 @@ server.csr
 server.key
 server.pass.key
 testing/
+ca_bundle.crt
+server.crt

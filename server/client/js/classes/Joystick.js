@@ -330,6 +330,7 @@ export default class Joystick{
 
         if(this.shoot)
             this.createBullet()
+
     }
 
     /* Create bullet trayectory and sprite of the animation */
@@ -401,6 +402,8 @@ export default class Joystick{
 
                 this.touchingFingers.push(e.changedTouches[i].identifier)
                 this.indexReloadButton = this.touchingFingers.length - 1
+
+                this.emitReload()
             }
         }
     }

@@ -19,6 +19,9 @@ class State {
         /* First server time stamp */
         this.firstServerTimestamp = 0
 
+        /* current state */
+        this.state = null
+
     }
 
     /**
@@ -83,6 +86,7 @@ class State {
 
         } else {
             const baseUpdate = this.buffer[base]
+            this.state = baseUpdate
             const next = this.buffer[base+1]
             const ratio = (serverTime - baseUpdate.serverTime) / (next.serverTime - baseUpdate.serverTime)
 
@@ -152,15 +156,19 @@ class State {
 
         /* Loop through the bullet's array and inteprolate each entry's position */
         return base.map((bullet) => {
-            let futureBullet = next.find((nextBullet) => nextBullet.timeStamp === bullet.timeStamp && nextBullet.ownerID === bullet.ownerID)
 
-            if(futureBullet){
-                let interpolatedPosition = this.interpolatePosition(bullet, futureBullet, ratio)
+            let owner = this.state.players[bullet.ownerID] || this.state.players[0][bullet.ownerID] || this.state.players[1][ownerID]
 
-                bullet.posX = interpolatedPosition.x
-                bullet.posY = interpolatedPosition.y
+            if(owner.skin !== 'mikaela'){
+                let futureBullet = next.find((nextBullet) => nextBullet.timeStamp === bullet.timeStamp && nextBullet.ownerID === bullet.ownerID)
+
+                if(futureBullet){
+                    let interpolatedPosition = this.interpolatePosition(bullet, futureBullet, ratio)
+
+                    bullet.posX = interpolatedPosition.x
+                    bullet.posY = interpolatedPosition.y
+                }
             }
-
             return bullet
         })
     }

@@ -14,7 +14,7 @@ export default class Online extends Engine{
     constructor(map, colissionMatrix, shadowMatrix, tileSet, canvas, socket, playerID, server, skin, name, game){
         super(map, colissionMatrix, shadowMatrix, tileSet, canvas, skin)
 
-        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload, this.playerStats)
+        this.controls = (window.mobileCheck()) ? new Joystick(this.canvas, this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload) : new Keyboard(this.character, this.emitPlayerPosition, this.triggerShooting, this.emitReload, this.playerStats)
 
         this.name = name
         /* Online attributes recevied from the sever */

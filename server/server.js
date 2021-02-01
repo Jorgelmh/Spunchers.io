@@ -23,7 +23,7 @@ app.set('views', __dirname + '/public/views')
 
 //Routes of server-side application
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/views/index.html'))
+    res.render('index')
 })
 
 app.get('/online', (req, res) => {
