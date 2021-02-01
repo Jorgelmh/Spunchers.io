@@ -271,6 +271,7 @@ export default class Engine{
         /* if the game mode is not capture the flag then we're done loading assets */
         if(this.mode !== 2){
             this.closeLoadingScreen()
+            this.addSocketListeners()
             requestAnimationFrame(this.render)
 
             return
@@ -281,6 +282,7 @@ export default class Engine{
         let callback = () => {
             if(++loaded >= 4){
                 this.closeLoadingScreen()
+                this.addSocketListeners()
                 requestAnimationFrame(this.render)
             }
         }
