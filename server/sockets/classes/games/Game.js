@@ -18,7 +18,7 @@ class Game {
         
         this.bulletSpeed = 200
 
-        this.characterSpeed = 2
+        this.characterSpeed = 1.5
 
         this.bulletWidth = 10
 
