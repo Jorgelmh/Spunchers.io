@@ -1,6 +1,6 @@
 /* add to cache */
 let elementsToCache = ['/offline']
-let cacheName = 'tilegame'
+let cacheName = 'spunchers.io'
 
 /* When installing */
 self.addEventListener('install', (event) => {

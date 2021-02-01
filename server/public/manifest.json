@@ -1,7 +1,7 @@
 {
-    "name": "Tile Game JS",
-    "short_name": "shooting game",
-    "description": "Progressive Web App that allows to donwload this game on mobile devices",
+    "name": "spunchers.io",
+    "short_name": "spunchers",
+    "description": "Progressive Web App that allows to download this game on mobile devices",
     "icons": [
       {
         "src": "icons/icon-32.png",
@@ -44,7 +44,7 @@
         "type": "image/png"
       }
     ],
-    "start_url": "/online",
+    "start_url": "/",
     "display": "fullscreen",
     "orientation": "landscape",
     "theme_color": "#B12A34",
