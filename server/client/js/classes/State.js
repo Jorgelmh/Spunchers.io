@@ -102,8 +102,18 @@ class State {
                     bonusKits: baseUpdate.bonusKits
                 }
 
-                if(baseUpdate.flags)
+                if(baseUpdate.flags){
+
+                    /* Interpolate each flag */
                     interpolatedState.flags = baseUpdate.flags
+
+                    let interpolatedBlue = this.interpolatePosition({posX: baseUpdate.flags[0].pos.x, posY: baseUpdate.flags[0].pos.y}, {posX: next.flags[0].pos.x, posY: next.flags[0].pos.y}, ratio)
+                    let interpolatedRed = this.interpolatePosition({posX: baseUpdate.flags[1].pos.x, posY: baseUpdate.flags[1].pos.y}, {posX: next.flags[1].pos.x, posY: next.flags[1].pos.y}, ratio)
+
+                    interpolatedState.flags[0].pos = interpolatedBlue
+                    interpolatedState.flags[1].pos = interpolatedRed
+
+                }
 
                 return interpolatedState
 
