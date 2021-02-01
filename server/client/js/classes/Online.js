@@ -65,9 +65,6 @@ export default class Online extends Engine{
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
-            if(!this.gameUpdates.delay)
-                this.gameUpdates.delay = Date.now()
-                
             this.gameUpdates.processGameUpdate(data)
             this.serverDelay = Date.now() - data.serverTime
         })
@@ -236,7 +233,7 @@ export default class Online extends Engine{
         //this.drawCharacter()
 
         this.context.fillStyle = "black"
-        this.context.fillText(`FPS: ${this.FPS}`, (this.screenTiles.x * this.tile.height) - 100, 50)
+        this.context.fillText(`FPS: ${this.serverDelay}`, (this.screenTiles.x * this.tile.height) - 100, 50)
         this.context.fillText(`Net: ${this.latency}ms`, (this.screenTiles.x * this.tile.height) - 100, 70)
 
         if(this.reloading || this.currentAmmo === 0){

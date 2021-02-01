@@ -26,6 +26,8 @@ export default class Joystick{
             sin: 0
         }
 
+        this.emit = true
+
         this.angleInDegrees = 0
 
         /* Dragging */
@@ -323,7 +325,12 @@ export default class Joystick{
                 this.character.onMovingBackwardsRight()
             }
 
-            this.emitPosition(this.movement)
+            if(this.emit){
+                this.emitPosition(this.movement)
+                this.emit = false
+            }
+            else
+                this.emit = true
         }
 
         this.drawJoystick()
