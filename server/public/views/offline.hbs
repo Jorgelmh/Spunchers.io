@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- iOS -->
+    <meta name="apple-mobile-web-app-title" content="Application Title">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+    <!-- Main Link Tags  -->
+    <link href="../../icons/icon-16.png" rel="icon" type="image/png" sizes="16x16">
+    <link href="../../icons/icon-32.png" rel="icon" type="image/png" sizes="32x32">
+    <link href="../../icons/icon-48.png" rel="icon" type="image/png" sizes="48x48">
+
+    <!-- Import cache styles -->
+    <link href="../assets/styles/offlineStyles.css" rel="stylesheet"/>
+
+    <title>SPUNCHERS.IO | Have fun playing with your friends </title>
+</head>
+
+<body style="margin: 0;" class="background-connect-frame">
+    <div class="site-offline-message container">
+        <h1>You're offline :C</h1>
+        <p>It seems that you're not connected to the internet</p>
+    </div>
+    <div id="background-frame">
+    </div>
+    <script>
+        window.addEventListener( 'online' ,() => {
+
+            /* When conection comes back return to previous screen */
+            let url = window.location.href
+            window.location.href = url
+        })
+    </script>
+</body>
+</html>

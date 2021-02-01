@@ -102,3 +102,10 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('./ServiceWorker.js').
         then(() => console.log('Service Worker successfully registered'))
 }
+
+window.addEventListener('offline', () => {
+
+    /* If user disconnected then refresh to show offline screen */
+    let url = window.location.href
+    window.location.href = url
+})

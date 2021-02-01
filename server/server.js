@@ -39,7 +39,7 @@ app.get('/ctf', (req, res) => {
 })
 
 app.get('/offline', (req, res) => {
-    res.sendFile(path.join(__dirname + '/public/views/offline.html'))
+    res.render('offline')
 })
 
 server.listen(process.env.PORT ,() => {

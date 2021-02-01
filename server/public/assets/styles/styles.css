@@ -23,10 +23,6 @@ body{
     text-transform: capitalize;
 }
 
-.background-connect-frame{
-    background-image: url(../selectCharacters/background/background.png);
-}
-
 .glide__arrow{
     color: black!important;
 }
@@ -92,16 +88,6 @@ body{
     width: 200px;
     margin: auto;
     margin-bottom: 20px;
-}
-
-#background-frame{
-    position: absolute;
-    top: 0;
-    background-position: cover;
-    background-color: rgba(0,0,0,0.75);
-    z-index: 1;
-    width: 100%;
-    min-height: 100%;
 }
 
 /*
@@ -462,11 +448,6 @@ div#scores-team-red:empty {
 .content{
     position: relative;
     z-index: 2;
-}
-
-.container{
-    max-width: 1200px;
-    margin: auto;
 }
 
 .site-footer{

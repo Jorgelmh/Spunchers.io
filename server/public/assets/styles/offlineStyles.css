@@ -1,0 +1,33 @@
+/*
+    =============================
+            OFFLINE SCREEN
+    =============================
+*/
+
+.site-offline-message{
+    position: relative;
+    z-index: 2;
+    color: white;
+    font-size: 2rem;
+    padding: 20px 40px;
+}
+
+.background-connect-frame{
+    background-image: url(../selectCharacters/background/background.png);
+}
+
+#background-frame{
+    position: absolute;
+    top: 0;
+    background-position: cover;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 1;
+    width: 100%;
+    min-height: 100%;
+}
+
+
+.container{
+    max-width: 1200px;
+    margin: auto;
+}
