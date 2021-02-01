@@ -39,7 +39,6 @@ export default class Keyboard {
     /* Add keyboard listeners */
     addListeners(){
         window.addEventListener('keydown', (e) => {
-            e.preventDefault()
             switch (e.key.toLowerCase()){
                 case 'arrowup':
                     this.controls.goUp = true
@@ -65,6 +64,7 @@ export default class Keyboard {
                     this.shoot = true
                     break
                 case'tab':
+                    e.preventDefault()
                     this.showScores = true
                     break
                 case 'r':
@@ -75,7 +75,6 @@ export default class Keyboard {
 
         window.addEventListener('keyup', (e) => {
 
-            e.preventDefault()
             switch (e.key.toLowerCase()){
                 case 'arrowup':
                     this.character.stopMoving()
@@ -104,6 +103,7 @@ export default class Keyboard {
                     this.shoot = false
                     break
                 case 'tab':
+                    e.preventDefault()
                     this.showScores = false
                     document.getElementById('site-individual-scores').style.display = 'none'
                     break
