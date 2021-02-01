@@ -8,7 +8,7 @@ class State {
     constructor(){
 
         /* Delay behind server time */
-        this.RENDER_DELAY = 60
+        this.RENDER_DELAY = 50
 
         /* buffer to push new packet states */
         this.buffer = []
@@ -63,15 +63,15 @@ class State {
 
         /* If the client goes ahead of the server, then reduce some delay and add a controlled amount */
         let delay = now - serverTime
-        if(delay > 0)
+        if(delay > 0){
             serverTime += delay
-
-        serverTime-=this.RENDER_DELAY*3
+            serverTime-=this.RENDER_DELAY*3
+        }
 
         return  serverTime
     }
 
-    getCurrentState() {
+    getCurrentState(){
         if (!this.firstServerTimestamp) {
           return {};
         }
@@ -92,8 +92,6 @@ class State {
 
             /* If a team lobby then interpolate each team individually */
             if(Array.isArray(baseUpdate.players)){
-
-                console.log(this.interpolateBullets(baseUpdate.bullets, next.bullets, ratio));
 
                 let interpolatedState = {
                     players: [
