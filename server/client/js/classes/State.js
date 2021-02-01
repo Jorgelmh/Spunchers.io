@@ -57,21 +57,7 @@ class State {
 
     /* get current time of the state in the server */
     currentServerTime() {
-
-        const now = Date.now()
-        let serverTime = this.firstServerTimestamp + (now - this.gameStart)
-
-        /* If the client goes ahead of the server, then reduce some delay and add a controlled amount */
-        let delay = now - serverTime
-        console.log(now-serverTime);
-        if(delay > 0){
-            serverTime += delay
-            serverTime-=this.RENDER_DELAY*3
-        }else{
-            serverTime= this.firstServerTimestamp + (now - this.gameStart) - this.RENDER_DELAY
-        }
-
-        return  serverTime
+        return  this.firstServerTimestamp + (now - this.gameStart) - this.RENDER_DELAY
     }
 
     getCurrentState(){
