@@ -22,6 +22,9 @@ class State {
         /* current state */
         this.state = null
 
+        /* delay since package is received */
+        this.delay = 0
+
     }
 
     /**
@@ -32,7 +35,7 @@ class State {
 
     processGameUpdate(update) {
         if (!this.firstServerTimestamp) {
-            this.firstServerTimestamp = update.serverTime
+            this.firstServerTimestamp = update.serverTime + (Date.now() - this.delay)
             this.gameStart = Date.now()
         }
         this.buffer.push(update);

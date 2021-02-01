@@ -65,6 +65,9 @@ export default class Online extends Engine{
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
+            if(!this.gameUpdates.delay)
+                this.gameUpdates.delay = Date.now()
+                
             this.gameUpdates.processGameUpdate(data)
             this.serverDelay = Date.now() - data.serverTime
         })
