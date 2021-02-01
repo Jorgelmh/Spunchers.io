@@ -167,11 +167,13 @@ export default class Online extends Engine{
          *  ===========================================
         */
        this.socketIO.on('Capture medicalKit', () => {
-            this.sounds.healing.play()
+           if(!window.mobileCheck())
+                this.sounds.healing.play()
        })
 
        this.socketIO.on('Capture bulletKit', () => {
-            this.sounds.reload.play()
+           if(!window.mobileCheck())
+                this.sounds.reload.play()
        })
 
         /* Still players animation */
