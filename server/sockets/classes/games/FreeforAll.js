@@ -143,7 +143,7 @@ class FreeforAll extends Game{
             let greaterScore = i
 
             for(let j = i+1; j < arr.length; j++){
-                if(hashMap[arr[j]].score > hashMap[arr[greaterScore]].kills)
+                if(hashMap[arr[j]].kills > hashMap[arr[greaterScore]].kills)
                     greaterScore = j
                 
             }

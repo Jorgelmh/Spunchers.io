@@ -33,6 +33,9 @@ export default class Keyboard {
         /* Show scores */
         this.showScores = false
 
+        /* Emit position 30 times per second */
+        this.emit = true
+
         this.addListeners()
     }
     
@@ -182,13 +185,18 @@ export default class Keyboard {
 
         if(this.shoot)
             this.createBullet()
-            
-        if(movement.x !== 0 || movement.y !== 0)
-            this.emitPosition(movement)
-        else if(this.character.currentSprite.y !== 5){
-            this.character.onMovingStop()
-            this.emitPosition(movement)
-        }
+        
+        if(this.emit){
+            if(movement.x !== 0 || movement.y !== 0){
+                this.emitPosition(movement)
+                this.emit = false
+            }
+            else if(this.character.currentSprite.y !== 5){
+                this.character.onMovingStop()
+                this.emitPosition(movement)
+            }
+        }else
+            this.emit = true
     }
 
     createBullet(){

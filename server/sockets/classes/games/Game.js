@@ -18,7 +18,7 @@ class Game {
         
         this.bulletSpeed = 200
 
-        this.characterSpeed = 1.5
+        this.characterSpeed = 2
 
         this.bulletWidth = 10
 
@@ -142,14 +142,14 @@ class Game {
 
                 /* Movement on X */
                 let oldPositionX = currentPlayer.posX
-                currentPlayer.posX += data.movement.x
+                currentPlayer.posX += data.movement.x * this.characterSpeed
 
                 if(this.detectCollisions(currentPlayer, socketID))
                     currentPlayer.posX = oldPositionX
 
                 /* Movement on Y */
                 let oldPositionY = currentPlayer.posY
-                currentPlayer.posY += data.movement.y
+                currentPlayer.posY += data.movement.y * this.characterSpeed
 
                 if(this.detectCollisions(currentPlayer, socketID))
                     currentPlayer.posY = oldPositionY
