@@ -32,5 +32,18 @@
     
     <div id="background-frame">
     </div>
+
+    <script>
+        /**
+        *  ==============================
+        *     Register Service Worker
+        *  ==============================
+        */
+
+        if('serviceWorker' in navigator){
+            navigator.serviceWorker.register('./ServiceWorker.js').
+                then(() => console.log('Service Worker successfully registered'))
+        }
+    </script>
 </body>
 </html>
