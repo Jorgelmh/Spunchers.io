@@ -57,7 +57,7 @@ class State {
 
     /* get current time of the state in the server */
     currentServerTime() {
-        return  this.firstServerTimestamp + (now - this.gameStart) - this.RENDER_DELAY
+        return  this.firstServerTimestamp + (Date.now() - this.gameStart) - this.RENDER_DELAY
     }
 
     getCurrentState(){
