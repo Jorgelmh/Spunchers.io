@@ -63,6 +63,7 @@ class State {
 
         /* If the client goes ahead of the server, then reduce some delay and add a controlled amount */
         let delay = now - serverTime
+        console.log(now-serverTime);
         if(delay > 0){
             serverTime += delay
             serverTime-=this.RENDER_DELAY*3
