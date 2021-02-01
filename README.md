@@ -14,7 +14,7 @@ Clone and npm intall
 
 ## Art and sound
 - [Sound effects](https://Zapsplat.com)
-- [Tileset] (https://pipoya.itch.io/pipoya-rpg-tileset-32x32)
+- [Tileset](https://pipoya.itch.io/pipoya-rpg-tileset-32x32)
 
 ## Deployment
 Heroku and AWS for networking purposes.
