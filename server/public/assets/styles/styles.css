@@ -470,12 +470,17 @@ div#scores-team-red:empty {
 }
 
 .site-footer{
-    position: fixed;
-    bottom: 0;
     background: linear-gradient(0deg, rgba(22,112,35,1) 0%, rgba(43,255,92,1) 100%);
     box-shadow: 2px 4px 39px 3px rgb(174 255 197 / 75%);
     width: 100%;
     padding-bottom: 10px;
+}
+
+@media(min-height: 754px){
+    .site-footer{
+        position: fixed;
+        bottom: 0;
+    }
 }
 
 .site-footer h2{
