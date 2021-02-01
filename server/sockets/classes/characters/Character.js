@@ -32,11 +32,6 @@ class Character {
         this.still = true
         this.lastShot = Date.now()
 
-        this.lastUpdate = 0
-
-        /* Interpolation */
-        this.buffer = []
-
         /* reloading */
         this.reloading = false
         this.lastReload = 0

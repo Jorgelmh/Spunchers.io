@@ -66,9 +66,11 @@ class State {
         if(delay > 0){
             serverTime += delay
             serverTime-=this.RENDER_DELAY*3
+        }else{
+            serverTime-=this.RENDER_DELAY
         }
 
-        return this.firstServerTimestamp + (now - this.gameStart) - this.RENDER_DELAY
+        return  serverTime
     }
 
     getCurrentState(){
