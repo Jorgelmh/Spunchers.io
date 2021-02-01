@@ -10,7 +10,7 @@ sorting algorithms, sprite animations and much more.
 It also includes a Progressive Web App that allows you to have an app-like experience in either mobile or pc.
 
 ## Install
-Clone and npm intall
+npm install
 
 ## Art and sound
 - [Sound effects](https://Zapsplat.com)
