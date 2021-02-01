@@ -85,15 +85,7 @@ class Game {
 
         /* Only store user's state when they are alive */
         else if(player.life > 0){
-            if(player.lastUpdate === 0){
-                this.calculateMovement(player, data, socketID)
-                player.lastUpdate = Date.now()
-            }
-            player.lastPacket = Date.now()
-            player.buffer.push(data)
-
-            if(player.buffer.length > 5)
-                player.buffer.splice(0,player.buffer.length-3)
+            this.calculateMovement(player, data, socketID)
         }
         
     }
@@ -408,10 +400,6 @@ class Game {
     serializePlayers(players){
         return Object.fromEntries(Object.entries(players).map(([id, player]) => {
 
-            /* Interpolate player's packet buffer */
-            if(Date.now() - player.lastUpdate >= this.interpolationDelay && player.lastUpdate !== 0 && player.buffer.length > 0){
-                this.calculateMovement(player, player.dequeueState(), id)
-            }
             /* Death animation */
             if(players[id].life === 0 && Date.now() - players[id].lastDeath >= 300 && players[id].character.currentSprite.x === 0)
                 players[id].character.currentSprite.x ++

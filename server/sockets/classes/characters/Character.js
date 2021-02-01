@@ -54,16 +54,6 @@ class Character {
         this.deaths = 0
     }
     
-    /* dequeue interpolated state */
-    dequeueState(){
-
-        let state = this.buffer[0] 
-        this.buffer.splice(0,1)
-
-        this.lastUpdate = Date.now()
-
-        return state
-    }
 
     /* Standard method for creating bullets -> it returns only one bullet based on the movement of the player*/
     createBullet(playerID, position,bullet){
