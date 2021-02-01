@@ -165,7 +165,7 @@ class State {
         /* Loop through the bullet's array and inteprolate each entry's position */
         return base.map((bullet) => {
 
-            let owner = this.state.players[bullet.ownerID] || this.state.players[0][bullet.ownerID] || this.state.players[1][ownerID]
+            let owner = this.state.players[bullet.ownerID] || this.state.players[0][bullet.ownerID] || this.state.players[1][bullet.ownerID]
 
             if(owner.skin !== 'mikaela'){
                 let futureBullet = next.find((nextBullet) => nextBullet.timeStamp === bullet.timeStamp && nextBullet.ownerID === bullet.ownerID)
