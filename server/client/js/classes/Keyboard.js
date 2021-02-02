@@ -73,6 +73,7 @@ export default class Keyboard {
                 case 'r':
                     this.emitReload()
                     break
+                    
             }
         })
 
