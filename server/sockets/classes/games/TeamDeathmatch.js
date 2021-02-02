@@ -69,11 +69,18 @@ class TeamDeathmatch extends Game{
     removePlayer(playerID){
 
         /* Delete depending on their team */
-        if(this.blueTeam[playerID])
+        if(this.blueTeam[playerID]){
             delete this.blueTeam[playerID]
-        
-        else
+
+            /* Delete bullets from the disconnected user */
+            this.bulletsBlueTeam = this.bulletsBlueTeam.filter((bullet) => bullet.ownerID !== playerID)
+        }
+        else{
             delete this.redTeam[playerID]
+
+            /* Delete bullets from the disconnected user */
+            this.bulletsRedTeam = this.bulletsRedTeam.filter((bullet) => bullet.ownerID !== playerID)
+        }
 
         if(Object.keys(this.blueTeam).length === 0 && Object.keys(this.redTeam).length === 0)
             this.scores = {blueTeam: 0, redTeam: 0}

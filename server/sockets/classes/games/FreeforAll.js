@@ -58,6 +58,9 @@ class FreeforAll extends Game{
     removePlayer = (id) => {
         delete this.players[id] 
 
+        /* Remove bullets from player that's been disconnected */
+        this.bullets = this.bullets.filter((bullet) => bullet.ownerID !== id)
+
         if(Object.keys(this.players).length === 0) this.onlineChat.messages = []
         this.socketIO.to(this.roomname).emit('New leaderboard', this.sortScores(this.players))
     }

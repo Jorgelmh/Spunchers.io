@@ -67,7 +67,6 @@ class Game {
 
         /* Manage updates */
         this.updateInterval = null
-        this.sendState = false
 
         /* Declare BonusKit respawner */
         this.bonusKitRespawner = new BonusKit(this.tile, this.collisionMatrix)
@@ -252,29 +251,6 @@ class Game {
                 bulletsArray.push(...characterBullet) 
             }
         }
-    }
-
-
-    /** 
-     * =================================
-     *        Update Game state
-     * =================================
-    */
-
-    setUpdate(){
-        this.updateInterval = setInterval(() => {
-
-            /* Send state to sockets */
-            let state = this.update()
-            
-            if(this.sendState){
-                this.socketIO.to(this.roomname).emit('state', state)
-                this.sendState = false
-            }
-            else
-                this.sendState = true
-
-        }, 1000 / 60)
     }
 
     /* calculate collisions against a given hash table of players and bullets */

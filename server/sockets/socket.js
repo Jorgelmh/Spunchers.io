@@ -16,17 +16,49 @@ const socketListen = (app) => {
 
     const io = socketIO(app, {pingInterval: 1000})
 
-    //Lobby for freeforall game and start game loop
+    //Lobby for freeforall game
     const freeforall = new FreeforAll(map, io)
-    freeforall.setUpdate()
-    
-    /* Lobby for team deathmatch game and start game loop */
-    const teamDeathmatch = new TeamDeathmatch(map, io)
-    teamDeathmatch.setUpdate()
 
-    /* Lobby for team capture the flag game and start game loop */
+    /* Lobby for team deathmatch game */
+    const teamDeathmatch = new TeamDeathmatch(map, io)
+
+    /* Lobby for team capture the flag game */
     const captureTheFlag = new CaptureTheFlag(map, io)
-    captureTheFlag.setUpdate()
+
+    /* Send state only 30 times per second */
+    this.sendState = false
+
+    /**
+     *  ===============================
+     *      GAME LOOP FOR ALL LOBBIES
+     *  ===============================
+     */
+    setInterval(() => {
+
+        /**
+         *  =======================
+         *      FREE FOR ALL
+         *  =======================
+         */
+
+        /* Get new states*/
+        let ffaState = freeforall.update()
+        let tdState = teamDeathmatch.update()
+        let ctfState = captureTheFlag.update()
+            
+        if(this.sendState){
+
+            /* Send state to sockets connected to each room */
+            io.to(freeforall.roomname).emit('state', ffaState)
+            io.to(teamDeathmatch.roomname).emit('state', tdState)
+            io.to(captureTheFlag.roomname).emit('state', ctfState)
+            this.sendState = false
+        }
+        else
+            this.sendState = true
+
+    }, 1000 / 60)
+
     
     /**
      * ====================================
