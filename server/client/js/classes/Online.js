@@ -57,113 +57,8 @@ export default class Online extends Engine{
             y: false
         }
 
-                /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
-                this.socketIO.on('Load Skins, ammunition and sounds', ({skins, ids}) => {
-                    skins.srcArray.forEach((value) => {
-                        if(value != this.skin){
-                            this.loadServerSkin(value)
-                        }
-                    })
+        this.addSocketListeners()
         
-                    this.playerAmmunition = skins.characterInfo.bullets
-                    this.currentAmmo = this.playerAmmunition
-                    this.shootingDelay = skins.characterInfo.shootingDelay
-        
-                    this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
-        
-                    /* Load a footstep audio for every player already in the room */
-                    ids.map((id) => {
-                        this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
-                    })
-                })
-        
-                /* when a new player enters, other people must load their skin */
-                this.socketIO.on('Load New Skin', ({src, id}) =>{
-                    let element = this.onlineSkins[src]
-                    if(!element && src != this.skin)
-                        this.loadServerSkin(src)
-        
-                    let availableSlot = Object.keys(this.sounds.footsteps).find((idPlayer) => this.sounds.footsteps[idPlayer].free)
-        
-                    if(availableSlot){
-                        this.sounds.footsteps[id] = {sound: this.sounds.footsteps[availableSlot].sound}
-                        delete this.sounds.footsteps[availableSlot]
-                    }else
-                        this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
-        
-                })
-        
-                /* When a player's been disconnected set its footstep variable as free, so that new players can used it, without needing to load the audio again */
-                this.socketIO.on('Player Disconnected', (id) => {
-                    if(this.sounds.footsteps[id])
-                        this.sounds.footsteps[id].free = true
-                    
-                    console.log(`Someone disconnected from the lobby`);
-                })
-        
-                /* When the score changes */
-                this.socketIO.on('New leaderboard', (data) => {
-        
-                    let positions = ['trophy', 'medal', 'award']
-                    let score = document.getElementById('scores')
-        
-                    score.innerHTML = ''
-        
-                    data.map((elem, index) => {
-        
-                        let text = document.createElement('p')
-                        if(elem.id === this.playerID)
-                            text.style.color = '#f0565e'
-        
-                        let scoreText = `<i class="fas fa-${positions[index]}"></i>.${elem.name}: ${elem.score}`
-                        text.innerHTML = scoreText
-        
-                        score.appendChild(text)
-                    })
-        
-                })
-        
-                /* Scores from a team based lobby */
-                this.socketIO.on('New teams leaderboard', (data)=>{
-                    document.getElementById('fbi-score').innerHTML = data.blueTeam
-                    document.getElementById('gambinos-score').innerHTML = data.redTeam
-                })
-        
-                this.socketIO.on('pong', (ms) => {
-                    this.latency= ms
-                })
-        
-                /* Play sound effect */
-                this.socketIO.on('Bullet sound', ({bullet, sound}) => {
-        
-                    if(this.playerStats){
-                        let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
-        
-                        if(distanceFromGunshot <= this.soundWaves.bullets && !window.mobileCheck()){
-                            if(!this.sounds[sound].paused)
-                                this.sounds[sound].currentTime = 0
-                        
-                            this.sounds[sound].volume = (1 - distanceFromGunshot/this.soundWaves.bullets)/2
-                            this.sounds[sound].play()
-                        }
-                    }
-                })
-        
-                /** 
-                 *  ===========================================
-                 *      SOUND EFFECTS WHEN PICKING A BONUS
-                 *  ===========================================
-                */
-               this.socketIO.on('Capture medicalKit', () => {
-                   if(!window.mobileCheck())
-                        this.sounds.healing.play()
-               })
-        
-               this.socketIO.on('Capture bulletKit', () => {
-                   if(!window.mobileCheck())
-                        this.sounds.reload.play()
-               })
-
         /* Still players animation */
         this.lastStillUpdate = Date.now()
 
@@ -205,7 +100,6 @@ export default class Online extends Engine{
             this.drawOtherPlayers()
             this.showScoresTable()
         }
-        
 
         this.controls.animate()
 
@@ -674,13 +568,12 @@ export default class Online extends Engine{
 
     }
 
-    /* add listeners */
-    addSocketListeners(){
-        /**
-         *  =============================
-         *        INTERPOLATE STATE
-         *  =============================
-         */
+    /**
+    *  =============================
+    *         STATE Listener
+     *  =============================
+    */ 
+    addStateListener(){
         
         /* SOCKET LISTENERS */
         this.socketIO.on('state', (data) =>{
@@ -690,6 +583,121 @@ export default class Online extends Engine{
 
     }
 
+    /**
+     *  ==========================
+     *      SOCKET LISTENERS
+     *  ==========================
+     */
+
+     addSocketListeners(){
+         /* When new players enter the lobby, they must load other users skins and default info about the skin selected */
+         this.socketIO.on('Load Skins, ammunition and sounds', ({skins, ids}) => {
+            skins.srcArray.forEach((value) => {
+                if(value != this.skin){
+                    this.loadServerSkin(value)
+                }
+            })
+
+            this.playerAmmunition = skins.characterInfo.bullets
+            this.currentAmmo = this.playerAmmunition
+            this.shootingDelay = skins.characterInfo.shootingDelay
+
+            this.bulletsHTMLElement.innerText = `${this.currentAmmo}/${this.playerAmmunition}`
+
+            /* Load a footstep audio for every player already in the room */
+            ids.map((id) => {
+                this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
+            })
+        })
+
+        /* when a new player enters, other people must load their skin */
+        this.socketIO.on('Load New Skin', ({src, id}) =>{
+            let element = this.onlineSkins[src]
+            if(!element && src != this.skin)
+                this.loadServerSkin(src)
+
+            let availableSlot = Object.keys(this.sounds.footsteps).find((idPlayer) => this.sounds.footsteps[idPlayer].free)
+
+            if(availableSlot){
+                this.sounds.footsteps[id] = {sound: this.sounds.footsteps[availableSlot].sound}
+                delete this.sounds.footsteps[availableSlot]
+            }else
+                this.sounds.footsteps[id] = {sound: new Audio('../assets/sounds/footstep.mp3')}
+
+        })
+
+        /* When a player's been disconnected set its footstep variable as free, so that new players can used it, without needing to load the audio again */
+        this.socketIO.on('Player Disconnected', (id) => {
+            if(this.sounds.footsteps[id])
+                this.sounds.footsteps[id].free = true
+            
+            console.log(`Someone disconnected from the lobby`);
+        })
+
+        /* When the score changes */
+        this.socketIO.on('New leaderboard', (data) => {
+
+            let positions = ['trophy', 'medal', 'award']
+            let score = document.getElementById('scores')
+
+            score.innerHTML = ''
+
+            data.map((elem, index) => {
+
+                let text = document.createElement('p')
+                if(elem.id === this.playerID)
+                    text.style.color = '#f0565e'
+
+                let scoreText = `<i class="fas fa-${positions[index]}"></i>.${elem.name}: ${elem.score}`
+                text.innerHTML = scoreText
+
+                score.appendChild(text)
+            })
+
+        })
+
+        /* Scores from a team based lobby */
+        this.socketIO.on('New teams leaderboard', (data)=>{
+            document.getElementById('fbi-score').innerHTML = data.blueTeam
+            document.getElementById('gambinos-score').innerHTML = data.redTeam
+        })
+
+        this.socketIO.on('pong', (ms) => {
+            this.latency= ms
+        })
+
+        /* Play sound effect */
+        this.socketIO.on('Bullet sound', ({bullet, sound}) => {
+
+            if(this.playerStats){
+                let distanceFromGunshot = Math.floor(Math.sqrt(Math.pow(this.playerStats.posX - bullet.x,2) + (Math.pow(this.playerStats.posY - bullet.y,2))))
+
+                if(distanceFromGunshot <= this.soundWaves.bullets && !window.mobileCheck()){
+                    if(!this.sounds[sound].paused)
+                        this.sounds[sound].currentTime = 0
+                
+                    this.sounds[sound].volume = (1 - distanceFromGunshot/this.soundWaves.bullets)/2
+                    this.sounds[sound].play()
+                }
+            }
+        })
+
+        /** 
+         *  ===========================================
+         *      SOUND EFFECTS WHEN PICKING A BONUS
+         *  ===========================================
+        */
+       this.socketIO.on('Capture medicalKit', () => {
+           if(!window.mobileCheck())
+                this.sounds.healing.play()
+       })
+
+       this.socketIO.on('Capture bulletKit', () => {
+           if(!window.mobileCheck())
+                this.sounds.reload.play()
+       })
+
+     }
     /* Emit bullet to server */
 
     emitBullet(dir, spriteY){
