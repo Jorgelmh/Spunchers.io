@@ -111,7 +111,6 @@ export default class Keyboard {
                     document.getElementById('site-individual-scores').style.display = 'none'
                     break
             }
-            this.emitPosition({x: 0, y: 0})
         })
     }
     /**
@@ -185,7 +184,7 @@ export default class Keyboard {
 
         if(this.shoot)
             this.createBullet()
-        
+
         if(this.emit){
             if(movement.x !== 0 || movement.y !== 0){
                 this.emitPosition(movement)

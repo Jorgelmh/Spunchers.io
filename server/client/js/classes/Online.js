@@ -155,6 +155,7 @@ export default class Online extends Engine{
 
     /* Send data back to the server */
     emitPlayerPosition = (movement) =>{
+        console.log(movement);
         this.socketIO.emit('movement', {
             movement,
             cartisianMovement: this.controls.cartesianValueOfMovement,
@@ -273,6 +274,8 @@ export default class Online extends Engine{
 
     /* Draws online players from server's data */
     drawOnlineCharacter(player, onlineCharacter, skin, name){
+
+        console.log(onlineCharacter.x);
 
         this.context.textAlign = 'center'
         this.context.fillStyle = 'black'
